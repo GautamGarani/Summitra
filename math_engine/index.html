@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summitra | M3 Temporal Engine</title>
+    
+    <!-- Material Symbols & Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Material 3 Light Palette (Baseline Blue) */
+            --md-sys-color-primary: #0061A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #D1E4FF;
+            --md-sys-color-on-primary-container: #001D36;
+            --md-sys-color-secondary-container: #D7E3F7;
+            --md-sys-color-on-secondary-container: #101C2B;
+            --md-sys-color-surface: #F8F9FF;
+            --md-sys-color-on-surface: #191C20;
+            --md-sys-color-surface-container-high: #E2E2E6;
+            --md-sys-color-outline: #74777F;
+            --md-sys-color-outline-variant: #C4C6D0;
+            --md-sys-color-error: #BA1A1A;
+            --md-sys-color-tertiary: #5B5D72;
+            --md-sys-color-tertiary-container: #E1E0F9;
+            
+            --nav-height: 80px;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            font-family: 'Roboto', system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- M3 TOP APP BAR --- */
+        header {
+            position: sticky;
+            top: 0;
+            height: var(--nav-height);
+            background-color: var(--md-sys-color-surface);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .top-app-bar__title {
+            font-size: 22px;
+            font-weight: 400; 
+            flex-grow: 1;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        /* --- M3 NAVIGATION --- */
+        nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--md-sys-color-on-surface);
+            padding: 4px 16px;
+            border-radius: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item .icon-wrapper {
+            width: 64px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active .icon-wrapper {
+            background-color: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+        }
+
+        .nav-item__label {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        main {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- M3 ELEVATED CARD --- */
+        #monitor-card {
+            background-color: var(--md-sys-color-surface-container-high);
+            border-radius: 28px; 
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            position: relative;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .engine-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .label-medium {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--md-sys-color-outline);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .title-large {
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        /* Status Badge */
+        #status-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            font-size: 14px;
+            font-weight: 500;
+            background-color: var(--md-sys-color-surface);
+        }
+
+        .status-active-glow {
+            color: var(--md-sys-color-primary);
+            border-color: var(--md-sys-color-primary) !important;
+            background-color: var(--md-sys-color-primary-container) !important;
+        }
+
+        /* --- DISPLAY SECTION --- */
+        .display-section {
+            text-align: center;
+            margin: 48px 0;
+        }
+
+        #depth-value {
+            font-size: 88px; 
+            font-weight: 400;
+            letter-spacing: -2px;
+            color: var(--md-sys-color-primary);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .unit {
+            font-size: 24px;
+            color: var(--md-sys-color-outline);
+            vertical-align: baseline;
+            margin-left: 4px;
+        }
+
+        /* --- TERMINAL / LOG --- */
+        .log-container {
+            background-color: var(--md-sys-color-surface);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+        }
+
+        #engine-log {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            color: var(--md-sys-color-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--md-sys-color-outline-variant);
+        }
+
+        .active-pulse {
+            background-color: var(--md-sys-color-primary);
+            animation: pulse-animation 2s infinite linear;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 97, 164, 0.4); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 97, 164, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 97, 164, 0); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <span class="material-symbols-rounded">menu</span>
+    <div class="top-app-bar__title">Summitra Engine</div>
+    <nav>
+        <a href="#" class="nav-item active">
+            <div class="icon-wrapper">
+                <span class="material-symbols-rounded">speed</span>
+            </div>
+            <span class="nav-item__label">Monitor</span>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="icon-wrapper">
+                <span class="material-symbols-rounded">history</span>
+            </div>
+            <span class="nav-item__label">History</span>
+        </a>
+    </nav>
+</header>
+
+<main>
+    <div id="monitor-card">
+        <div class="card-header">
+            <div id="status-chip">
+                <span id="status-icon" class="material-symbols-rounded" style="font-size: 18px;">power_settings_new</span>
+                <span id="status-text">Standby</span>
+            </div>
+        </div>
+        
+        <div class="display-section">
+            <div id="depth-value">--<span class="unit">cm</span></div>
+        </div>
+        
+        <div class="log-container">
+            <div id="engine-log">
+                <div id="log-pulse" class="pulse"></div>
+                <span id="log-text">Initializing Kernel...</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="module">
+    import init, { analyze_and_smooth } from './pkg/math_engine.js';
+
+    (async () => {
+        const display = document.getElementById('depth-value');
+        const logText = document.getElementById('log-text');
+        const chip = document.getElementById('status-chip');
+
+        try {
+            logText.textContent = "Fetching 500x100 Dataset...";
+            await init();
+
+            const response = await fetch('my_dataset.csv');
+            if (!response.ok) throw new Error("File System Access Denied");
+
+            const rawText = await response.text();
+            
+            // Parse CSV: Split by newline, then by comma, and cast to numbers
+            const matrix = rawText.trim().split('\n').map(row => 
+                row.split(',').map(val => parseFloat(val))
+            );
+
+            logText.textContent = `Kernel Active: ${matrix.length} Frames Loaded`;
+            
+            let frameIndex = 0;
+
+            const runEngine = () => {
+                // Extract 100-element array for the current temporal frame
+                const currentFrame = new Float32Array(matrix[frameIndex]);
+
+                // WASM Analysis
+                if (currentFrame.length === 100) {
+                    const result = analyze_and_smooth(currentFrame);
+                    display.innerHTML = `${result.toFixed(2)}<span class="unit">cm</span>`;
+                }
+
+                // Advance to next array; reset to 0 after array 500
+                frameIndex = (frameIndex + 1) % matrix.length;
+
+                requestAnimationFrame(runEngine);
+            };
+
+            runEngine();
+
+        } catch (err) {
+            logText.textContent = "Data Stream Interrupted";
+            console.error(err);
+        }
+    })();
+</script>
+
+</body>
+</html>
