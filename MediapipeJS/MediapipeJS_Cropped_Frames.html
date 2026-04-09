@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MediapipeJS_Cropped_Frames</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+</head>
+
+<body>
+  <video id="video" width="640" height="480" autoplay playsinline></video>
+  <canvas id="canvas" width="640" height="480"></canvas>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+
+function toDeg(rad) {
+  return rad * (180 / Math.PI);
+}
+
+function verticalAngle(p1, p2) {
+  return Math.abs(toDeg(Math.atan2(p2.x - p1.x, p2.y - p1.y)));
+}
+
+
+const pose = new Pose({
+  locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+});
+
+pose.setOptions({
+  modelComplexity: 1,
+  smoothLandmarks: true
+});
+
+// ---------------- FACE MESH ----------------
+const faceMesh = new FaceMesh({
+  locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+});
+
+faceMesh.setOptions({
+  maxNumFaces: 1,
+  refineLandmarks: true
+});
+
+
+const poseCropped = new Pose({
+  locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+});
+
+poseCropped.setOptions({
+  modelComplexity: 1,
+  smoothLandmarks: true
+});
+
+let lastAngles = { tilt: 0, forward: 0 };
+
+
+poseCropped.onResults((res) => {
+  if (!res.poseLandmarks) return;
+
+  const lm = res.poseLandmarks;
+
+  const nose = lm[0];
+  const leftEar = lm[7];
+  const rightEar = lm[8];
+  const leftShoulder = lm[11];
+  const rightShoulder = lm[12];
+
+  
+  const earMid = {
+    x: (leftEar.x + rightEar.x) / 2,
+    y: (leftEar.y + rightEar.y) / 2
+  };
+
+  const shoulderMid = {
+    x: (leftShoulder.x + rightShoulder.x) / 2,
+    y: (leftShoulder.y + rightShoulder.y) / 2
+  };
+
+ 
+  const tiltAngle = verticalAngle(earMid, nose);
+
+ 
+  const forwardAngle = verticalAngle(shoulderMid, earMid);
+
+  lastAngles = {
+    tilt: tiltAngle.toFixed(1),
+    forward: forwardAngle.toFixed(1)
+  };
+});
+
+
+pose.onResults(async (results) => {
+  if (!results.poseLandmarks) return;
+
+  const lm = results.poseLandmarks;
+
+  const leftShoulder = lm[11];
+  const rightShoulder = lm[12];
+  const nose = lm[0];
+
+  const w = canvas.width;
+  const h = canvas.height;
+
+  const xMin = Math.min(leftShoulder.x, rightShoulder.x) * w;
+  const xMax = Math.max(leftShoulder.x, rightShoulder.x) * w;
+
+  const yMin = (nose.y - 0.15) * h;
+  const yMax = Math.max(leftShoulder.y, rightShoulder.y) * h;
+
+  const cropW = xMax - xMin;
+  const cropH = yMax - yMin;
+
+  if (cropW <= 0 || cropH <= 0) return;
+
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = cropW;
+  tempCanvas.height = cropH;
+  const tempCtx = tempCanvas.getContext('2d');
+
+  tempCtx.drawImage(
+    video,
+    xMin, yMin, cropW, cropH,
+    0, 0, cropW, cropH
+  );
+
+  
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(tempCanvas, 0, 0);
+
+  ctx.fillStyle = "lime";
+  ctx.font = "20px Arial";
+
+  ctx.fillText(`Head Tilt: ${lastAngles.tilt}°`, 20, 30);
+  ctx.fillText(`Forward Bend: ${lastAngles.forward}°`, 20, 60);
+
+  
+  await faceMesh.send({ image: tempCanvas });
+  await poseCropped.send({ image: tempCanvas });
+});
+
+
+const camera = new Camera(video, {
+  onFrame: async () => {
+    await pose.send({ image: video });
+  },
+  width: 640,
+  height: 480
+});
+
+camera.start();
+</script>
+</body>
+</html>
