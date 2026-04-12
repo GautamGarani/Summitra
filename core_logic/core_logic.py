@@ -1,7 +1,7 @@
 import math
 import json
 from datetime import datetime
-from dummy_dataset import dataset   # your dataset file
+from dummy_dataset import dataset   # sample dataset file
 
 # -------------------------------
 # 1. NORMALIZATION
