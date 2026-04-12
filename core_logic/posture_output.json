@@ -1,0 +1,98 @@
+[
+    {
+        "sample_id": 1,
+        "timestamp": "2026-04-07T19:30:58.190620",
+        "expected": "good",
+        "predicted": "good",
+        "features": {
+            "head_forward": 0.0,
+            "shoulder_slope": 0.0,
+            "head_tilt": 0.0,
+            "neck_angle": 90.0
+        }
+    },
+    {
+        "sample_id": 2,
+        "timestamp": "2026-04-07T19:30:58.191598",
+        "expected": "good",
+        "predicted": "good",
+        "features": {
+            "head_forward": 0.0,
+            "shoulder_slope": 0.0,
+            "head_tilt": 0.0,
+            "neck_angle": 90.0
+        }
+    },
+    {
+        "sample_id": 3,
+        "timestamp": "2026-04-07T19:30:58.193055",
+        "expected": "bad",
+        "predicted": "forward_slouch",
+        "features": {
+            "head_forward": 0.75,
+            "shoulder_slope": 0.0,
+            "head_tilt": 0.0,
+            "neck_angle": 63.43494882292201
+        }
+    },
+    {
+        "sample_id": 4,
+        "timestamp": "2026-04-07T19:30:58.193505",
+        "expected": "bad",
+        "predicted": "forward_slouch",
+        "features": {
+            "head_forward": 0.75,
+            "shoulder_slope": 0.0,
+            "head_tilt": 0.0,
+            "neck_angle": 63.43494882292201
+        }
+    },
+    {
+        "sample_id": 5,
+        "timestamp": "2026-04-07T19:30:58.193505",
+        "expected": "bad",
+        "predicted": "head_tilt",
+        "features": {
+            "head_forward": 0.0,
+            "shoulder_slope": 0.0,
+            "head_tilt": 0.5,
+            "neck_angle": 90.0
+        }
+    },
+    {
+        "sample_id": 6,
+        "timestamp": "2026-04-07T19:30:58.194561",
+        "expected": "bad",
+        "predicted": "uneven_shoulders",
+        "features": {
+            "head_forward": 0.0,
+            "shoulder_slope": 0.6000000000000005,
+            "head_tilt": 0.0,
+            "neck_angle": 90.0
+        }
+    },
+    {
+        "sample_id": 7,
+        "timestamp": "2026-04-07T19:30:58.195596",
+        "expected": "good",
+        "predicted": "good",
+        "features": {
+            "head_forward": 0.0,
+            "shoulder_slope": 0.0,
+            "head_tilt": 0.0,
+            "neck_angle": 90.0
+        }
+    },
+    {
+        "sample_id": 8,
+        "timestamp": "2026-04-07T19:30:58.195596",
+        "expected": "bad",
+        "predicted": "forward_slouch",
+        "features": {
+            "head_forward": 0.625,
+            "shoulder_slope": 0.0,
+            "head_tilt": 0.0,
+            "neck_angle": 68.96248897457819
+        }
+    }
+]
