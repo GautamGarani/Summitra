@@ -3,217 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summitra | M3 Temporal Engine</title>
+    <title>Summitra | Biometric Preview</title>
     
-    <!-- Material Symbols & Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3"></script>
+
     <style>
         :root {
-            /* Material 3 Light Palette (Baseline Blue) */
             --md-sys-color-primary: #0061A4;
-            --md-sys-color-on-primary: #FFFFFF;
-            --md-sys-color-primary-container: #D1E4FF;
-            --md-sys-color-on-primary-container: #001D36;
-            --md-sys-color-secondary-container: #D7E3F7;
-            --md-sys-color-on-secondary-container: #101C2B;
             --md-sys-color-surface: #F8F9FF;
-            --md-sys-color-on-surface: #191C20;
             --md-sys-color-surface-container-high: #E2E2E6;
-            --md-sys-color-outline: #74777F;
             --md-sys-color-outline-variant: #C4C6D0;
             --md-sys-color-error: #BA1A1A;
             --md-sys-color-tertiary: #5B5D72;
-            --md-sys-color-tertiary-container: #E1E0F9;
-            
-            --nav-height: 80px;
-        }
-
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             margin: 0;
             background-color: var(--md-sys-color-surface);
-            color: var(--md-sys-color-on-surface);
-            font-family: 'Roboto', system-ui, sans-serif;
+            font-family: 'Roboto', sans-serif;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
-        /* --- M3 TOP APP BAR --- */
         header {
-            position: sticky;
-            top: 0;
-            height: var(--nav-height);
-            background-color: var(--md-sys-color-surface);
+            height: 64px;
             display: flex;
             align-items: center;
             padding: 0 24px;
             gap: 16px;
-            z-index: 10;
         }
 
-        .top-app-bar__title {
-            font-size: 22px;
-            font-weight: 400; 
-            flex-grow: 1;
-            color: var(--md-sys-color-on-surface);
-        }
-
-        /* --- M3 NAVIGATION --- */
-        nav {
-            display: flex;
-            gap: 8px;
-        }
-
-        .nav-item {
+        main {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: var(--md-sys-color-on-surface);
-            padding: 4px 16px;
-            border-radius: 16px;
-            transition: background-color 0.2s;
+            padding: 16px;
+            gap: 20px;
+            overflow-y: auto;
         }
 
-        .nav-item .icon-wrapper {
-            width: 64px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            margin-bottom: 4px;
+        /* --- VIDEO PREVIEW CARD --- */
+        .preview-container {
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 4/3;
+            background: #000;
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 4px solid var(--md-sys-color-surface-container-high);
         }
 
-        .nav-item.active .icon-wrapper {
-            background-color: var(--md-sys-color-secondary-container);
-            color: var(--md-sys-color-on-secondary-container);
+        #webcam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Mirror the video for natural user interaction */
+            transform: scaleX(-1); 
         }
 
-        .nav-item__label {
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        /* --- MAIN CONTENT AREA --- */
-        main {
-            flex: 1;
-            padding: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* --- M3 ELEVATED CARD --- */
+        /* --- FEEDBACK CARD --- */
         #monitor-card {
             background-color: var(--md-sys-color-surface-container-high);
             border-radius: 28px; 
-            padding: 32px;
+            padding: 24px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-            position: relative;
+            max-width: 480px;
         }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-
-        .engine-meta {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .label-medium {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--md-sys-color-outline);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .title-large {
-            font-size: 22px;
-            font-weight: 400;
-            color: var(--md-sys-color-on-surface);
-        }
-
-        /* Status Badge */
-        #status-chip {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--md-sys-color-outline-variant);
-            font-size: 14px;
-            font-weight: 500;
-            background-color: var(--md-sys-color-surface);
-        }
-
-        .status-active-glow {
-            color: var(--md-sys-color-primary);
-            border-color: var(--md-sys-color-primary) !important;
-            background-color: var(--md-sys-color-primary-container) !important;
-        }
-
-        /* --- DISPLAY SECTION --- */
         .display-section {
             text-align: center;
-            margin: 48px 0;
+            margin: 20px 0;
         }
 
-        #depth-value {
-            font-size: 88px; 
-            font-weight: 400;
-            letter-spacing: -2px;
-            color: var(--md-sys-color-primary);
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .unit {
+        #feedback-value {
             font-size: 24px;
-            color: var(--md-sys-color-outline);
-            vertical-align: baseline;
-            margin-left: 4px;
+            font-weight: 500;
+            color: var(--md-sys-color-primary);
         }
 
-        /* --- TERMINAL / LOG --- */
         .log-container {
             background-color: var(--md-sys-color-surface);
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 12px;
             border: 1px solid var(--md-sys-color-outline-variant);
-        }
-
-        #engine-log {
             font-family: 'Roboto Mono', monospace;
-            font-size: 13px;
-            color: var(--md-sys-color-tertiary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 11px;
         }
 
         .pulse {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+            width: 8px; height: 8px; border-radius: 50%;
             background-color: var(--md-sys-color-outline-variant);
+            display: inline-block; margin-right: 8px;
         }
 
         .active-pulse {
@@ -231,95 +117,91 @@
 <body>
 
 <header>
-    <span class="material-symbols-rounded">menu</span>
-    <div class="top-app-bar__title">Summitra Engine</div>
-    <nav>
-        <a href="#" class="nav-item active">
-            <div class="icon-wrapper">
-                <span class="material-symbols-rounded">speed</span>
-            </div>
-            <span class="nav-item__label">Monitor</span>
-        </a>
-        <a href="#" class="nav-item">
-            <div class="icon-wrapper">
-                <span class="material-symbols-rounded">history</span>
-            </div>
-            <span class="nav-item__label">History</span>
-        </a>
-    </nav>
+    <span class="material-symbols-rounded" style="color: var(--md-sys-color-primary)">self_care</span>
+    <div style="font-size: 20px;">Summitra Coach</div>
 </header>
 
 <main>
+    <div class="preview-container">
+        <video id="webcam" autoplay playsinline></video>
+    </div>
+
     <div id="monitor-card">
-        <div class="card-header">
-            <div id="status-chip">
-                <span id="status-icon" class="material-symbols-rounded" style="font-size: 18px;">power_settings_new</span>
-                <span id="status-text">Standby</span>
-            </div>
-        </div>
-        
         <div class="display-section">
-            <div id="depth-value">--<span class="unit">cm</span></div>
+            <div id="feedback-value">Initializing Biometrics...</div>
+            <div id="raw-angle" style="font-size: 12px; margin-top: 8px; color: var(--md-sys-color-tertiary);">Angle: --°</div>
         </div>
         
         <div class="log-container">
-            <div id="engine-log">
-                <div id="log-pulse" class="pulse"></div>
-                <span id="log-text">Initializing Kernel...</span>
-            </div>
+            <div id="log-pulse" class="pulse"></div>
+            <span id="log-text">Booting Summitra Kernel...</span>
         </div>
     </div>
 </main>
 
 <script type="module">
-    import init, { analyze_and_smooth } from './pkg/math_engine.js';
+    import init, { process_tilt_data } from './pkg/math_engine.js';
+    const { FaceLandmarker, FilesetResolver } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3");
 
-    (async () => {
-        const display = document.getElementById('depth-value');
+    async function startCoach() {
+        const display = document.getElementById('feedback-value');
+        const rawText = document.getElementById('raw-angle');
         const logText = document.getElementById('log-text');
-        const chip = document.getElementById('status-chip');
+        const pulse = document.getElementById('log-pulse');
+        const video = document.getElementById('webcam');
 
         try {
-            logText.textContent = "Fetching 500x100 Dataset...";
-            await init();
+            logText.textContent = "Syncing Rust Module...";
+            await init(); 
 
-            const response = await fetch('my_dataset.csv');
-            if (!response.ok) throw new Error("File System Access Denied");
+            logText.textContent = "Loading Vision Models...";
+            const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
+            const landmarker = await FaceLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+                    delegate: "GPU"
+                },
+                runningMode: "VIDEO",
+                numFaces: 1
+            });
 
-            const rawText = await response.text();
+            logText.textContent = "Starting Camera...";
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+            video.srcObject = stream;
             
-            // Parse CSV: Split by newline, then by comma, and cast to numbers
-            const matrix = rawText.trim().split('\n').map(row => 
-                row.split(',').map(val => parseFloat(val))
-            );
+            await new Promise((resolve) => video.onloadedmetadata = resolve);
+            await video.play();
 
-            logText.textContent = `Kernel Active: ${matrix.length} Frames Loaded`;
-            
-            let frameIndex = 0;
+            logText.textContent = "Monitoring Active";
+            pulse.classList.add('active-pulse');
 
-            const runEngine = () => {
-                // Extract 100-element array for the current temporal frame
-                const currentFrame = new Float32Array(matrix[frameIndex]);
+            // 4 FPS Temporal Loop
+            setInterval(() => {
+                const results = landmarker.detectForVideo(video, performance.now());
+                
+                if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+                    const l = results.faceLandmarks[0];
+                    // Ocular Vector Calculation (indices 33 and 263)
+                    const degrees = Math.atan2(l[263].y - l[33].y, l[263].x - l[33].x) * (180 / Math.PI);
 
-                // WASM Analysis
-                if (currentFrame.length === 100) {
-                    const result = analyze_and_smooth(currentFrame);
-                    display.innerHTML = `${result.toFixed(2)}<span class="unit">cm</span>`;
+                    // Call Rust logic
+                    const feedback = process_tilt_data(degrees);
+
+                    display.innerHTML = feedback;
+                    rawText.innerHTML = `Lateral Tilt: ${degrees.toFixed(1)}°`;
+                    display.style.color = feedback.includes("Lean") ? "var(--md-sys-color-error)" : "var(--md-sys-color-primary)";
+                } else {
+                    display.innerHTML = "No Subject Detected";
                 }
+            }, 250);
 
-                // Advance to next array; reset to 0 after array 500
-                frameIndex = (frameIndex + 1) % matrix.length;
-
-                requestAnimationFrame(runEngine);
-            };
-
-            runEngine();
-
-        } catch (err) {
-            logText.textContent = "Data Stream Interrupted";
-            console.error(err);
+        } catch (error) {
+            logText.textContent = "Fatal Initialization Error";
+            console.error(error);
         }
-    })();
+    }
+
+    startCoach();
 </script>
 
 </body>

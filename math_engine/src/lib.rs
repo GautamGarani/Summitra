@@ -1,32 +1,42 @@
-use wasm_bindgen::prelude::*;
-use std::collections::VecDeque;
-use std::sync::Mutex;
-use once_cell::sync::Lazy;
+use wasm_bindgen::prelude::*; // Provides the bridge between Rust and JavaScript
+use std::collections::VecDeque; // A double-ended queue for our temporal sliding window
+use std::sync::Mutex; // Ensures thread-safe access to our global state
+use once_cell::sync::Lazy; // Allows for the thread-safe initialization of global variables
 
-static DEPTH_TREND: Lazy<Mutex<VecDeque<f32>>> = Lazy::new(|| {
-    Mutex::new(VecDeque::with_capacity(30))
+// Define a global, persistent state for our sliding window of tilt data
+// We wrap it in a Mutex so we can safely mutate it from the JS-invoked function
+static TILT_BUFFER: Lazy<Mutex<VecDeque<f32>>> = Lazy::new(|| {
+    Mutex::new(VecDeque::with_capacity(30)) // Capacity for ~7.5 seconds of data at 4 FPS
 });
 
 #[wasm_bindgen]
-pub fn analyze_and_smooth(data: &[f32]) -> f32 {
-    if data.is_empty()
-    {
-        return 0.0;
+pub fn process_tilt_data(current_tilt: f32) -> String {
+    // Acquire the lock to access the global buffer
+    let mut buffer = TILT_BUFFER.lock().unwrap();
+
+    // Maintain the sliding window size (max 30 samples)
+    if buffer.len() >= 30 {
+        buffer.pop_front();
     }
+    buffer.push_back(current_tilt);
 
-    let current_avg: f32 = data.iter().sum::<f32>()/data.len() as f32;
+    // Calculate the Arithmetic Mean ($\mu$) of the window
+    let mean_tilt: f32 = buffer.iter().sum::<f32>() / buffer.len() as f32;
 
-    let mut window = DEPTH_TREND.lock().unwrap();
+    // Calculate the Variance ($\sigma^2$) to determine stability (how much the head wobbles)
+    let variance: f32 = buffer.iter()
+        .map(|&x| (x - mean_tilt).powi(2))
+        .sum::<f32>() / buffer.len() as f32;
 
-    if window.len()>=30
-    {
-        window.pop_front();
+    // Logic: Define thresholds for posture and stability
+    // 10 degrees is our threshold for a 'lateral lean'
+    let is_level = mean_tilt.abs() < 10.0;
+    let is_stable = variance < 5.0; // Low variance means the user is holding still
+
+    // Return the formatted analysis string back to the JS frontend
+    match (is_level, is_stable) {
+        (true, true)   => "Optimal Posture".to_string(),
+        (true, false)  => "Posture Level: Excessive Jitter".to_string(),
+        (false, _)     => format!("Corrective Action: Lean is {:.1}°", mean_tilt),
     }
-
-    window.push_back(current_avg);
-
-    let trend_sum: f32 = window.iter().sum();
-    trend_sum/window.len() as f32
 }
-
-
