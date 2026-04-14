@@ -285,6 +285,64 @@
         }
     }
 
+    // ---------- AUDIO SYSTEM (integrated fix) ----------
+    let audioCtx = null;
+    let audioUnlocked = false;
+
+    function unlockAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        if (audioCtx.state === "suspended") {
+            audioCtx.resume();
+        }
+
+        audioUnlocked = true;
+    }
+
+    // Required user interaction
+    document.addEventListener("click", unlockAudio, { once: true });
+
+    // 🔴 Alert sound (bad posture)
+    window.play_alert = function () {
+        if (!audioUnlocked) return;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "square";
+        osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+    };
+
+    // 🟢 Success sound (recovered posture)
+    window.play_success = function () {
+        if (!audioUnlocked) return;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.15);
+
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.18);
+    };
+
     startCoach();
 </script>
 
