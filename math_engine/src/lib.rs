@@ -36,7 +36,7 @@ pub fn process_tilt_data(current_tilt: f32) -> String {
     // Return the formatted analysis string back to the JS frontend
     match (is_level, is_stable) {
         (true, true)   => "Optimal Posture".to_string(),
-        (true, false)  => "Posture Level: Excessive Jitter".to_string(),
-        (false, _)     => format!("Corrective Action: Lean is {:.1}°", mean_tilt),
+        (true, false)  => "Excessive Jitter in Head tilt! ".to_string(),
+        (false, _)     => format!("Alert: Lean is {:.1}°", mean_tilt),
     }
 }
