@@ -184,7 +184,9 @@
                 
                 if (results.faceLandmarks && results.faceLandmarks.length > 0) {
                     const l = results.faceLandmarks[0];
+
                     // Ocular Vector Calculation (indices 33 and 263)
+                    //USING THE line betwen eyes
                     const degrees = Math.atan2(l[263].y - l[33].y, l[263].x - l[33].x) * (180 / Math.PI);
 
                     // THE RUST CALL
