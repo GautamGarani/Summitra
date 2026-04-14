@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summitra | Biometric Monitor</title>
+    <title>Summitra</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
@@ -189,7 +189,7 @@
     </div>
     <div>
         <div class="header-title">Summitra</div>
-        <div class="header-subtitle">Advanced Postural Analytics</div>
+        <div class="header-subtitle">Reaching the epitome of wellness</div>
     </div>
 </header>
 
@@ -271,7 +271,10 @@
 
                     display.innerHTML = feedback;
                     rawText.innerHTML = `Lateral Tilt: ${degrees.toFixed(2)}°`;
-                    display.style.color = feedback.includes("Lean") ? "var(--error-state)" : "var(--blue-primary)";
+                    display.style.color = 
+                        feedback === "Good!" 
+        			? "#16A34A" 
+        			:feedback.includes("Lean") ? "var(--error-state)" : "var(--blue-primary)";
                 } else {
                     display.innerHTML = "Subject Not Found";
                     display.style.color = "var(--blue-300)";
