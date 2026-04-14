@@ -1,9 +1,12 @@
+<!--THIS PROGRAM PROCESSES HEAD TILT considering 30 frames at a time, at 4FPS rate.-->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summitra | Biometric Preview</title>
+    <title>Summitra</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
@@ -118,7 +121,7 @@
 
 <header>
     <span class="material-symbols-rounded" style="color: var(--md-sys-color-primary)">self_care</span>
-    <div style="font-size: 20px;">Summitra Coach</div>
+    <div style="font-size: 20px;">Summitra | Reaching the Epitome of Wellness</div>
 </header>
 
 <main>
@@ -134,7 +137,7 @@
         
         <div class="log-container">
             <div id="log-pulse" class="pulse"></div>
-            <span id="log-text">Booting Summitra Kernel...</span>
+            <span id="log-text">Booting Summitra Vision Module...</span>
         </div>
     </div>
 </main>
@@ -151,7 +154,7 @@
         const video = document.getElementById('webcam');
 
         try {
-            logText.textContent = "Syncing Rust Module...";
+            logText.textContent = "Syncing the Rust Module...";
             await init(); 
 
             logText.textContent = "Loading Vision Models...";
@@ -184,7 +187,7 @@
                     // Ocular Vector Calculation (indices 33 and 263)
                     const degrees = Math.atan2(l[263].y - l[33].y, l[263].x - l[33].x) * (180 / Math.PI);
 
-                    // Call Rust logic
+                    // THE RUST CALL
                     const feedback = process_tilt_data(degrees);
 
                     display.innerHTML = feedback;
