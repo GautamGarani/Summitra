@@ -11,14 +11,12 @@
 
     <style>
         :root {
-            /* Rich Blue Monochromatic Spectrum */
-            --blue-900: #0D1B2A; /* Deep Navy */
-            --blue-700: #1B263B; /* Indigo */
-            --blue-500: #415A77; /* Steel Blue */
-            --blue-300: #778DA9; /* Slate */
-            --blue-primary: #0052CC; /* Azure Radiance */
-            --blue-accent: #E1EFFF; /* Sky Tint */
-            
+            --blue-900: #0D1B2A;
+            --blue-700: #1B263B;
+            --blue-500: #415A77;
+            --blue-300: #778DA9;
+            --blue-primary: #0052CC;
+            --blue-accent: #E1EFFF;
             --surface: #F8FAFC;
             --card-bg: #FFFFFF;
             --error-state: #D32F2F;
@@ -73,24 +71,90 @@
             box-sizing: border-box;
         }
 
-        /* --- PREVIEW ARCHITECTURE --- */
         .viewport-container {
             background: var(--card-bg);
             border-radius: 32px;
             padding: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 82, 204, 0.05), 
-                        0 8px 10px -6px rgba(0, 82, 204, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 82, 204, 0.05);
             border: 1px solid var(--border-soft);
             display: flex;
             flex-direction: column;
         }
 
+        /* --- RECTANGULAR VIDEO WRAPPER WITH ENHANCED THEME BORDERS --- */
         .video-wrapper {
             position: relative;
             flex: 1;
             border-radius: 24px;
             overflow: hidden;
             background: #000;
+            
+            /* Enhanced Border: Primary Azure stroke with a Sky Tint glow */
+            border: 2px solid var(--blue-primary);
+            box-shadow: 
+                0 0 0 16px var(--blue-accent), /* Outer secondary border */
+                0 12px 24px -12px rgba(0, 82, 204, 0.3); /* Thematic depth shadow */
+        }
+
+        /* --- CIRCULAR LOGO INTEGRATION --- */
+        .video-watermark {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 64px;
+            height: 64px;
+            
+            /* Circular Geometry */
+            border-radius: 50%;
+            object-fit: cover;
+            
+            /* Visual Separation */
+            background: var(--card-bg);
+            border: 2px solid var(--blue-primary);
+            padding: 4px; 
+            
+            opacity: 0.8;
+            z-index: 10;
+            filter: drop-shadow(0 4px 8px rgba(13, 27, 42, 0.4));
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-watermark {
+            position: left;
+            top: 20px;
+            right: 20px;
+            width: 64px;
+            height: 64px;
+            
+            /* Circular Geometry */
+            border-radius: 50%;
+            object-fit: cover;
+            
+            /* Visual Separation */
+            /*background: var(--card-bg);*/
+            border: 2px solid var(--blue-primary);
+            padding: 0px; 
+            
+            opacity: 0.8;
+            z-index: 10;
+            /*filter: drop-shadow(0 4px 8px rgba(13, 27, 42, 0.4));*/
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .video-wrapper:hover .video-watermark {
+            opacity: 1;
+            transform: scale(1.05);
+            border: 2px solid var(--blue-primary);
+        }
+
+        .video-vignette {
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 0 80px rgba(13, 27, 42, 0.5);
+            z-index: 5;
+            pointer-events: none;
         }
 
         #webcam {
@@ -100,7 +164,6 @@
             transform: scaleX(-1); 
         }
 
-        /* --- TELEMETRY CARD --- */
         #monitor-card {
             display: flex;
             flex-direction: column;
@@ -157,7 +220,6 @@
             margin-top: auto;
         }
 
-        /* --- ANIMATIONS & INDICATORS --- */
         .pulse {
             width: 10px; height: 10px; border-radius: 50%;
             background: #3a4759;
@@ -184,9 +246,9 @@
 <body>
 
 <header>
-    <div style="background: var(--blue-accent); color: var(--blue-primary); padding: 8px; border-radius: 12px;">
-        <span class="material-symbols-rounded" style="font-size: 28px;">clinical_notes</span>
-    </div>
+    <!--<div style="background: var(--blue-accent); color: var(--blue-primary); padding: 8px; border-radius: 12px;">-->
+        <img src="logo.jpg" alt="Summitra Logo" class="logo-watermark">
+    <!--</div>-->
     <div>
         <div class="header-title">Summitra</div>
         <div class="header-subtitle">Reaching the epitome of wellness</div>
@@ -197,6 +259,8 @@
     <section class="viewport-container">
         <div class="video-wrapper">
             <video id="webcam" autoplay playsinline></video>
+            <div class="video-vignette"></div>
+            <img src="logo.jpg" alt="Summitra Logo" class="video-watermark">
         </div>
         <div style="padding: 16px 8px 4px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 11px; color: var(--blue-300); font-weight: 600;">STREAM_SOURCE: WEBCAM_01</span>
@@ -273,8 +337,8 @@
                     rawText.innerHTML = `Lateral Tilt: ${degrees.toFixed(2)}°`;
                     display.style.color = 
                         feedback === "Good!" 
-        			? "#16A34A" 
-        			:feedback.includes("Lean") ? "var(--error-state)" : "var(--blue-primary)";
+                    ? "#16A34A" 
+                    : feedback.includes("Lean") ? "var(--error-state)" : "var(--blue-primary)";
                 } else {
                     display.innerHTML = "Subject Not Found";
                     display.style.color = "var(--blue-300)";
@@ -288,7 +352,6 @@
         }
     }
 
-    // ---------- AUDIO SYSTEM (integrated fix) ----------
     let audioCtx = null;
     let audioUnlocked = false;
 
@@ -296,55 +359,37 @@
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
-
-        if (audioCtx.state === "suspended") {
-            audioCtx.resume();
-        }
-
+        if (audioCtx.state === "suspended") audioCtx.resume();
         audioUnlocked = true;
     }
 
-    // Required user interaction
     document.addEventListener("click", unlockAudio, { once: true });
 
-    // 🔴 Alert sound (bad posture)
-    window.play_alert = function () {
-        if (!audioUnlocked) return;
+const alertSound = new Audio("alert.mp3");
+const successSound = new Audio("success.mp3");
 
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+// Optional tuning
+alertSound.volume = 1.0;
+successSound.volume = 0.5;
 
-        osc.type = "square";
-        osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+// Improve responsiveness
+alertSound.preload = "auto";
+successSound.preload = "auto";
 
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
 
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+window.play_alert = function () {
+    if (!audioUnlocked) return;
 
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.32);
-    };
+    alertSound.currentTime = 0; // restart instantly
+    alertSound.play();
+};
 
-    // 🟢 Success sound (recovered posture)
-    window.play_success = function () {
-        if (!audioUnlocked) return;
+window.play_success = function () {
+    if (!audioUnlocked) return;
 
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.15);
-
-        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.28);
-    };
+    successSound.currentTime = 0;
+    successSound.play();
+};
 
     startCoach();
 </script>
