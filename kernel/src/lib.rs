@@ -61,7 +61,7 @@ pub fn process_tilt_data(current_tilt: f32) -> String {
         // GOOD TO BAD TRANSITION
         (PostureState::Good, PostureState::Bad) => {
             play_alert();
-            format!("Alert: Lean is {:.1}°", mean_tilt)
+            "Alert: LATERAL Lean".to_string()
         }
 
         // BAD TO GOOD TRANSITION 
@@ -72,7 +72,7 @@ pub fn process_tilt_data(current_tilt: f32) -> String {
 
         // No transition, but still bad posture
         (_, PostureState::Bad) => {
-            format!("Alert: Lean is {:.1}°", mean_tilt)
+            "Alert: LATERAL Lean".to_string()
         }
 
         (_, PostureState::Good) => {
