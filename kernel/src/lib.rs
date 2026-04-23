@@ -5,7 +5,7 @@ use once_cell::sync::Lazy;
 
 // ---------- Sliding Window ----------
 static TILT_BUFFER: Lazy<Mutex<VecDeque<f32>>> = Lazy::new(|| {
-    Mutex::new(VecDeque::with_capacity(12))
+    Mutex::new(VecDeque::with_capacity(20))
 });
 
 // ---------- Posture State ----------
@@ -48,7 +48,7 @@ pub fn process_tilt_data(current_tilt: f32) -> String {
 
     // ---------- Thresholds ----------
     let is_level = mean_tilt.abs() < 25.0;
-    let is_stable = variance < 20.0;
+    let is_stable = variance < 25.0;
 
     let current_state = if is_level && is_stable {
         PostureState::Good
