@@ -18,14 +18,14 @@ enum PostureState {
 static LAST_STATE: Lazy<Mutex<PostureState>> =
     Lazy::new(|| Mutex::new(PostureState::Good));
 
-// ---------- JS Hooks ----------
+// ---------- JS Hook----------
 #[wasm_bindgen]
 extern "C" {
     fn play_alert();
     fn play_success();
 }
 
-// ---------- Main Logic ----------
+// ---------- Main Logic just for the head tilt part (copy this for the others) ----------
 #[wasm_bindgen]
 pub fn process_tilt_data(current_tilt: f32) -> String {
     let mut buffer = TILT_BUFFER.lock().unwrap_or_else(|e| e.into_inner());
@@ -58,19 +58,19 @@ pub fn process_tilt_data(current_tilt: f32) -> String {
 
     let result = match (*last_state, current_state) {
 
-        // 🔴 Good → Bad (trigger once)
+        // GOOD TO BAD TRANSITION
         (PostureState::Good, PostureState::Bad) => {
             play_alert();
             format!("Alert: Lean is {:.1}°", mean_tilt)
         }
 
-        // 🟢 Bad → Good (trigger once)
+        // BAD TO GOOD TRANSITION 
         (PostureState::Bad, PostureState::Good) => {
             play_success();
             "Good!".to_string()
         }
 
-        // 🔁 No transition
+        // No transition, but still bad posture
         (_, PostureState::Bad) => {
             format!("Alert: Lean is {:.1}°", mean_tilt)
         }
