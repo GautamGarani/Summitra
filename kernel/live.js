@@ -228,7 +228,7 @@ async function startCoach() {
                     animationFrameId =
                         requestAnimationFrame(process);
 
-            }, 250);
+            }, 80);
         };
 
 
