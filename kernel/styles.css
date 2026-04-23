@@ -1,6 +1,6 @@
 /* =========================================
    SUMMITRA MASTER STYLESHEET
-   Replaces BOTH inline style blocks entirely
+  
 ========================================= */
 
 :root{
@@ -95,6 +95,7 @@ max-width:1440px;
 margin:0 auto;
 padding:32px;
 box-sizing:border-box;
+overflow-y: auto; /* Allow main to scroll if sidebar grows huge */
 }
 
 /* live.html */
@@ -102,6 +103,7 @@ body:has(#monitor-card) main{
 display:grid;
 grid-template-columns:1fr 380px;
 gap:32px;
+align-items: start; /* Prevent grid items from stretching vertically */
 }
 
 /* dashboard.html */
@@ -278,6 +280,10 @@ border:1px solid var(--border-soft);
 box-shadow:0 10px 25px -5px rgba(0,82,204,.05);
 display:flex;
 flex-direction:column;
+width: 100%;
+/* FIX: Force specific aspect ratio for video frame consistency */
+aspect-ratio: 16 / 9; 
+max-height: calc(100vh - 180px); /* Keep it within viewport height */
 }
 
 .video-wrapper{
@@ -436,13 +442,10 @@ transform:none;
 display:flex;
 flex-direction:column;
 gap:8px;
-
 overflow-y:auto;
 overflow-x:hidden;
-
 min-height:260px;
 max-height:340px;
-
 word-break:break-word;
 overflow-wrap:anywhere;
 }
@@ -451,19 +454,15 @@ overflow-wrap:anywhere;
 .alert-log-entry{
 display:block;
 width:100%;
-
-white-space:normal;          /* allow wrapping */
-overflow-wrap:anywhere;      /* wrap long tokens */
+white-space:normal;
+overflow-wrap:anywhere;
 word-break:break-word;
-
 line-height:1.45;
 padding:10px 12px;
 margin:0;
-
 border-radius:10px;
 background:rgba(225,239,255,.45);
 border:1px solid var(--border-soft);
-
 animation:slideIn .3s ease-out;
 }
 
@@ -504,18 +503,16 @@ border-radius:8px;
 .stats-table thead{
     position:sticky;
     top:0;
-    background:var(--blue-accent); /* your light blue variable */
+    background:var(--blue-accent);
 }
 
 .stats-table th{
     padding:12px 10px;
     text-align:left;
-
-    color:#000;                /* black headers */
+    color:#000;
     font-weight:700;
     font-size:11px;
     letter-spacing:.08em;
-
     border-bottom:1px solid rgba(0,0,0,.08);
 }
 
@@ -523,17 +520,9 @@ border-radius:8px;
 /* BODY */
 .stats-table td{
     padding:11px 10px;
-
-    color: #ffffff;             /* white content */
-
+    color: #ffffff;
     border-bottom:1px dashed rgba(130,170,255,.12);
 }
-
-
-/* subtle striping */
-/*.stats-table tbody tr:nth-child(even){
-    background:rgba(130,170,255,.04);
-}*/
 
 .stats-table tbody tr:hover{
     background:rgba(130,170,255,.08);
@@ -549,17 +538,19 @@ border-radius:8px;
     background:var(--blue-accent);
     border-radius:10px;
 }
+
 /* ---------- RESPONSIVE ---------- */
 
 @media (max-width:1024px){
-
 body:has(#monitor-card) main{
 grid-template-columns:1fr;
 overflow-y:auto;
 }
-
+.viewport-container {
+aspect-ratio: auto; /* Remove fixed ratio for mobile to allow scrolling */
+height: 400px;
+}
 header{
 padding:0 20px;
 }
-
 }
