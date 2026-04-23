@@ -38,6 +38,8 @@ pub fn process_tilt_data(current_tilt: f32) -> String {
 
     let len = buffer.len() as f32;
 
+    //We are using the mean mean tilt here over 12 frames.
+
     let mean_tilt = buffer.iter().sum::<f32>() / len;
 
     let variance = buffer.iter()
