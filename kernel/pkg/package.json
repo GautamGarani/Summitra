@@ -1,0 +1,15 @@
+{
+  "name": "math_engine",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "math_engine_bg.wasm",
+    "math_engine.js",
+    "math_engine.d.ts"
+  ],
+  "main": "math_engine.js",
+  "types": "math_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
