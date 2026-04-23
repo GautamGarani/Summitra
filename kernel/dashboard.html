@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summitra</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+
+    <style>
+        :root {
+            --blue-900: #0D1B2A;
+            --blue-700: #1B263B;
+            --blue-500: #415A77;
+            --blue-300: #778DA9;
+            --blue-primary: #0052CC;
+            --blue-accent: #E1EFFF;
+            --surface: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --border-soft: #E2E8F0;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--surface);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            gap: 16px;
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--blue-accent);
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--blue-primary);
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: var(--blue-500);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 28px;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 14px 24px;
+            border-radius: 16px;
+            border: none;
+            background: var(--blue-primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="background: var(--blue-accent); color: var(--blue-primary); padding: 8px; border-radius: 12px;">
+        <span class="material-symbols-rounded">clinical_notes</span>
+    </div>
+    <div>
+        <div class="header-title">Summitra</div>
+        <div class="header-subtitle">Reaching the epitome of wellness</div>
+    </div>
+</header>
+
+<main>
+    <div class="card">
+        <h2>Start Monitoring</h2>
+        <p style="color: var(--blue-300)">Launch the live posture tracking system</p>
+        <button class="btn" onclick="location.href='live.html'">
+            Open Live Monitor
+        </button>
+    </div>
+</main>
+
+</body>
+</html>
