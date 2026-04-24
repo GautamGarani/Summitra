@@ -1,22 +1,32 @@
-
 let latestFeedback = null;
-let starting = false; // added startup lock
+let starting = false;
 
-//THE JSON DATA ACCUMULATION LOGIC
-const sessionData = 
-{
-	sessionStart : new Date().toISOString(),
-	alerts : [],
-	calibration : [],
-	totalFrames : 0
+// ----------------------------
+// SESSION DATA
+// ----------------------------
+const sessionData = {
+    sessionStart: new Date().toISOString(),
+    alerts: [],
+    calibration: [],
+    totalFrames: 0
 };
 
+// ----------------------------
+// IMPORTS
+// ----------------------------
+import init, { process_feedback } from './pkg/math_engine.js';
 
-import init, { process_tilt_data } from './pkg/math_engine.js';
-const { FaceLandmarker, FilesetResolver } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3");
+const {
+    FaceLandmarker,
+    PoseLandmarker,
+    FilesetResolver
+} = await import(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3"
+);
 
-
+// ----------------------------
 // UI ELEMENTS
+// ----------------------------
 const welcomeModal = document.getElementById('welcome-modal');
 const exitModal = document.getElementById('exit-modal');
 const startBtn = document.getElementById('modal-start-btn');
@@ -24,16 +34,16 @@ const stopBtn = document.getElementById('stop-session-btn');
 const confirmExitBtn = document.getElementById('confirm-exit-btn');
 const cancelExitBtn = document.getElementById('cancel-exit-btn');
 
-
+// ----------------------------
 // STATE
+// ----------------------------
 let landmarker = null;
+let poseLandmarker = null;
 let running = false;
-let animationFrameId = null;
 
-
-/**
- * EXIT PREVENTION LOGIC
- */
+// ----------------------------
+// EXIT PREVENTION
+// ----------------------------
 window.addEventListener('beforeunload', (e) => {
     if (running) {
         e.preventDefault();
@@ -41,17 +51,15 @@ window.addEventListener('beforeunload', (e) => {
     }
 });
 
-
-// MODAL CONTROL
+// ----------------------------
+// MODALS
+// ----------------------------
 startBtn.addEventListener('click', () => {
-
-    startBtn.disabled = true; // added to prevent double start
-
+    startBtn.disabled = true;
     welcomeModal.classList.add('modal-hidden');
     unlockAudio();
     startCoach();
 });
-
 
 stopBtn.addEventListener('click', () => {
     exitModal.classList.remove('modal-hidden');
@@ -61,30 +69,22 @@ cancelExitBtn.addEventListener('click', () => {
     exitModal.classList.add('modal-hidden');
 });
 
-
 confirmExitBtn.addEventListener('click', () => {
 
     running = false;
 
     const serverData = JSON.stringify(sessionData);
-
     localStorage.setItem('last_session_stats', serverData);
-
-    const summary =
-        `Session complete. We recorded ${sessionData.alerts.length} posture alerts.`;
-
-    document.querySelector('#exit-modal .modal-text').textContent = summary;
 
     window.location.href = 'dashboard.html';
 });
 
-
-
+// ----------------------------
+// MAIN START
+// ----------------------------
 async function startCoach() {
 
-    // fixed startup race
     if (running || starting) return;
-
     starting = true;
 
     const display = document.getElementById('feedback-value');
@@ -105,31 +105,45 @@ async function startCoach() {
                 "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
             );
 
-        landmarker = await FaceLandmarker.createFromOptions(
-            vision,
-            {
-                baseOptions: {
-                    modelAssetPath:
-                    `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-                    delegate: "GPU"
-                },
-                runningMode: "VIDEO",
-                numFaces: 1
-            }
-        );
+        landmarker =
+            await FaceLandmarker.createFromOptions(
+                vision,
+                {
+                    baseOptions: {
+                        modelAssetPath:
+                        "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    numFaces: 1
+                }
+            );
 
+        poseLandmarker =
+            await PoseLandmarker.createFromOptions(
+                vision,
+                {
+                    baseOptions: {
+                        modelAssetPath:
+                        "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    numPoses: 1
+                }
+            );
 
         logText.textContent = "Accessing Media Stream...";
 
         const stream =
-            await navigator.mediaDevices.getUserMedia(
-                { video: { width: 640, height: 480 } }
-            );
+            await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480 }
+            });
 
         video.srcObject = stream;
 
         await new Promise(
-            (resolve) => video.onloadedmetadata = resolve
+            resolve => video.onloadedmetadata = resolve
         );
 
         await video.play();
@@ -137,82 +151,105 @@ async function startCoach() {
         logText.textContent = "System Active";
         pulse.classList.add('active-pulse');
 
-
-        // startup officially complete
         running = true;
         starting = false;
 
-
+        // ----------------------------
+        // LOOP
+        // ----------------------------
         const process = () => {
 
             if (!running) return;
 
-            const results =
+            const faceResults =
                 landmarker.detectForVideo(
                     video,
                     performance.now()
                 );
 
-            if (results.faceLandmarks &&
-                results.faceLandmarks.length > 0) {
+            const poseResults =
+                poseLandmarker.detectForVideo(
+                    video,
+                    performance.now()
+                );
 
-                const l = results.faceLandmarks[0];
+            sessionData.totalFrames++;
 
-                const degrees =
+            let feedback = "Awaiting calibration";
+            let degrees = null;
+            let neckAngle = null;
+
+            if (
+                faceResults.faceLandmarks?.length > 0 &&
+                poseResults.landmarks?.length > 0
+            ) {
+
+                const l = faceResults.faceLandmarks[0];
+                const p = poseResults.landmarks[0];
+
+                const eyeAngle =
                     Math.atan2(
                         l[263].y - l[33].y,
                         l[263].x - l[33].x
-                    ) * (180 / Math.PI);
+                    ) * 180 / Math.PI;
 
-                const feedback =
-                    process_tilt_data(degrees);
+                const shoulderAngle =
+                    Math.atan2(
+                        p[12].y - p[11].y,
+                        p[12].x - p[11].x
+                    ) * 180 / Math.PI;
 
-                sessionData.totalFrames++;
+                degrees = eyeAngle - shoulderAngle;
+
+                const dx = l[234].x - p[11].x;
+                const dy = p[11].y - l[234].y;
+
+                neckAngle = Math.abs(
+                    Math.atan2(dy, dx) *
+                    180 / Math.PI
+                );
+
+                feedback = process_feedback(
+                    degrees,
+                    neckAngle
+                );
 
                 display.innerHTML = feedback;
 
                 rawText.innerHTML =
-                    `Lateral Tilt: ${degrees.toFixed(2)}°`;
+                    `Lateral Tilt: ${degrees.toFixed(2)}° | Neck: ${neckAngle.toFixed(2)}°`;
 
                 display.style.color =
-                    feedback === "Good!"
-                        ? "#16A34A"
-                        : feedback.includes("Lean")
-                            ? "var(--error-state)"
+                    feedback.includes("Alert")
+                        ? "var(--error-state)"
+                        : feedback.includes("Good")
+                            ? "#16A34A"
                             : "var(--blue-primary)";
-
 
                 const normalizedFeedback =
                     feedback.trim();
 
-
                 if (
-                    (feedback.includes("Lean") ||
-                     feedback.includes("Alert")) &&
-                    (normalizedFeedback !== latestFeedback)
+                    feedback.includes("Alert") &&
+                    normalizedFeedback !== latestFeedback
                 ) {
-
                     const newAlert = {
-                        time : new Date().toLocaleTimeString(),
-                        type : feedback,
-                        angle: degrees.toFixed(2)
+                        time: new Date().toLocaleTimeString(),
+                        type: feedback,
+                        angle: neckAngle.toFixed(2)
                     };
 
                     sessionData.alerts.push(newAlert);
-
                     latestFeedback = normalizedFeedback;
-
                     updateStatsInUI(newAlert);
                 }
-
-                else if (feedback.includes("Good")) {
-
+                else if (
+                    feedback.includes("Good")
+                ) {
                     latestFeedback = null;
                 }
 
-            }
-
-            else {
+            } else {
 
                 display.innerHTML =
                     "Get into the camera frame";
@@ -221,44 +258,23 @@ async function startCoach() {
                     "var(--blue-300)";
             }
 
-
-            setTimeout(() => {
-
-                if (running)
-                    animationFrameId =
-                        requestAnimationFrame(process);
-
-            }, 80);
+            setTimeout(process, 180);
         };
-
-
-        // extra protection against orphan loops
-        if (animationFrameId) {
-            cancelAnimationFrame(animationFrameId);
-        }
 
         process();
 
-    }
+    } catch (error) {
 
-    catch (error) {
-
-        starting = false; // reset lock on failure
+        starting = false;
         running = false;
-
-        logText.textContent =
-            "Initialization Failed";
-
-        logText.style.color =
-            "#FF8A8A";
 
         console.error(error);
     }
 }
 
-
-
+// ----------------------------
 // AUDIO
+// ----------------------------
 let audioCtx = null;
 let audioUnlocked = false;
 
@@ -278,45 +294,32 @@ function unlockAudio() {
     audioUnlocked = true;
 }
 
-
-const alertSound =
-    new Audio("alert.mp3");
-
-const successSound =
-    new Audio("success.mp3");
-
+const alertSound = new Audio("alert.mp3");
+const successSound = new Audio("success.mp3");
 
 window.play_alert = function () {
-
     if (!audioUnlocked) return;
-
     alertSound.currentTime = 0;
-
     alertSound.play().catch(() => {});
 };
 
-
 window.play_success = function () {
-
     if (!audioUnlocked) return;
-
     successSound.currentTime = 0;
-
     successSound.play().catch(() => {});
 };
-
 
 window.addEventListener('load', () => {
     welcomeModal.classList.remove('modal-hidden');
 });
 
+function updateStatsInUI(latestAlert) {
 
+    const tbody =
+        document.getElementById('stats-body');
 
-function updateStatsInUI(latestAlert)
-{
-    const tbody = document.getElementById('stats-body');
-
-    const row = document.createElement('tr');
+    const row =
+        document.createElement('tr');
 
     row.innerHTML = `
         <td>${latestAlert.time}</td>
@@ -326,4 +329,3 @@ function updateStatsInUI(latestAlert)
 
     tbody.prepend(row);
 }
-
