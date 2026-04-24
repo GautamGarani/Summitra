@@ -1,14 +1,15 @@
 /* @ts-self-types="./math_engine.d.ts" */
 
 /**
- * @param {number} current_tilt
+ * @param {number} tilt_degrees
+ * @param {number} forward_degrees
  * @returns {string}
  */
-export function process_tilt_data(current_tilt) {
+export function process_feedback(tilt_degrees, forward_degrees) {
     let deferred1_0;
     let deferred1_1;
     try {
-        const ret = wasm.process_tilt_data(current_tilt);
+        const ret = wasm.process_feedback(tilt_degrees, forward_degrees);
         deferred1_0 = ret[0];
         deferred1_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);

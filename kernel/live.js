@@ -198,8 +198,12 @@ async function startCoach() {
                         p[12].y - p[11].y,
                         p[12].x - p[11].x
                     ) * 180 / Math.PI;
+                
+                let value = null;
+                
+                value = Math.abs(eyeAngle - shoulderAngle);
 
-                degrees = eyeAngle - shoulderAngle;
+                degrees = value<(180-value)?value:(180-value);
 
                 const dx = l[234].x - p[11].x;
                 const dy = p[11].y - l[234].y;
