@@ -47,7 +47,8 @@ pub fn process_feedback(
     vertical_ratio: f32,
     tilt_on: bool,
     forward_on: bool,
-    slouch_on: bool
+    slouch_on: bool,
+    success_on: bool
 ) -> String{
 
     let mut buffer_tilt = TILT_BUFFER.lock().unwrap();
@@ -95,7 +96,6 @@ pub fn process_feedback(
     let result = match (last_state, current_state) {
         // Case 1: Deterioration from Optimal to any Bad state
         (PostureState::Good, s) if s != PostureState::Good => {
-            // ONLY PLAY SOUND IF TOGGLE IS ON
             let should_play = match s {
                 PostureState::BadTilt => tilt_on,
                 PostureState::BadForward => forward_on,
@@ -114,7 +114,6 @@ pub fn process_feedback(
         }
         (PostureState::BadTilt, PostureState::BothBad) | 
         (PostureState::BadForward, PostureState::BothBad) => {
-            // Only play if the new issue being added is enabled
             let should_play = if current_state == PostureState::BothBad {
                 tilt_on || forward_on
             } else { false };
@@ -124,7 +123,7 @@ pub fn process_feedback(
 
         // Case 3: Recovery: Only play success when reaching Optimal
         (s, PostureState::Good) if s != PostureState::Good => {
-            play_success();
+            if success_on { play_success(); }
             match_state_text(current_state)
         }
 

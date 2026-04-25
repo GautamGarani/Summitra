@@ -556,17 +556,25 @@ p {
     background: var(--card-bg);
     border-radius: 24px;
     margin-top: 24px;
-    /* Fix: Create gap from video */
     border: 1px solid var(--border-soft);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+}
+
+.viewport-controls.is-muted-all .control-item:not(:first-child) {
+    opacity: 0.4;
+    pointer-events: auto;
+    /* Keep clickable to "break" the mute */
+    filter: grayscale(0.8);
+    transition: all 0.3s ease;
 }
 
 .control-item {
     display: flex;
     flex-direction: column;
-    /* Label above slider */
     align-items: center;
     gap: 12px;
+    transition: opacity 0.3s ease;
 }
 
 .control-label {

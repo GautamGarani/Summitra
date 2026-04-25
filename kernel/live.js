@@ -79,39 +79,41 @@ confirmExitBtn.addEventListener('click', () => {
     window.location.href = 'dashboard.html';
 });
 
-// --- SMART MASTER MUTE LOGIC ---
-document.addEventListener('DOMContentLoaded', () => {
-    const master = document.getElementById('toggle-master');
-    const tilt = document.getElementById('toggle-tilt');
-    const forward = document.getElementById('toggle-forward');
-    const slouch = document.getElementById('toggle-slouch');
-    const subs = [tilt, forward, slouch];
+                // --- SMART MASTER MUTE LOGIC (Refined) ---
+                const controlsContainer = document.querySelector('.viewport-controls');
+                const master = document.getElementById('toggle-master');
+                const subs = [
+                    document.getElementById('toggle-tilt'),
+                    document.getElementById('toggle-forward'),
+                    document.getElementById('toggle-slouch')
+                ];
 
-    // Case 1: Master Mute clicked
-    master.addEventListener('change', () => {
-        if (master.checked) {
-            // Mute All ON -> Alerts OFF
-            subs.forEach(s => s.checked = false);
-        } else {
-            // Mute All OFF -> Alerts ON (Default)
-            subs.forEach(s => s.checked = true);
-        }
-    });
+                master.addEventListener('change', () => {
+                    if (master.checked) {
+                        controlsContainer.classList.add('is-muted-all');
+                        subs.forEach(s => s.checked = false);
+                    } else {
+                        controlsContainer.classList.remove('is-muted-all');
+                        subs.forEach(s => s.checked = true);
+                    }
+                });
 
-    // Case 2: Individual alert toggled
-    subs.forEach(s => {
-        s.addEventListener('change', () => {
-            if (s.checked) {
-                // If any alert is turned ON, Master Mute must turn OFF
-                master.checked = false;
-            } else {
-                // If every single alert is turned OFF, turn Master Mute ON
-                const allOff = subs.every(toggle => !toggle.checked);
-                if (allOff) master.checked = true;
-            }
-        });
-    });
-});
+                subs.forEach(s => {
+                    s.addEventListener('change', () => {
+                        if (s.checked) {
+                            // Turning an alert ON breaks the master mute
+                            master.checked = false;
+                            controlsContainer.classList.remove('is-muted-all');
+                        } else {
+                            // If user manually turns all off, trigger master mute
+                            const allOff = !subs.some(toggle => toggle.checked);
+                            if (allOff) {
+                                master.checked = true;
+                                controlsContainer.classList.add('is-muted-all');
+                            }
+                        }
+                    });
+                });
 
 // ----------------------------
 // MAIN START
@@ -262,10 +264,11 @@ async function startCoach() {
                 const verticalRatio = ((vGapL + vGapR) / 2) / sWidth;
 
                 // Get toggle states
-                const isMasterMute = document.getElementById('toggle-master').checked;
-                const tiltOn = !isMasterMute && document.getElementById('toggle-tilt').checked;
-                const forwardOn = !isMasterMute && document.getElementById('toggle-forward').checked;
-                const slouchOn = !isMasterMute && document.getElementById('toggle-slouch').checked;
+                const isMasterMuted = document.getElementById('toggle-master').checked;
+                const tiltOn = document.getElementById('toggle-tilt').checked;
+                const forwardOn = document.getElementById('toggle-forward').checked;
+                const slouchOn = document.getElementById('toggle-slouch').checked;
+                const successOn = !isMasterMuted; // Master Mute silences success sounds too
 
                 feedback = process_feedback(
                     degrees,
@@ -273,7 +276,8 @@ async function startCoach() {
                     verticalRatio,
                     tiltOn,
                     forwardOn,
-                    slouchOn
+                    slouchOn,
+                    successOn
                 );
 
                 display.innerHTML = feedback;
