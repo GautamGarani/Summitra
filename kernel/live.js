@@ -8,8 +8,36 @@ const sessionData = {
     sessionStart: new Date().toISOString(),
     alerts: [],
     calibration: [],
-    totalFrames: 0
+    totalFrames: 0,
+
+    goodFrames: 0,
+    badFrames: 0,
+
+    lateralAlerts: 0,
+    forwardAlerts: 0,
+    slouchAlerts: 0
 };
+
+/*
+const SESSION_ID = Date.now();
+const SERVER_URL = "http://localhost:5000";
+
+let lastSent = 0;
+const SEND_INTERVAL = 1000;
+
+function sendToServer(score, posture) {
+    fetch(`${SERVER_URL}/log`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            session_id: SESSION_ID,
+            score,
+            posture
+        })
+    }).catch(() => {});
+}*/
 
 // ----------------------------
 // IMPORTS
@@ -73,47 +101,72 @@ confirmExitBtn.addEventListener('click', () => {
 
     running = false;
 
-    const serverData = JSON.stringify(sessionData);
-    localStorage.setItem('last_session_stats', serverData);
+    // stop webcam cleanly
+    const video = document.getElementById('webcam');
 
-    window.location.href = 'dashboard.html';
+    if (video.srcObject) {
+        video.srcObject
+            .getTracks()
+            .forEach(track => track.stop());
+    }
+
+    // load prior sessions
+    let sessions =
+        JSON.parse(
+            localStorage.getItem("sessions")
+        ) || [];
+
+    // append this session
+    sessions.push(sessionData);
+
+    // optional cap (keep last 20 sessions)
+    if (sessions.length > 20) {
+        sessions = sessions.slice(-20);
+    }
+
+    localStorage.setItem(
+        "sessions",
+        JSON.stringify(sessions)
+    );
+
+    window.location.href = "dashboard.html";
 });
 
-                // --- SMART MASTER MUTE LOGIC (Refined) ---
-                const controlsContainer = document.querySelector('.viewport-controls');
-                const master = document.getElementById('toggle-master');
-                const subs = [
-                    document.getElementById('toggle-tilt'),
-                    document.getElementById('toggle-forward'),
-                    document.getElementById('toggle-slouch')
-                ];
+// ----------------------------
+// TOGGLES
+// ----------------------------
+const controlsContainer = document.querySelector('.viewport-controls');
+const master = document.getElementById('toggle-master');
+const subs = [
+    document.getElementById('toggle-tilt'),
+    document.getElementById('toggle-forward'),
+    document.getElementById('toggle-slouch')
+];
 
-                master.addEventListener('change', () => {
-                    if (master.checked) {
-                        controlsContainer.classList.add('is-muted-all');
-                        subs.forEach(s => s.checked = false);
-                    } else {
-                        controlsContainer.classList.remove('is-muted-all');
-                        subs.forEach(s => s.checked = true);
-                    }
-                });
+master.addEventListener('change', () => {
+    if (master.checked) {
+        controlsContainer.classList.add('is-muted-all');
+        subs.forEach(s => s.checked = false);
+    } else {
+        controlsContainer.classList.remove('is-muted-all');
+        subs.forEach(s => s.checked = true);
+    }
+});
 
-                subs.forEach(s => {
-                    s.addEventListener('change', () => {
-                        if (s.checked) {
-                            // Turning an alert ON breaks the master mute
-                            master.checked = false;
-                            controlsContainer.classList.remove('is-muted-all');
-                        } else {
-                            // If user manually turns all off, trigger master mute
-                            const allOff = !subs.some(toggle => toggle.checked);
-                            if (allOff) {
-                                master.checked = true;
-                                controlsContainer.classList.add('is-muted-all');
-                            }
-                        }
-                    });
-                });
+subs.forEach(s => {
+    s.addEventListener('change', () => {
+        if (s.checked) {
+            master.checked = false;
+            controlsContainer.classList.remove('is-muted-all');
+        } else {
+            const allOff = !subs.some(toggle => toggle.checked);
+            if (allOff) {
+                master.checked = true;
+                controlsContainer.classList.add('is-muted-all');
+            }
+        }
+    });
+});
 
 // ----------------------------
 // MAIN START
@@ -142,32 +195,26 @@ async function startCoach() {
             );
 
         landmarker =
-            await FaceLandmarker.createFromOptions(
-                vision,
-                {
-                    baseOptions: {
-                        modelAssetPath:
-                            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-                        delegate: "GPU"
-                    },
-                    runningMode: "VIDEO",
-                    numFaces: 1
-                }
-            );
+            await FaceLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath:
+                        "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+                    delegate: "GPU"
+                },
+                runningMode: "VIDEO",
+                numFaces: 1
+            });
 
         poseLandmarker =
-            await PoseLandmarker.createFromOptions(
-                vision,
-                {
-                    baseOptions: {
-                        modelAssetPath:
-                            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
-                        delegate: "GPU"
-                    },
-                    runningMode: "VIDEO",
-                    numPoses: 1
-                }
-            );
+            await PoseLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath:
+                        "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+                    delegate: "GPU"
+                },
+                runningMode: "VIDEO",
+                numPoses: 1
+            });
 
         logText.textContent = "Accessing Media Stream...";
 
@@ -178,9 +225,7 @@ async function startCoach() {
 
         video.srcObject = stream;
 
-        await new Promise(
-            resolve => video.onloadedmetadata = resolve
-        );
+        await new Promise(resolve => video.onloadedmetadata = resolve);
 
         await video.play();
 
@@ -197,17 +242,8 @@ async function startCoach() {
 
             if (!running) return;
 
-            const faceResults =
-                landmarker.detectForVideo(
-                    video,
-                    performance.now()
-                );
-
-            const poseResults =
-                poseLandmarker.detectForVideo(
-                    video,
-                    performance.now()
-                );
+            const faceResults = landmarker.detectForVideo(video, performance.now());
+            const poseResults = poseLandmarker.detectForVideo(video, performance.now());
 
             sessionData.totalFrames++;
 
@@ -224,51 +260,38 @@ async function startCoach() {
                 const p = poseResults.landmarks[0];
 
                 const eyeAngle =
-                    Math.atan2(
-                        l[263].y - l[33].y,
-                        l[263].x - l[33].x
-                    ) * 180 / Math.PI;
+                    Math.atan2(l[263].y - l[33].y, l[263].x - l[33].x) * 180 / Math.PI;
 
                 const shoulderAngle =
-                    Math.atan2(
-                        p[12].y - p[11].y,
-                        p[12].x - p[11].x
-                    ) * 180 / Math.PI;
+                    Math.atan2(p[12].y - p[11].y, p[12].x - p[11].x) * 180 / Math.PI;
 
-                let value = null;
-
-                value = Math.abs(eyeAngle - shoulderAngle); //to get the angle between the eyes and shoulders
-
+                let value = Math.abs(eyeAngle - shoulderAngle);
                 degrees = value < (180 - value) ? value : (180 - value);
 
-                // --- Balanced Cross-Body Logic (Restores "Old" Angle Magnitude) ---
-                // Side 1: Left Ear to RIGHT Shoulder
-                const dxL = Math.abs(l[454].x - p[12].x); 
+                const dxL = Math.abs(l[454].x - p[12].x);
                 const dyL = p[12].y - l[454].y;
                 const angleL = Math.abs(Math.atan2(dyL, dxL) * 180 / Math.PI);
 
-                // Side 2: Right Ear to LEFT Shoulder (Original code logic)
                 const dxR = Math.abs(l[234].x - p[11].x);
                 const dyR = p[11].y - l[234].y;
                 const angleR = Math.abs(Math.atan2(dyR, dxR) * 180 / Math.PI);
 
-                neckAngle = (angleL + angleR) / 2; 
+                neckAngle = (angleL + angleR) / 2;
 
-                // --- Slouch Detection (Sinking Head Logic) ---
                 const sWidth = Math.sqrt(
                     Math.pow(p[11].x - p[12].x, 2) +
                     Math.pow(p[11].y - p[12].y, 2)
                 );
+
                 const vGapL = p[11].y - l[454].y;
                 const vGapR = p[12].y - l[234].y;
                 const verticalRatio = ((vGapL + vGapR) / 2) / sWidth;
 
-                // Get toggle states
                 const isMasterMuted = document.getElementById('toggle-master').checked;
                 const tiltOn = document.getElementById('toggle-tilt').checked;
                 const forwardOn = document.getElementById('toggle-forward').checked;
                 const slouchOn = document.getElementById('toggle-slouch').checked;
-                const successOn = !isMasterMuted; // Master Mute silences success sounds too
+                const successOn = !isMasterMuted;
 
                 feedback = process_feedback(
                     degrees,
@@ -292,14 +315,63 @@ async function startCoach() {
                             ? "#16A34A"
                             : "var(--blue-primary)";
 
-                const normalizedFeedback =
-                    feedback.trim();
+                
+                const tiltFactor = Math.min(degrees / 15, 1);
+                const neckFactor = Math.min(neckAngle / 25, 1);
+                const slouchFactor = Math.min(verticalRatio / 0.6, 1);
+
+                let penalty =
+                    (tiltFactor * 30) +
+                    (neckFactor * 30) +
+                    (slouchFactor * 40);
+
+                let score = 100 - penalty;
+
+                if (
+                    degrees < 5 &&
+                    neckAngle < 10 &&
+                    verticalRatio < 0.3
+                ) {
+                    score = Math.min(100, score + 10);
+                }
+
+                score = Math.max(0, Math.min(100, score));
+
+                const posture =
+                    (feedback.includes("Good") || feedback.includes("Optimal"))
+                        ? "good"
+                        : "bad";
+                if (posture === "good") {
+                    sessionData.goodFrames++;
+                } else {
+                    sessionData.badFrames++;
+                }
+
+                /*
+
+                const nowTime = Date.now();
+                if (nowTime - lastSent > SEND_INTERVAL) {
+                    sendToServer(score.toFixed(1), posture);
+                    lastSent = nowTime;
+                }
+                */
+
+                const normalizedFeedback = feedback.trim();
 
                 if (
                     feedback.includes("Alert") &&
                     normalizedFeedback !== latestFeedback
-                ) {
-                    // Determine which angles to log based on alert type
+                ) { 
+                    if (feedback.includes("Lateral")) {
+                        sessionData.lateralAlerts++;
+                        }
+                    else if (feedback.includes("Forward")) {
+                        sessionData.forwardAlerts++;
+                        }
+                    else if (feedback.includes("Slouch")) {
+                        sessionData.slouchAlerts++;
+                        }
+
                     let logAngle = "";
                     if (feedback.includes("+")) {
                         logAngle = `T ${degrees.toFixed(1)} / N ${neckAngle.toFixed(1)}`;
@@ -328,12 +400,8 @@ async function startCoach() {
                 }
 
             } else {
-
-                display.innerHTML =
-                    "Get into the camera frame";
-
-                display.style.color =
-                    "var(--blue-300)";
+                display.innerHTML = "Get into the camera frame";
+                display.style.color = "var(--blue-300)";
             }
 
             setTimeout(process, 180);
@@ -342,10 +410,8 @@ async function startCoach() {
         process();
 
     } catch (error) {
-
         starting = false;
         running = false;
-
         console.error(error);
     }
 }
@@ -357,18 +423,10 @@ let audioCtx = null;
 let audioUnlocked = false;
 
 function unlockAudio() {
-
     if (!audioCtx) {
-        audioCtx =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-
-    if (audioCtx.state === "suspended")
-        audioCtx.resume();
-
+    if (audioCtx.state === "suspended") audioCtx.resume();
     audioUnlocked = true;
 }
 
@@ -392,12 +450,8 @@ window.addEventListener('load', () => {
 });
 
 function updateStatsInUI(latestAlert) {
-
-    const tbody =
-        document.getElementById('stats-body');
-
-    const row =
-        document.createElement('tr');
+    const tbody = document.getElementById('stats-body');
+    const row = document.createElement('tr');
 
     row.innerHTML = `
         <td>${latestAlert.time}</td>

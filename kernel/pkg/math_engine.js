@@ -1,20 +1,14 @@
 /* @ts-self-types="./math_engine.d.ts" */
 
 /**
- * @param {number} tilt_degrees
- * @param {number} forward_degrees
- * @param {number} vertical_ratio
- * @param {boolean} tilt_on
- * @param {boolean} forward_on
- * @param {boolean} slouch_on
- * @param {boolean} success_on
+ * @param {number} current_tilt
  * @returns {string}
  */
-export function process_feedback(tilt_degrees, forward_degrees, vertical_ratio, tilt_on, forward_on, slouch_on, success_on) {
+export function process_tilt_data(current_tilt) {
     let deferred1_0;
     let deferred1_1;
     try {
-        const ret = wasm.process_feedback(tilt_degrees, forward_degrees, vertical_ratio, tilt_on, forward_on, slouch_on, success_on);
+        const ret = wasm.process_tilt_data(current_tilt);
         deferred1_0 = ret[0];
         deferred1_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);

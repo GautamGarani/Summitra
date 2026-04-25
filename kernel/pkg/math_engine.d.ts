@@ -1,13 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export function process_feedback(tilt_degrees: number, forward_degrees: number, vertical_ratio: number, tilt_on: boolean, forward_on: boolean, slouch_on: boolean, success_on: boolean): string;
+export function process_tilt_data(current_tilt: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
-    readonly process_feedback: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
+    readonly process_tilt_data: (a: number) => [number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_free: (a: number, b: number, c: number) => void;
     readonly __wbindgen_start: () => void;

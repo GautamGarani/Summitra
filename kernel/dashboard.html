@@ -7,9 +7,19 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-    <link href = "styles.css" rel = "stylesheet">
+    <link href="styles.css" rel="stylesheet">
 
+    <!-- Chart.js -->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+
+    <style>
+        #chart-container {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
 
 <header>
@@ -23,18 +33,95 @@
 </header>
 
 <main>
+
+    <!-- EXISTING CARD -->
     <div class="card">
         <div class="icon-box">
             <span class="material-symbols-rounded" style="font-size: 40px;">monitoring</span>
         </div>
         <h2>Start Monitoring</h2>
-        <p>Launch the Vision Engine to begin real-time posture tracking and ergonomic calibration.</p>
+        <p>Launch the Vision Engine to begin real-time posture tracking.</p>
         <button class="btn" onclick="location.href='live.html'">
             Launch Live Monitor
             <span class="material-symbols-rounded">arrow_forward</span>
         </button>
     </div>
+
+    <!-- ANALYTICS CARD -->
+    <div class="card">
+        <div class="icon-box">
+            <span class="material-symbols-rounded" style="font-size: 40px;">pie_chart</span>
+        </div>
+        <h2>View Analytics</h2>
+        <p>Compare your last two sessions.</p>
+
+        <button id="view-analytics-btn" onclick="location.href='analytics.html'">
+        View Analytics
+        <span class="material-symbols-rounded">analytics</span>
+        </button>
+
+        <!--<div id="chart-container">
+            <canvas id="pieChart"></canvas>
+        </div>-->
+    </div>
+
 </main>
+<!--
+<script>
+const SERVER = "http://localhost:5000";
+let chart = null;
+
+// fetch session data
+async function getSessionData(sessionId) {
+    const res = await fetch(`${SERVER}/get_session/${sessionId}`);
+    return await res.json();
+}
+
+document.getElementById("view-analytics-btn")
+.addEventListener("click", async () => {
+
+    const currentId =
+        localStorage.getItem("current_session_id");
+
+    const previousId =
+        localStorage.getItem("previous_session_id");
+
+    if (!currentId) {
+        alert("No current session found");
+        return;
+    }
+
+    // fetch current
+    const current = await getSessionData(currentId);
+    const currentBad = current.bad_time || 0;
+
+    // fetch previous
+    let previousBad = 0;
+
+    if (previousId) {
+        const previous = await getSessionData(previousId);
+        previousBad = previous.bad_time || 0;
+    }
+
+    // render chart
+    const ctx = document.getElementById("pieChart");
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: "pie",
+        data: {
+            labels: ["Previous Session", "Current Session"],
+            datasets: [{
+                data: [previousBad, currentBad]
+            }]
+        }
+    });
+
+    document.getElementById("chart-container")
+        .style.display = "block";
+});
+</script>-->
 
 </body>
 </html>
