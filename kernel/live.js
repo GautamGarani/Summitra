@@ -191,8 +191,19 @@ async function startCoach() {
                 const eyeAngle = Math.atan2(l[263].y - l[33].y, l[263].x - l[33].x) * 180 / Math.PI;
                 const shoulderAngle = Math.atan2(p[12].y - p[11].y, p[12].x - p[11].x) * 180 / Math.PI;
 
-                let value = Math.abs(eyeAngle - shoulderAngle);
-                let degrees = value < (180 - value) ? value : (180 - value);
+let rawTilt = (eyeAngle - shoulderAngle);
+
+// 1. Shift the boundary so 180 becomes 0
+let tilt = rawTilt + 180;
+
+// 2. Wrap back to [-180, 180] range
+if (tilt > 180) tilt -= 360;
+if (tilt < -180) tilt += 360;
+
+// 3. Remove Math.abs() to keep the sign
+// Right tilt will be positive, Left will be negative.
+// If signs are swapped for your specific camera, use: tilt = -tilt;
+const degrees = tilt; 
 
                 const dxL = Math.abs(l[454].x - p[12].x);
                 const dyL = p[12].y - l[454].y;
@@ -207,7 +218,7 @@ async function startCoach() {
                 const sWidth = Math.sqrt(Math.pow(p[11].x - p[12].x, 2) + Math.pow(p[11].y - p[12].y, 2));
                 const vGapL = p[11].y - l[454].y;
                 const vGapR = p[12].y - l[234].y;
-                const verticalRatio = 1000*((vGapL + vGapR) / 2) / sWidth;
+                const verticalRatio = 10*((vGapL + vGapR) / 2) / sWidth;
 
                 const isMasterMuted = master.checked;
                 const tiltOn = subs[0].checked;

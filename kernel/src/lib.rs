@@ -16,9 +16,9 @@ enum PostureState {
 
 const BUFFER_SIZE: usize = 20;
 
-// ---------------------------------------------------------
-// ROLLING BUFFERS
-// ---------------------------------------------------------
+// =========================================================
+// BUFFERS
+// =========================================================
 static TILT_BUFFER: Lazy<Mutex<VecDeque<f32>>> =
     Lazy::new(|| Mutex::new(VecDeque::with_capacity(BUFFER_SIZE)));
 
@@ -32,67 +32,42 @@ static LAST_STATE: Lazy<Mutex<PostureState>> =
     Lazy::new(|| Mutex::new(PostureState::Good));
 
 // =========================================================
-// DRIFT MEMORY
+// DRIFT MEMORY (Constants tailored for 180ms loop)
 // =========================================================
 static DRIFT_ACCUM: Lazy<Mutex<f32>> =
     Lazy::new(|| Mutex::new(0.0));
 
-const DRIFT_ALERT_THRESHOLD: f32 = 8.0;
 const CUMULATIVE_ALERT_THRESHOLD: f32 = 20.0;
-const DRIFT_DECAY: f32 = 0.85;
+const DRIFT_DECAY: f32 = 0.85; 
+const INSTABILITY_THRESHOLD: f32 = 8.0; 
 
 // =========================================================
-// CALIBRATION STATE
+// CALIBRATION (DYNAMIC BOUNDARIES)
 // =========================================================
 struct CalibrationState {
     complete: bool,
     frames: usize,
-
     min_tilt: f32,
     max_tilt: f32,
-
     min_forward: f32,
     max_forward: f32,
-
     min_vertical: f32,
     max_vertical: f32,
-
-    neutral_tilt: f32,
-    neutral_forward: f32,
-    neutral_vertical: f32,
-
-    tilt_margin: f32,
-    forward_margin: f32,
-    vertical_margin: f32
 }
 
 static CALIBRATION: Lazy<Mutex<CalibrationState>> = Lazy::new(|| {
     Mutex::new(CalibrationState {
         complete: false,
         frames: 0,
-
-        min_tilt: 999.0,
-        max_tilt: -999.0,
-
-        min_forward: 999.0,
-        max_forward: -999.0,
-
-        min_vertical: 999.0,
-        max_vertical: -999.0,
-
-        neutral_tilt: 0.0,
-        neutral_forward: 0.0,
-        neutral_vertical: 0.0,
-
-        tilt_margin: 0.0,
-        forward_margin: 0.0,
-        vertical_margin: 0.0
+        min_tilt: f32::MAX,
+        max_tilt: f32::MIN,
+        min_forward: f32::MAX,
+        max_forward: f32::MIN,
+        min_vertical: f32::MAX,
+        max_vertical: f32::MIN,
     })
 });
 
-// =========================================================
-// JS AUDIO HOOKS
-// =========================================================
 #[wasm_bindgen]
 extern "C" {
     fn play_alert();
@@ -100,231 +75,136 @@ extern "C" {
 }
 
 // =========================================================
-// CALIBRATION UPDATE
+// CALIBRATION: Recording User's Proprioceptive Range
 // =========================================================
 fn update_calibration(tilt: f32, forward: f32, vertical: f32) {
     let mut c = CALIBRATION.lock().unwrap();
-
-    if c.complete {
-        return;
-    }
+    if c.complete { return; }
 
     c.frames += 1;
 
-    let sec = c.frames as f32 * 0.18;
+    if tilt < c.min_tilt { c.min_tilt = tilt; }
+    if tilt > c.max_tilt { c.max_tilt = tilt; }
+    if forward < c.min_forward { c.min_forward = forward; }
+    if forward > c.max_forward { c.max_forward = forward; }
+    if vertical < c.min_vertical { c.min_vertical = vertical; }
+    if vertical > c.max_vertical { c.max_vertical = vertical; }
 
-    if sec <= 5.0 {
-        c.min_tilt = c.min_tilt.min(tilt);
-        c.max_tilt = c.max_tilt.max(tilt);
-    } else if sec <= 10.0 {
-        c.min_forward = c.min_forward.min(forward);
-        c.max_forward = c.max_forward.max(forward);
-    } else if sec <= 15.0 {
-        c.min_vertical = c.min_vertical.min(vertical);
-        c.max_vertical = c.max_vertical.max(vertical);
-    }
-
-    if sec >= 20.0 {
-        c.neutral_tilt = (c.min_tilt + c.max_tilt) / 2.0;
-        c.neutral_forward = (c.min_forward + c.max_forward) / 2.0;
-        c.neutral_vertical = (c.min_vertical + c.max_vertical) / 2.0;
-
-        c.tilt_margin = ((c.max_tilt - c.min_tilt) * 0.10).max(2.0);
-        c.forward_margin = ((c.max_forward - c.min_forward) * 0.10).max(2.0);
-        c.vertical_margin = ((c.max_vertical - c.min_vertical) * 0.10).max(0.02);
-
+    if c.frames >= 28 { // ~5 seconds at 180ms
         c.complete = true;
     }
 }
 
 // =========================================================
-// DRIFT SCORE
+// DECISION LOGIC: 10% Buffer Range & Speed Check
 // =========================================================
-fn drift_score(tilt: f32, forward: f32, vertical: f32) -> f32 {
+fn calculate_deviation_score(tilt: f32, forward: f32, vertical: f32) -> (f32, bool, bool, bool) {
     let c = CALIBRATION.lock().unwrap();
+    if !c.complete { return (0.0, false, false, false); }
 
-    if !c.complete {
-        return 0.0;
-    }
+    // Dynamic Safe Zones with 10% Buffer
+    let t_low = c.min_tilt - (c.min_tilt.abs() * 0.1).max(1.0);
+    let t_high = c.max_tilt + (c.max_tilt.abs() * 0.1).max(1.0);
+    let f_low = c.min_forward - (c.min_forward.abs() * 0.1).max(1.0);
+    let f_high = c.max_forward + (c.max_forward.abs() * 0.1).max(1.0);
+    // Vertical is ratio (slouch), buffer is tighter
+    let v_low = c.min_vertical - (c.min_vertical * 0.05); 
+    let v_high = c.max_vertical + (c.max_vertical * 0.05);
 
-    let d_t = (tilt - c.neutral_tilt).abs();
-    let d_f = (forward - c.neutral_forward).abs();
-    let d_v = (vertical - c.neutral_vertical).abs();
+    let mut score = 0.0;
+    let mut is_tilt_bad = false;
+    let mut is_forward_bad = false;
+    let mut is_slouch_bad = false;
 
-    0.4 * d_t + 0.4 * d_f + 0.2 * d_v
+    if tilt < t_low { score += t_low - tilt; is_tilt_bad = true; }
+    else if tilt > t_high { score += tilt - t_high; is_tilt_bad = true; }
+
+    if forward < f_low { score += f_low - forward; is_forward_bad = true; }
+    else if forward > f_high { score += forward - f_high; is_forward_bad = true; }
+
+    if vertical < v_low { score += (v_low - vertical) * 100.0; is_slouch_bad = true; }
+    else if vertical > v_high { score += (vertical - v_high) * 100.0; is_slouch_bad = true; }
+
+    (score, is_tilt_bad, is_forward_bad, is_slouch_bad)
 }
 
-// =========================================================
-// CUMULATIVE DRIFT
-// =========================================================
-fn update_cumulative_drift(drift: f32) -> f32 {
-    let mut acc = DRIFT_ACCUM.lock().unwrap();
-
-    if drift > DRIFT_ALERT_THRESHOLD {
-        *acc += drift * 0.2;
-    } else {
-        *acc *= DRIFT_DECAY;
-    }
-
-    if *acc < 0.0 {
-        *acc = 0.0;
-    }
-
-    *acc
-}
-
-// =========================================================
-// MAIN ENGINE
-// =========================================================
 #[wasm_bindgen]
 pub fn process_feedback(
-    mut tilt_degrees: f32,
+    tilt_degrees: f32,
     forward_degrees: f32,
-    mut vertical_ratio: f32,
-
+    vertical_ratio: f32,
     tilt_on: bool,
     forward_on: bool,
     slouch_on: bool,
     success_on: bool
 ) -> String {
 
-    // -----------------------------------------------------
-    // NORMALIZE JS SCALE (IMPORTANT FIX)
-    // -----------------------------------------------------
-    vertical_ratio = vertical_ratio / 1000.0;
-
     update_calibration(tilt_degrees, forward_degrees, vertical_ratio);
 
-    // -----------------------------------------------------
-    // BUFFERS
-    // -----------------------------------------------------
-    let mut buffer_tilt = TILT_BUFFER.lock().unwrap();
-    let mut buffer_forward = FORWARD_BUFFER.lock().unwrap();
-    let mut buffer_vertical = VERTICAL_BUFFER.lock().unwrap();
+    // Speed Calculation (Instability)
+    let mut tbuf = TILT_BUFFER.lock().unwrap();
+    if tbuf.len() >= BUFFER_SIZE { tbuf.pop_front(); }
+    tbuf.push_back(tilt_degrees);
+    let mean = tbuf.iter().sum::<f32>() / tbuf.len() as f32;
+    let instability = (tbuf.iter().map(|x| (x - mean).powi(2)).sum::<f32>() / tbuf.len() as f32).sqrt();
+    drop(tbuf);
 
-    if buffer_tilt.len() >= BUFFER_SIZE { buffer_tilt.pop_front(); }
-    if buffer_forward.len() >= BUFFER_SIZE { buffer_forward.pop_front(); }
-    if buffer_vertical.len() >= BUFFER_SIZE { buffer_vertical.pop_front(); }
+    // Deviation & Classification based on Calibration Range
+    let (deviation, bad_t, bad_f, bad_v) = calculate_deviation_score(tilt_degrees, forward_degrees, vertical_ratio);
 
-    buffer_tilt.push_back(tilt_degrees);
-    buffer_forward.push_back(forward_degrees);
-    buffer_vertical.push_back(vertical_ratio);
+    // Time Filter (Cumulative Drift)
+    let mut acc = DRIFT_ACCUM.lock().unwrap();
+    if deviation > 0.0 {
+        *acc += deviation * 0.1; // Multiplier helps reach 20.0 in ~3s
+    } else {
+        *acc *= DRIFT_DECAY;
+    }
+    let cumulative = *acc;
 
-    let len = buffer_tilt.len() as f32;
+    // The Gate: Out of range AND Moving Slow AND Persistent
+    let gate = deviation > 0.0 && instability < INSTABILITY_THRESHOLD && cumulative > CUMULATIVE_ALERT_THRESHOLD;
 
-    let mean_tilt = buffer_tilt.iter().sum::<f32>() / len;
-    let mean_forward = buffer_forward.iter().sum::<f32>() / len;
-    let mean_vertical = buffer_vertical.iter().sum::<f32>() / len;
+    let is_tilt_bad = bad_t && tilt_on && gate;
+    let is_forward_bad = bad_f && forward_on && gate;
+    let is_slouch_bad = bad_v && slouch_on && gate;
 
-    let var_tilt = buffer_tilt.iter().map(|x| (x - mean_tilt).powi(2)).sum::<f32>() / len;
-    let var_forward = buffer_forward.iter().map(|x| (x - mean_forward).powi(2)).sum::<f32>() / len;
-
-    drop(buffer_tilt);
-    drop(buffer_forward);
-    drop(buffer_vertical);
-
-    // -----------------------------------------------------
-    // CALIBRATION CHECK
-    // -----------------------------------------------------
-    let c = CALIBRATION.lock().unwrap();
-
-    let is_tilt_good =
-        (mean_tilt - c.neutral_tilt).abs() <= c.tilt_margin
-        && var_tilt < 40.0;
-
-    let is_forward_good =
-        (mean_forward - c.neutral_forward).abs() <= c.forward_margin
-        && var_forward < 40.0;
-
-    let is_vertical_good =
-        (mean_vertical - c.neutral_vertical).abs() <= c.vertical_margin
-        && var_tilt < 0.1;
-
-    drop(c);
-
-    // -----------------------------------------------------
-    // SLouch as SIGNAL (NOT STATE)
-    // -----------------------------------------------------
-    let slouch_flag = !is_vertical_good;
-
-    // -----------------------------------------------------
-    // STATE CLASSIFICATION (NO SLouch OVERRIDE)
-    // -----------------------------------------------------
-    let current_state = match (is_tilt_good, is_forward_good) {
-        (true, true) => PostureState::Good,
-        (false, true) => PostureState::BadTilt,
-        (true, false) => PostureState::BadForward,
-        (false, false) => PostureState::BothBad
+    let current_state = match (is_tilt_bad, is_forward_bad) {
+        (false, false) => PostureState::Good,
+        (true, false) => PostureState::BadTilt,
+        (false, true) => PostureState::BadForward,
+        (true, true) => PostureState::BothBad
     };
 
     let mut last_state = LAST_STATE.lock().unwrap();
     let prev = *last_state;
-
-    let drift = drift_score(mean_tilt, mean_forward, mean_vertical);
-    let cumulative = update_cumulative_drift(drift);
-
-    let instability = var_tilt.sqrt();
-
-    let drift_gate =
-        (drift > DRIFT_ALERT_THRESHOLD
-        || cumulative > CUMULATIVE_ALERT_THRESHOLD)
-        && instability < 8.0;
+    *last_state = current_state;
 
     let mut result = match (prev, current_state) {
-
         (PostureState::Good, s) if s != PostureState::Good => {
-            let should = match s {
-                PostureState::BadTilt => tilt_on,
-                PostureState::BadForward => forward_on,
-                PostureState::BothBad => tilt_on || forward_on,
-                _ => false
-            };
-
-            if should && drift_gate {
-                play_alert();
-            }
-
+            play_alert();
             match_state_text(current_state)
         }
-
         (s, PostureState::Good) if s != PostureState::Good => {
-            if success_on {
-                play_success();
-            }
+            if success_on { play_success(); }
             match_state_text(current_state)
         }
-
         _ => match_state_text(current_state)
     };
 
-    // -----------------------------------------------------
-    // SLouch ALERT (INDEPENDENT)
-    // -----------------------------------------------------
-    if slouch_flag && slouch_on && drift_gate {
-        play_alert();
-        result = format!("{} (Slouch Detected)", result);
+    if is_slouch_bad {
+        if prev == PostureState::Good { play_alert(); }
+        result = format!("{} (Alert: Slouching)", result);
     }
-
-    *last_state = current_state;
 
     result
 }
 
-// =========================================================
-// OUTPUT TEXT
-// =========================================================
 fn match_state_text(state: PostureState) -> String {
     match state {
-        PostureState::BadTilt =>
-            "Alert: Lateral Tilt".to_string(),
-
-        PostureState::BadForward =>
-            "Alert: Forward Lean".to_string(),
-
-        PostureState::BothBad =>
-            "Alert: Lateral Tilt + Forward Lean".to_string(),
-
-        PostureState::Good =>
-            "Optimal Posture".to_string()
+        PostureState::BadTilt => "Alert: Lateral Tilt".to_string(),
+        PostureState::BadForward => "Alert: Forward Lean".to_string(),
+        PostureState::BothBad => "Alert: Lateral Tilt + Forward Lean".to_string(),
+        PostureState::Good => "Optimal Posture".to_string()
     }
 }
+

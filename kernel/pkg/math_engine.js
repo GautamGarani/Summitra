@@ -22,7 +22,6 @@ export function process_feedback(tilt_degrees, forward_degrees, vertical_ratio, 
         wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
     }
 }
-
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
