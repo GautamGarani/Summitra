@@ -2,162 +2,298 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summitra</title>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+<title>Summitra</title>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
-        rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
-    <!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3"></script>-->
+<link
+href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+rel="stylesheet">
+
+<link
+href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+rel="stylesheet">
+
+<link href="styles.css" rel="stylesheet">
 </head>
 
 <body>
 
-    <!-- WELCOME (made so that the user is forced to click the page atleast once, so that the browser plays the audio-->
-    <div id="welcome-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-icon">
-                <span class="material-symbols-rounded" style="font-size: 40px;">rocket_launch</span>
-            </div>
-            <h2 class="modal-title">Ready to start?</h2>
-            <p class="modal-text">Initialize the Summitra Vision Engine to begin your posture and wellness calibration
-                session.</p>
-            <button id="modal-start-btn" class="primary-btn">
-                Click the start button!
-                <span class="material-symbols-rounded">arrow_forward</span>
-            </button>
-        </div>
-    </div>
+<div id="welcome-modal" class="modal-overlay">
+<div class="modal-content">
+<div class="modal-icon">
+<span class="material-symbols-rounded"
+style="font-size:40px;">
+rocket_launch
+</span>
+</div>
 
-    <!-- EXIT CONFIRMATION-->
-    <div id="exit-modal" class="modal-overlay modal-hidden">
-        <div class="modal-content">
-            <div class="modal-icon danger">
-                <span class="material-symbols-rounded" style="font-size: 40px;">logout</span>
-            </div>
-            <h2 class="modal-title">Terminate Session?</h2>
-            <p class="modal-text">Are you sure you want to exit? Your current session kinetic data will be uploaded to
-                the server.</p>
-            <div class="btn-group">
-                <button id="confirm-exit-btn" class="danger-btn">
-                    Yes, Stop Session
-                </button>
-                <button id="cancel-exit-btn" class="secondary-btn">
-                    Continue Calibration
-                </button>
-            </div>
-        </div>
-    </div>
+<h2 class="modal-title">
+Ready to start?
+</h2>
 
-    <header>
-        <img src="logo.jpg" alt="Summitra Logo" class="logo-watermark"
-            onerror="this.src='https://via.placeholder.com/64'">
-        <div>
-            <div class="header-title">Summitra</div>
-            <div class="header-subtitle">Reaching the epitome of wellness</div>
-        </div>
-    </header>
+<p class="modal-text">
+Initialize the Summitra Vision Engine
+to begin your posture and wellness
+calibration session.
+</p>
 
-    <main>
-        <section class="viewport-container">
-            <div class="video-wrapper">
-                <video id="webcam" autoplay playsinline></video>
-                <div class="video-vignette"></div>
-                <img src="logo.jpg" alt="Summitra Logo" class="video-watermark"
-                    onerror="this.src='https://via.placeholder.com/64'">
-            </div>
-            <div class="viewport-controls">
-                <div class="control-item">
-                    <span class="control-label">Mute All</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggle-master">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="control-divider"></div>
-                <div class="control-item">
-                    <span class="control-label">Mute Lateral Alerts</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggle-tilt" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="control-divider"></div>
-                <div class="control-item">
-                    <span class="control-label">Mute Forward Lean Alerts</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggle-forward" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="control-divider"></div>
-                <div class="control-item">
-                    <span class="control-label">Mute Slouching Alerts</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggle-slouch" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </section>
+<button id="modal-start-btn"
+class="primary-btn">
+Click the start button!
+<span class="material-symbols-rounded">
+arrow_forward
+</span>
+</button>
 
-        <section id="monitor-card">
-            <div class="card-segment">
-                <span class="label">Kinetic Feedback</span>
-                <div id="feedback-value">Awaiting Calibration...</div>
-                <div id="raw-angle">Tilt Vector: --°</div>
-            </div>
+</div>
+</div>
 
-            <div class="card-segment stats-panel">
 
-                <span class="label">Session STATS</span>
+<div id="exit-modal"
+class="modal-overlay modal-hidden">
 
-                <div class="stats-table-wrapper">
-                    <table class="stats-table">
+<div class="modal-content">
 
-                        <thead>
-                            <tr>
-                                <th>TIME</th>
-                                <th>ALERT</th>
-                                <th>ANGLE</th>
-                            </tr>
-                        </thead>
+<div class="modal-icon danger">
+<span class="material-symbols-rounded"
+style="font-size:40px;">
+logout
+</span>
+</div>
 
-                        <tbody id="stats-body">
+<h2 class="modal-title">
+Terminate Session?
+</h2>
 
-                            <!-- JS prepends rows here -->
-                            <!-- Example:
-                <tr>
-                    <td>12:41:07</td>
-                    <td>LATERAL Lean</td>
-                    <td>8.4°</td>
-                </tr>
-                -->
+<p class="modal-text">
+Are you sure you want to exit?
+Your current session kinetic data
+will be uploaded to the server.
+</p>
 
-                        </tbody>
+<div class="btn-group">
 
-                    </table>
-                </div>
+<button id="confirm-exit-btn"
+class="danger-btn">
+Yes, Stop Session
+</button>
 
-                <button id="stop-session-btn" class="danger-btn" style="width:100%; margin-top:18px;">
-                    <span class="material-symbols-rounded">cancel</span>
-                    Terminate Session
-                </button>
+<button id="cancel-exit-btn"
+class="secondary-btn">
+Continue Calibration
+</button>
 
-            </div>
+</div>
+</div>
+</div>
 
-            <div class="log-container">
-                <div id="log-pulse" class="pulse"></div>
-                <span id="log-text">Initializing Vision Systems...</span>
-            </div>
-        </section>
-    </main>
 
-    <script type="module" src="live.js"></script>
+<header>
+
+<img src="logo.jpg"
+alt="Summitra Logo"
+class="logo-watermark"
+onerror="this.src='https://via.placeholder.com/64'">
+
+<div>
+<div class="header-title">
+Summitra
+</div>
+
+<div class="header-subtitle">
+Reaching the epitome of wellness
+</div>
+</div>
+
+</header>
+
+
+<main>
+
+<section class="viewport-container">
+
+<div class="video-wrapper">
+
+<video id="webcam"
+autoplay
+playsinline>
+</video>
+
+<div class="video-vignette"></div>
+
+<img src="logo.jpg"
+alt="Summitra Logo"
+class="video-watermark"
+onerror="this.src='https://via.placeholder.com/64'">
+
+
+<!-- NEW CALIBRATION OVERLAY -->
+<div id="calibration-overlay"
+class="calibration-card cal-blue">
+
+<div class="cal-step">
+Step 1 of 4
+</div>
+
+<div id="calibration-message">
+Rotate head gently left and right
+</div>
+
+</div>
+<!-- END NEW -->
+
+
+</div>
+
+
+<div class="viewport-controls">
+
+<div class="control-item">
+<span class="control-label">
+Mute All
+</span>
+
+<label class="switch">
+<input type="checkbox"
+id="toggle-master">
+<span class="slider"></span>
+</label>
+</div>
+
+<div class="control-divider"></div>
+
+
+<div class="control-item">
+<span class="control-label">
+Mute Lateral Alerts
+</span>
+
+<label class="switch">
+<input
+type="checkbox"
+id="toggle-tilt"
+checked>
+<span class="slider"></span>
+</label>
+</div>
+
+<div class="control-divider"></div>
+
+
+<div class="control-item">
+<span class="control-label">
+Mute Forward Lean Alerts
+</span>
+
+<label class="switch">
+<input
+type="checkbox"
+id="toggle-forward"
+checked>
+<span class="slider"></span>
+</label>
+</div>
+
+<div class="control-divider"></div>
+
+
+<div class="control-item">
+<span class="control-label">
+Mute Slouching Alerts
+</span>
+
+<label class="switch">
+<input
+type="checkbox"
+id="toggle-slouch"
+checked>
+<span class="slider"></span>
+</label>
+</div>
+
+</div>
+</section>
+
+
+<section id="monitor-card">
+
+<div class="card-segment">
+
+<span class="label">
+Kinetic Feedback
+</span>
+
+<div id="feedback-value">
+Awaiting Calibration...
+</div>
+
+<div id="raw-angle">
+Tilt Vector: --°
+</div>
+
+</div>
+
+
+<div class="card-segment stats-panel">
+
+<span class="label">
+Session STATS
+</span>
+
+<div class="stats-table-wrapper">
+
+<table class="stats-table">
+
+<thead>
+<tr>
+<th>TIME</th>
+<th>ALERT</th>
+<th>ANGLE</th>
+</tr>
+</thead>
+
+<tbody id="stats-body">
+</tbody>
+
+</table>
+
+</div>
+
+<button id="stop-session-btn"
+class="danger-btn"
+style="width:100%;margin-top:18px;">
+
+<span class="material-symbols-rounded">
+cancel
+</span>
+
+Terminate Session
+
+</button>
+
+</div>
+
+
+<div class="log-container">
+<div id="log-pulse"
+class="pulse">
+</div>
+
+<span id="log-text">
+Initializing Vision Systems...
+</span>
+
+</div>
+
+</section>
+
+</main>
+
+<script type="module"
+src="live.js">
+</script>
+
 </body>
-
 </html>

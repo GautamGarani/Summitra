@@ -1,127 +1,107 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summitra | Wellness Hub</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summitra | Wellness Hub</title>
 
-    <!-- Chart.js -->
-    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
-
-    <style>
-        #chart-container {
-            margin-top: 20px;
-            display: none;
-        }
-    </style>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="styles.css" rel="stylesheet">
 </head>
-
 <body>
 
 <header>
-    <div class="icon-box" style="width: 48px; height: 48px; border-radius: 12px; margin: 0;">
-        <span class="material-symbols-rounded">clinical_notes</span>
-    </div>
-    <div>
-        <div class="header-title">Summitra</div>
-        <div class="header-subtitle">Reaching the epitome of wellness</div>
-    </div>
+<img src="logo.jpg" class="logo-watermark" alt="Summitra">
+<div>
+<div class="header-title">Summitra</div>
+<div class="header-subtitle">Reaching the epitome of wellness</div>
+</div>
 </header>
 
-<main>
+<main class="dashboard-main-pro">
 
-    <!-- EXISTING CARD -->
-    <div class="card">
-        <div class="icon-box">
-            <span class="material-symbols-rounded" style="font-size: 40px;">monitoring</span>
-        </div>
-        <h2>Start Monitoring</h2>
-        <p>Launch the Vision Engine to begin real-time posture tracking.</p>
-        <button class="btn" onclick="location.href='live.html'">
-            Launch Live Monitor
-            <span class="material-symbols-rounded">arrow_forward</span>
-        </button>
-    </div>
+<section class="dashboard-hero">
+<div class="hero-copy">
+<div class="hero-eyebrow">AI WELLNESS CONSOLE</div>
+<h1>Personal posture intelligence for sustainable wellness.</h1>
+<p class="hero-text">
+Launch real-time monitoring, review posture analytics, and track session compliance trends.
+</p>
+</div>
 
-    <!-- ANALYTICS CARD -->
-    <div class="card">
-        <div class="icon-box">
-            <span class="material-symbols-rounded" style="font-size: 40px;">pie_chart</span>
-        </div>
-        <h2>View Analytics</h2>
-        <p>Compare your last two sessions.</p>
+<div class="hero-pills">
+<div class="metric-pill">
+<span class="material-symbols-rounded">monitoring</span>
+Realtime Guidance
+</div>
 
-        <button id="view-analytics-btn" onclick="location.href='analytics.html'">
-        View Analytics
-        <span class="material-symbols-rounded">analytics</span>
-        </button>
+<div class="metric-pill">
+<span class="material-symbols-rounded">query_stats</span>
+Session Trends
+</div>
 
-        <!--<div id="chart-container">
-            <canvas id="pieChart"></canvas>
-        </div>-->
-    </div>
+<div class="metric-pill">
+<span class="material-symbols-rounded">workspace_premium</span>
+Adaptive Calibration
+</div>
+</div>
+</section>
+
+<section class="feature-grid">
+
+<div class="card feature-card">
+<div class="feature-badge">
+<span class="material-symbols-rounded">center_focus_strong</span>
+</div>
+
+<h2>Start Monitoring</h2>
+<p>
+Launch the Vision Engine to begin real-time posture tracking, guided correction and live audio feedback.
+</p>
+
+<div class="feature-points">
+<div>• Personalized calibration</div>
+<div>• Drift-aware posture feedback</div>
+<div>• Real-time alert suppression logic</div>
+</div>
+
+<button class="btn" onclick="location.href='live.html'">
+Launch Live Monitor
+<span class="material-symbols-rounded">arrow_forward</span>
+</button>
+</div>
+
+
+<div class="card feature-card analytics-card-accent">
+<div class="feature-badge analytics-badge">
+<span class="material-symbols-rounded">analytics</span>
+</div>
+
+<h2>View Analytics</h2>
+<p>
+Compare recent sessions, examine alert distributions, and track posture compliance progression.
+</p>
+
+<div class="feature-points">
+<div>• Session comparison</div>
+<div>• Alert distribution review</div>
+<div>• Compliance trend visibility</div>
+</div>
+
+<button id="view-analytics-btn" class="btn" onclick="location.href='analytics.html'">
+View Analytics
+<span class="material-symbols-rounded">insights</span>
+</button>
+</div>
+
+</section>
 
 </main>
-<!--
-<script>
-const SERVER = "http://localhost:5000";
-let chart = null;
-
-// fetch session data
-async function getSessionData(sessionId) {
-    const res = await fetch(`${SERVER}/get_session/${sessionId}`);
-    return await res.json();
-}
-
-document.getElementById("view-analytics-btn")
-.addEventListener("click", async () => {
-
-    const currentId =
-        localStorage.getItem("current_session_id");
-
-    const previousId =
-        localStorage.getItem("previous_session_id");
-
-    if (!currentId) {
-        alert("No current session found");
-        return;
-    }
-
-    // fetch current
-    const current = await getSessionData(currentId);
-    const currentBad = current.bad_time || 0;
-
-    // fetch previous
-    let previousBad = 0;
-
-    if (previousId) {
-        const previous = await getSessionData(previousId);
-        previousBad = previous.bad_time || 0;
-    }
-
-    // render chart
-    const ctx = document.getElementById("pieChart");
-
-    if (chart) chart.destroy();
-
-    chart = new Chart(ctx, {
-        type: "pie",
-        data: {
-            labels: ["Previous Session", "Current Session"],
-            datasets: [{
-                data: [previousBad, currentBad]
-            }]
-        }
-    });
-
-    document.getElementById("chart-container")
-        .style.display = "block";
-});
-</script>-->
 
 </body>
 </html>
+
+
+

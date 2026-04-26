@@ -35,10 +35,6 @@ static LAST_STATE: Lazy<Mutex<PostureState>> =
 
 // =========================================================
 // NEW: CUMULATIVE DRIFT MEMORY
-// ---------------------------------------------------------
-// Stores sustained deviation “load”.
-// Large brief excursions don't instantly annoy user.
-// Prolonged deterioration accumulates.
 // =========================================================
 static DRIFT_ACCUM: Lazy<Mutex<f32>> =
     Lazy::new(|| Mutex::new(0.0));
@@ -50,11 +46,6 @@ const DRIFT_DECAY: f32 = 0.85;
 
 // =========================================================
 // NEW: PERSONALIZED CALIBRATION STATE
-// ---------------------------------------------------------
-// 0-5 sec : user explores max left-right tilt
-// 5-10 sec: user explores forward bend range
-//10-15 sec: user explores slouch/straighten
-//15-20 sec: settle window before locking calibration
 // =========================================================
 struct CalibrationState {
     complete: bool,
@@ -115,7 +106,7 @@ extern "C" {
 
 
 // =========================================================
-// NEW: PERSONALIZED CALIBRATION LEARNING
+// PERSONALIZED CALIBRATION LEARNING
 // =========================================================
 fn update_calibration(
     tilt:f32,
@@ -130,26 +121,23 @@ fn update_calibration(
 
     c.frames +=1;
 
-    // assuming ~180ms loop
     let sec=c.frames as f32 * 0.18;
 
-    // ---------- phase 1 ----------
     if sec<=5.0{
         c.min_tilt=c.min_tilt.min(tilt);
         c.max_tilt=c.max_tilt.max(tilt);
     }
-    // ---------- phase 2 ----------
     else if sec<=10.0{
         c.min_forward=c.min_forward.min(forward);
         c.max_forward=c.max_forward.max(forward);
     }
-    // ---------- phase 3 ----------
     else if sec<=15.0{
         c.min_vertical=c.min_vertical.min(vertical);
         c.max_vertical=c.max_vertical.max(vertical);
     }
 
     if sec>=20.0{
+
         c.neutral_tilt=
             (c.min_tilt+c.max_tilt)/2.0;
 
@@ -159,7 +147,6 @@ fn update_calibration(
         c.neutral_vertical=
             (c.min_vertical+c.max_vertical)/2.0;
 
-        // 10 percent tolerance window
         c.tilt_margin=
             (c.max_tilt-c.min_tilt)*0.10;
 
@@ -175,9 +162,7 @@ fn update_calibration(
 
 
 // =========================================================
-// NEW: CONTINUOUS DRIFT SCORE
-// ---------------------------------------------------------
-// Replaces binary deviation thinking with continuous error.
+// CONTINUOUS DRIFT SCORE
 // =========================================================
 fn drift_score(
     tilt:f32,
@@ -202,7 +187,7 @@ fn drift_score(
 
 
 // =========================================================
-// NEW: CUMULATIVE DRIFT INTEGRATOR
+// CUMULATIVE DRIFT INTEGRATOR
 // =========================================================
 fn update_cumulative_drift(
     drift:f32
@@ -227,32 +212,6 @@ fn update_cumulative_drift(
 
 
 // =========================================================
-// NEW: MICRO INSTABILITY DETECTION
-// ---------------------------------------------------------
-// Detects wobble/fatigue-like microcorrections.
-// =========================================================
-fn instability_score()->f32{
-
-    let b=TILT_BUFFER.lock().unwrap();
-
-    if b.len()<5{
-        return 0.0;
-    }
-
-    let n=b.len() as f32;
-
-    let mean=
-        b.iter().sum::<f32>()/n;
-
-    (
-        b.iter()
-         .map(|x|(x-mean).powi(2))
-         .sum::<f32>()/n
-    ).sqrt()
-}
-
-
-// =========================================================
 // MAIN FEEDBACK ENGINE
 // =========================================================
 #[wasm_bindgen]
@@ -267,13 +226,11 @@ pub fn process_feedback(
     success_on: bool
 )->String{
 
-    // NEW calibration learning always runs
     update_calibration(
         tilt_degrees,
         forward_degrees,
         vertical_ratio
     );
-
 
     // =====================================================
     // Existing rolling buffers preserved
@@ -298,7 +255,6 @@ pub fn process_feedback(
     buffer_forward.push_back(forward_degrees);
     buffer_vertical.push_back(vertical_ratio);
 
-
     let len=buffer_tilt.len() as f32;
 
     let mean_tilt=
@@ -309,7 +265,6 @@ pub fn process_feedback(
 
     let mean_vertical=
         buffer_vertical.iter().sum::<f32>()/len;
-
 
     let var_tilt=
         buffer_tilt.iter()
@@ -326,11 +281,14 @@ pub fn process_feedback(
         .map(|&x|(x-mean_vertical).powi(2))
         .sum::<f32>()/len;
 
+    // Explicitly drop all buffer locks before any future lock reuse
+    drop(buffer_tilt);
+    drop(buffer_forward);
+    drop(buffer_vertical);
+
 
     // =====================================================
-    // CHANGED:
-    // personalized thresholds override hardcoded thresholds
-    // fallback retained if calibration incomplete
+    // Personalized thresholds
     // =====================================================
     let cal=CALIBRATION.lock().unwrap();
 
@@ -347,7 +305,6 @@ pub fn process_feedback(
         var_tilt<40.0
     };
 
-
     let is_forward_good=
     if cal.complete{
         (mean_forward-cal.neutral_forward).abs()
@@ -360,7 +317,6 @@ pub fn process_feedback(
         &&
         var_forward<40.0
     };
-
 
     let is_vertical_good=
     if cal.complete{
@@ -375,11 +331,13 @@ pub fn process_feedback(
         var_vertical<0.1
     };
 
+    // Secondary bug already handled correctly:
+    // release calibration mutex before drift_score re-locks it.
     drop(cal);
 
 
     // =====================================================
-    // NEW: DRIFT ACTIVE IN ALERTING
+    // Drift + instability
     // =====================================================
     let drift=
         drift_score(
@@ -391,11 +349,10 @@ pub fn process_feedback(
     let cumulative_drift=
         update_cumulative_drift(drift);
 
-    let instability=
-        instability_score();
+    // FIX:
+    // Replaces instability_score() (which caused mutex deadlock)
+    let instability=var_tilt.sqrt();
 
-
-    // Alert only if meaningful sustained deviation exists.
     let drift_gate=
     (
       drift>DRIFT_ALERT_THRESHOLD
@@ -408,7 +365,7 @@ pub fn process_feedback(
 
 
     // =====================================================
-    // ORIGINAL STATE LOGIC  
+    // ORIGINAL STATE LOGIC
     // =====================================================
     let current_state=
         if !is_vertical_good {
@@ -435,10 +392,6 @@ pub fn process_feedback(
 
     let result=match (last_state,current_state){
 
-        // -------------------------------------------------
-        // CHANGED:
-        // alert only if drift gate permits
-        // -------------------------------------------------
         (PostureState::Good,s)
         if s!=PostureState::Good=>{
 
@@ -506,7 +459,7 @@ pub fn process_feedback(
 
 
 // =========================================================
-// EXISTING UI FEEDBACK TEXT 
+// EXISTING UI FEEDBACK TEXT
 // =========================================================
 fn match_state_text(
     state:PostureState
@@ -530,5 +483,3 @@ fn match_state_text(
             "Optimal Posture".to_string()
     }
 }
-
-
