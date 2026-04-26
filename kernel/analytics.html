@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="logo.jpg">
 <title>Analytics</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,7 +53,7 @@
         <img src="logo.jpg" class="logo-watermark" alt="Summitra">
         <div>
             <div class="header-title">Summitra</div>
-            <div class="header-subtitle">Session Analytics</div>
+            <div class="header-subtitle">Reaching the Epitome of Wellness</div>
         </div>
     </div>
     
@@ -232,7 +233,7 @@ function loadAnalytics() {
     if (currentSession.alerts && currentSession.alerts.length > 3) {
         let forwardToSlouch = 0;
         for (let i = 0; i < currentSession.alerts.length - 1; i++) {
-            if (currentSession.alerts[i].type.includes("FORWARD") && currentSession.alerts[i+1].type.includes("SLOUCH")) forwardToSlouch++;
+            if (currentSession.alerts[i].type.includes("Forward") && currentSession.alerts[i+1].type.includes("Slouch")) forwardToSlouch++;
         }
         corrText.textContent = forwardToSlouch > 1 ? "Pattern: Forward leaning precedes slouching." : "No significant trigger patterns detected.";
     }
