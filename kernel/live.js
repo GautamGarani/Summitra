@@ -19,7 +19,8 @@ const sessionData = {
     badFrames: 0,
     lateralAlerts: 0,
     forwardAlerts: 0,
-    slouchAlerts: 0
+    slouchAlerts: 0,
+    multipleAlerts: 0
 };
 
 import init, { process_feedback } from './pkg/math_engine.js';
@@ -275,9 +276,10 @@ const degrees = tilt;
                         if (feedback.includes('Lateral')) { sessionData.lateralAlerts++; }
                         else if (feedback.includes('Forward')) { sessionData.forwardAlerts++; }
                         else if (feedback.includes('Slouch')) { sessionData.slouchAlerts++; }
+                        else if(feedback.includes('Multiple')) {sessionData.multipleAlerts++;}
 
                         let logAngle = '';
-                        if (feedback.includes('+')) { logAngle = `T ${degrees.toFixed(1)} / N ${neckAngle.toFixed(1)}`; }
+                        if (feedback.includes('Multiple')) { logAngle = `T ${degrees.toFixed(1)} / N ${neckAngle.toFixed(1)} /N ${verticalRatio.toFixed(1)}`; }
                         else if (feedback.includes('Lateral')) { logAngle = `${degrees.toFixed(1)}°`; }
                         else if (feedback.includes('Slouching')) { logAngle = `S ${verticalRatio.toFixed(2)}`; }
                         else { logAngle = `${neckAngle.toFixed(1)}°`; }

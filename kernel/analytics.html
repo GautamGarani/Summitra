@@ -162,6 +162,7 @@ function loadAnalytics() {
     // KPI CALCULATIONS
     const currentVal = getSessionPct(currentSession);
     const previousSessions = sessions.slice(0, -1);
+
     let historicalAvg = null;
     if (previousSessions.length > 0) {
         historicalAvg = previousSessions.reduce((acc, s) => acc + getSessionPct(s), 0) / previousSessions.length;
@@ -177,6 +178,7 @@ function loadAnalytics() {
 
     let totalRecoveryTime = 0;
     let recoveryCount = 0;
+
     for (let i = 0; i < logs.length - 1; i++) {
         if (logs[i].status === 'ALERT' && logs[i+1].status === 'GOOD') {
             const diff = (new Date(logs[i+1].timestamp) - new Date(logs[i].timestamp)) / 1000;
@@ -196,20 +198,57 @@ function loadAnalytics() {
     if (currentSession.totalFrames < 100) {
         document.getElementById('fatigue-container').innerHTML = "<div style='padding:40px; color:var(--blue-500); font-weight:700;'>MINIMAL DATA RECORDED</div>";
     } else {
+
+        const logs = currentSession.logs;
+        const buckets = [0, 0, 0, 0, 0];
+        const step = Math.max(1, Math.floor(logs.lenght)/5);
+
+        for(let i=0; i<logs.length; i++)
+    {
+        const idx = Math.min(4, Math.floor(i/step));
+        if(logs[i].status === "GOOD")
+    {
+        buckets[idx]+=1;
+    }
+    }
+
+    const bucketSize = Math.max(1, logs.length/5);
+
+    const dataBuckets = buckets.map(b=>
+    {
+        const pct = (b/bucketSize)*100;
+        return Math.max(0, Math.min(100, pct));
+    }
+    );
+
+
         new Chart(fatigueCtx, {
             type: 'line',
             data: {
                 labels: ['0m', '5m', '10m', '15m', '20m'],
                 datasets: [{
-                    label: 'Efficiency %',
-                    data: [currentVal + 3, currentVal + 1, currentVal, currentVal - 2, currentVal - 5],
+                    label: 'Posture Efficiency (Fatigue) %',
+                    data: dataBuckets,
                     borderColor: '#0052CC',
                     backgroundColor: 'rgba(0, 82, 204, 0.05)',
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointRadius: 3
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: { responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { display: false }, 
+                    tooltip: {
+                        callbacks : {
+                            label: function(context){
+                                return `Efficiency: ${context.raw.toFixed(1)}%`;
+
+                            }
+                        }
+                    }
+                } }
         });
     }
 
@@ -218,10 +257,10 @@ function loadAnalytics() {
     new Chart(ctx, {
         type: "pie",
         data: {
-            labels: ["Lateral", "Forward", "Slouch"],
+            labels: ["Lateral", "Forward", "Slouch", "Multiple"],
             datasets: [{
-                data: [currentSession.lateralAlerts || 0, currentSession.forwardAlerts || 0, currentSession.slouchAlerts || 0],
-                backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b"],
+                data: [currentSession.lateralAlerts || 0, currentSession.forwardAlerts || 0, currentSession.slouchAlerts || 0, currentSession.multipleAlerts || 0],
+                backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "#000000"],
                 borderWidth: 0
             }]
         },

@@ -11,7 +11,8 @@ enum PostureState {
     Good,
     BadTilt,
     BadForward,
-    BothBad
+    BadSlouch,
+    MultipleBad
 }
 
 const BUFFER_SIZE: usize = 20;
@@ -161,25 +162,27 @@ pub fn process_feedback(
     }
     let cumulative = *acc;
 
-    // The Gate: Out of range AND Moving Slow AND Persistent
+    // Out of range AND Moving Slow AND Persistent
     let gate = deviation > 0.0 && instability < INSTABILITY_THRESHOLD && cumulative > CUMULATIVE_ALERT_THRESHOLD;
 
     let is_tilt_bad = bad_t && tilt_on && gate;
     let is_forward_bad = bad_f && forward_on && gate;
     let is_slouch_bad = bad_v && slouch_on && gate;
 
-    let current_state = match (is_tilt_bad, is_forward_bad) {
-        (false, false) => PostureState::Good,
-        (true, false) => PostureState::BadTilt,
-        (false, true) => PostureState::BadForward,
-        (true, true) => PostureState::BothBad
+    // Determine current state including Slouching
+    let current_state = match (is_tilt_bad, is_forward_bad, is_slouch_bad) {
+        (false, false, false) => PostureState::Good,
+        (true, false, false) => PostureState::BadTilt,
+        (false, true, false) => PostureState::BadForward,
+        (false, false, true) => PostureState::BadSlouch,
+        _ => PostureState::MultipleBad
     };
 
     let mut last_state = LAST_STATE.lock().unwrap();
     let prev = *last_state;
     *last_state = current_state;
 
-    let mut result = match (prev, current_state) {
+    match (prev, current_state) {
         (PostureState::Good, s) if s != PostureState::Good => {
             play_alert();
             match_state_text(current_state)
@@ -189,22 +192,15 @@ pub fn process_feedback(
             match_state_text(current_state)
         }
         _ => match_state_text(current_state)
-    };
-
-    if is_slouch_bad {
-        if prev == PostureState::Good { play_alert(); }
-        result = format!("{} (Alert: Slouching)", result);
     }
-
-    result
 }
 
 fn match_state_text(state: PostureState) -> String {
     match state {
         PostureState::BadTilt => "Alert: Lateral Tilt".to_string(),
         PostureState::BadForward => "Alert: Forward Lean".to_string(),
-        PostureState::BothBad => "Alert: Lateral Tilt + Forward Lean".to_string(),
+        PostureState::BadSlouch => "Alert: Slouching".to_string(),
+        PostureState::MultipleBad => "Alert: Multiple Issues".to_string(),
         PostureState::Good => "Optimal Posture".to_string()
     }
 }
-
