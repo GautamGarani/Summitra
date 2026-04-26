@@ -80,7 +80,7 @@ confirmExitBtn.addEventListener('click', () => {
     }
 
     localStorage.setItem('sessions', JSON.stringify(sessions));
-    window.location.href = 'dashboard.html';
+    window.location.href = 'analytics.html';
 });
 
 // ----------------------------
