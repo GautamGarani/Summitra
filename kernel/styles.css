@@ -325,3 +325,110 @@ input:checked + .slider:before { transform: translateX(22px); }
     .feature-card { padding: 32px; }
     header { padding: 0 20px; }
 }
+
+/* =========================================
+   LIVE.HTML FIT OVERRIDES (SIDE-BY-SIDE KEPT)
+========================================= */
+
+body:has(#monitor-card) main{
+    grid-template-columns: minmax(0,1fr) 300px; /* slimmer monitor rail */
+    gap:18px;
+    padding:16px;
+    max-width:100vw;
+    align-items:start;
+}
+
+/* Bigger video region, but bounded to viewport */
+body:has(#monitor-card) .viewport-container{
+    padding:12px;
+    min-height:auto;
+    height:calc(100vh - 115px);
+    max-height:calc(100vh - 115px);
+    aspect-ratio:auto;
+}
+
+/* Main camera enlarged */
+body:has(#monitor-card) .video-wrapper{
+    min-height:0;
+    height:calc(100vh - 250px);
+    border-radius:20px;
+}
+
+/* Show full face + shoulders (less crop) */
+body:has(#monitor-card) #webcam{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+/* Smaller calibration overlay */
+body:has(#monitor-card) .calibration-card{
+    top:16px;
+    width:min(80%,430px);
+    padding:18px;
+}
+
+body:has(#monitor-card) #calibration-message{
+    font-size:20px;
+}
+
+/* Compact control bar */
+body:has(#monitor-card) .viewport-controls{
+    padding:14px 16px;
+    gap:12px;
+    margin-top:10px;
+}
+
+body:has(#monitor-card) .control-item{
+    gap:8px;
+}
+
+body:has(#monitor-card) .control-label{
+    font-size:11px;
+}
+
+/* Compress right diagnostics stack */
+body:has(#monitor-card) #monitor-card{
+    gap:16px;
+}
+
+body:has(#monitor-card) .card-segment{
+    padding:20px;
+}
+
+body:has(#monitor-card) #feedback-value{
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+body:has(#monitor-card) #raw-angle{
+    font-size:15px;
+    padding:10px 16px;
+}
+
+body:has(#monitor-card) .stats-table-wrapper{
+    max-height:180px;
+}
+
+body:has(#monitor-card) .stats-table th,
+body:has(#monitor-card) .stats-table td{
+    padding:9px;
+    font-size:11px;
+}
+
+body:has(#monitor-card) #stop-session-btn{
+    margin-top:14px !important;
+    padding:14px 20px;
+}
+
+/* Only scale down slightly on smaller laptops,
+   NEVER stack vertically */
+@media (max-width:1350px){
+    body:has(#monitor-card) main{
+        grid-template-columns:minmax(0,1fr) 270px;
+    }
+
+    body:has(#monitor-card) #feedback-value{
+        font-size:26px;
+    }
+}
