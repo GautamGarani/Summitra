@@ -207,7 +207,7 @@ async function startCoach() {
                 const sWidth = Math.sqrt(Math.pow(p[11].x - p[12].x, 2) + Math.pow(p[11].y - p[12].y, 2));
                 const vGapL = p[11].y - l[454].y;
                 const vGapR = p[12].y - l[234].y;
-                const verticalRatio = ((vGapL + vGapR) / 2) / sWidth;
+                const verticalRatio = 1000*((vGapL + vGapR) / 2) / sWidth;
 
                 const isMasterMuted = master.checked;
                 const tiltOn = subs[0].checked;
@@ -240,6 +240,7 @@ async function startCoach() {
                     }
                 } else {
                     overlay.style.display = 'none';
+
                     let feedback = process_feedback(degrees, neckAngle, verticalRatio, tiltOn, forwardOn, slouchOn, successOn);
 
                     display.innerHTML = feedback;
