@@ -149,7 +149,7 @@ function goBack() { window.location.href = "dashboard.html"; }
 
 function getSessionPct(session) {
     if (!session || !session.totalFrames || session.totalFrames === 0) return 0;
-    return (session.goodFrames / session.totalFrames) * 100;
+    return (session.goodFrames / (session.totalFrames-110)) * 100;
 }
 
 function loadAnalytics() {
