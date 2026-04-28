@@ -92,7 +92,7 @@
         <div class="kpi-icon"><span class="material-symbols-rounded">receipt_long</span></div>
         <div class="kpi-label">Ergonomic Debt</div>
         <div class="kpi-value" id="ergo-debt">0m</div>
-        <div class="kpi-mini">Estimated physiological recovery time calculated using a 2:1 ratio of bad-posture duration to restorative rest.</div>
+        <div class="kpi-mini">Estimated physiological recovery time calculated using a 2:1 ratio of bad-posture duration to restorative rest. (ROUNDED UP to next minute)</div>
     </div>
 
     <div class="card analytics-kpi">
@@ -108,8 +108,8 @@
         <div class="chart-heading-row">
             <div>
                 <span class="label">Cognitive Load</span>
-                <h2>Focus vs. Fatigue</h2>
-                <p class="kpi-mini">A longitudinal timeline mapping compliance decay to identify muscular burnout points over session duration.</p>
+                <h2>Your Fatigue</h2>
+                <p class="kpi-mini">A timeline mapping focus decay to identify muscular strain over session duration.</p>
             </div>
         </div>
         <div class="chart-container-pro" id="fatigue-container">
@@ -194,63 +194,79 @@ function loadAnalytics() {
     document.getElementById("ergo-debt").textContent = debtMinutes + "m";
 
     // FATIGUE CHART
-    const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
-    if (currentSession.totalFrames < 100) {
-        document.getElementById('fatigue-container').innerHTML = "<div style='padding:40px; color:var(--blue-500); font-weight:700;'>MINIMAL DATA RECORDED</div>";
-    } else {
+    
+// --- FATIGUE CHART: DYNAMIC DENSITY LOGIC ---
+const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
 
-        const logs = currentSession.logs;
-        const buckets = [0, 0, 0, 0, 0];
-        const step = Math.max(1, Math.floor(logs.lenght)/5);
+if (currentSession.totalFrames < 100) {
+    document.getElementById('fatigue-container').innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--blue-500); font-weight:700; font-family:'JetBrains Mono';">
+            INSUFFICIENT TELEMETRY FOR ANALYSIS
+        </div>`;
+} else {
+    const logs = currentSession.logs;
+    const binCount = 5; // 5 segments for the 20m timeline
+    
+    // Initialize dual-stream accumulators
+    const goodCounts = new Array(binCount).fill(0);
+    const totalSamplesPerBin = new Array(binCount).fill(0);
 
-        for(let i=0; i<logs.length; i++)
-    {
-        const idx = Math.min(4, Math.floor(i/step));
-        if(logs[i].status === "GOOD")
-    {
-        buckets[idx]+=1;
-    }
-    }
+    // 1. DYNAMIC BINNING: Distribute logs proportionally across the session
+    logs.forEach((log, index) => {
+        // Calculate which 20% slice of the session this log belongs to
+        const binIndex = Math.min(binCount - 1, Math.floor((index / logs.length) * binCount));
+        
+        totalSamplesPerBin[binIndex]++;
+        if (log.status === "GOOD") {
+            goodCounts[binIndex]++;
+        }
+    });
 
-    const bucketSize = Math.max(1, logs.length/5);
+    // 2. NORMALIZATION: Calculate percentage based on LOCAL density
+    const fatigueDataPoints = goodCounts.map((good, i) => {
+        const total = totalSamplesPerBin[i];
+        return total > 0 ? (good / total) * 100 : 0;
+    });
 
-    const dataBuckets = buckets.map(b=>
-    {
-        const pct = (b/bucketSize)*100;
-        return Math.max(0, Math.min(100, pct));
-    }
-    );
-
-
-        new Chart(fatigueCtx, {
-            type: 'line',
-            data: {
-                labels: ['0m', '5m', '10m', '15m', '20m'],
-                datasets: [{
-                    label: 'Posture Efficiency (Fatigue) %',
-                    data: dataBuckets,
-                    borderColor: '#0052CC',
-                    backgroundColor: 'rgba(0, 82, 204, 0.05)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3
-                }]
+    // 3. RENDER: Chart.js Implementation
+    new Chart(fatigueCtx, {
+        type: 'line',
+        data: {
+            labels: ['Start', '25%', '50%', '75%', 'End'],
+            datasets: [{
+                label: 'Postural Efficiency %',
+                data: fatigueDataPoints,
+                borderColor: '#0052CC',
+                backgroundColor: 'rgba(0, 82, 204, 0.08)',
+                fill: true,
+                tension: 0.45, // Smooths the "Fatigue Curve"
+                pointRadius: 4,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#0052CC',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { callback: value => value + '%' }
+                }
             },
-            options: { responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { display: false }, 
-                    tooltip: {
-                        callbacks : {
-                            label: function(context){
-                                return `Efficiency: ${context.raw.toFixed(1)}%`;
-
-                            }
-                        }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `Efficiency: ${context.parsed.y.toFixed(1)}%`
                     }
-                } }
-        });
-    }
+                }
+            }
+        }
+    });
+}
 
     // PIE CHART
     const ctx = document.getElementById("chart");
