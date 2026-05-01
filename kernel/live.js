@@ -172,7 +172,7 @@ async function startCoach() {
         await new Promise(r => video.onloadedmetadata = r);
         await video.play();
 
-        logText.textContent = 'System Active';
+        logText.textContent = 'System Active at approx 1.4 fps';
         pulse.classList.add('active-pulse');
         running = true;
         starting = false;
