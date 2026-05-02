@@ -1,176 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<link rel="icon" type="image/png" href="logo.jpg">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Summitra : Reaching the Epitome of Wellness</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-<link href="styles.css" rel="stylesheet">
+<head>
+
+    <script>
+        //AUTH GUARD GATEKEEPING
+        (function () {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const currentUser = localStorage.getItem('currentUser');
+
+            if (isLoggedIn !== 'true' || !currentUser) {
+                // Optional: Clean any corrupted state
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+
+
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summitra : Reaching the Epitome of Wellness</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
 </head>
+
 <body>
 
-<header>
-<img src="logo.jpg" class="logo-watermark" alt="Summitra">
-<div>
-<div class="header-title">Summitra</div>
-<div class="header-subtitle">Reaching the epitome of wellness</div>
-</div>
-</header>
-
-<main class="dashboard-main-pro">
-
-<section class="dashboard-hero">
-<div class="hero-copy">
-<div class="hero-eyebrow">YOUR POSTURAL WELLNESS CONSOLE</div>
-<h1>Non-Invasive Intelligence for a painless life.</h1>
-<p class="hero-text">
-Launch your real-time monitoring, review your posture analytics, and track your session trends.
-</p>
-</div>
-
-<div class="hero-pills">
-<div class="metric-pill">
-<span class="material-symbols-rounded">monitoring</span>
-Realtime Guidance
-</div>
-
-<div class="metric-pill">
-<span class="material-symbols-rounded">query_stats</span>
-Session Trends
-</div>
-
-<div class="metric-pill">
-<span class="material-symbols-rounded">workspace_premium</span>
-Adaptive Calibration
-</div>
-</div>
-</section>
-
-<section class="feature-grid">
-
-    <div class="card feature-card">
-        <div class="feature-badge">
-            <span class="material-symbols-rounded">center_focus_strong</span>
+    <header>
+        <div class="header-content">
+            <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+            <div class="header-text-group">
+                <div class="header-title">Summitra</div>
+                <div class="header-subtitle">Reaching the Epitome of Wellness</div>
+            </div>
         </div>
-        <h2>Start Monitoring</h2>
-        <p>Launch the Vision Engine to begin real-time posture tracking and live feedback.</p>
-        <div class="feature-points">
-            <div>• Personalized calibration</div>
-            <div>• Drift-aware feedback</div>
-            <div>• Alert suppression logic (so you don't get annoyed!)</div>
-        </div>
-        <button class="btn" onclick="location.href='live.html'">
-            Launch Live Monitor
-            <span class="material-symbols-rounded">sensors</span>
-        </button>
-    </div>
 
-    <div class="card feature-card">
-        <div class="feature-badge" style="background: #E0F2FE; color: #0369A1;">
-            <span class="material-symbols-rounded">analytics</span>
-        </div>
-        <h2>View Analytics</h2>
-        <p>Compare sessions, examine alert distributions, and track your compliance trend.</p>
-        <div class="feature-points">
-            <div>• Session comparison</div>
-            <div>• Alert distribution review</div>
-            <div>• Trends</div>
-        </div>
-        <button class="btn" onclick="location.href='analytics.html'">
-            View Analytics
-            <span class="material-symbols-rounded">insights</span>
-        </button>
-    </div>
+        <div class="header-actions">
+            <div class="profile-container">
+                <button class="profile-trigger" onclick="toggleDropdown()">
+                    <span class="material-symbols-rounded">account_circle</span>
+                    <!-- display-user will now show the human-readable Display Name -->
+                    <span id="display-user">User</span>
+                    <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
+                </button>
 
-    <div class="card feature-card">
-        <div class="feature-badge" style="background:#FEE2E2; color:#B91C1C;">
-            <span class="material-symbols-rounded">bug_report</span>
+                <div id="profile-dropdown" class="dropdown-menu">
+                    <!-- Section 1: User -->
+                    <div class="dropdown-header">
+                        <span class="label">Authenticated As</span>
+                        <div class="user-email" id="user-detail">user@summitra</div>
+                    </div>
+
+                    <hr class="dropdown-divider">
+
+                    <!-- Section 2: Summitra -->
+                    <div class="dropdown-header">
+                        <span class="label">Summitra</span>
+                    </div>
+                    <button class="dropdown-item secondary-item" onclick="location.href='privacyPolicy.html'">
+                        <span class="material-symbols-rounded">shield</span>
+                        Our Policy
+                    </button>
+                    <button class="dropdown-item secondary-item" onclick="location.href='about.html'">
+                        <span class="material-symbols-rounded">info</span>
+                        About Summitra
+                    </button>
+
+                    <hr class="dropdown-divider">
+
+                    <div class="dropdown-header">
+                        <span class="label">System</span>
+                    </div>
+                    <button class="dropdown-item" onclick="logout()">
+                        <span class="material-symbols-rounded">logout</span>
+                        Logout
+                    </button>
+                </div>
+            </div>
         </div>
-        <h2>Error Analytics</h2>
-        <p>Inspect system errors, crashes, and telemetry logs captured during sessions.</p>
-        <div class="feature-points">
-            <div>• JS + Promise errors</div>
-            <div>• System crash tracking</div>
-            <div>• Debug telemetry</div>
-        </div>
-        <button class="btn" onclick="location.href='errorStats.html'">
-            View Errors
-            <span class="material-symbols-rounded">warning</span>
-        </button>
-    </div>
+    </header>
+    <main class="dashboard-main-pro">
 
-    <div class="card feature-card">
-        <div class="feature-badge" style="background: #F1F5F9; color: #475569;">
-            <span class="material-symbols-rounded">database</span>
-        </div>
-<div style="display: flex; justify-content: space-between; align-items: flex-start;">
-    <h2>Local Storage</h2>
-    <button class="secondary-btn delete-btn-danger" onclick="clearHistory()">
-        <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
-    </button>
-</div>
-        <p>A view of your data currently cached in your browser's local storage.</p>
-        
-        <div class="manifest-table-container">
-            <table class="manifest-light-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>FRAMES</th>
-                        <th>TILT ALERTS</th>
-                        <th>NECK ALERTS</th>
-                        <th>SLOUCH ALERTS</th>
-                        <th>SCORE</th>
-                    </tr>
-                </thead>
-                <tbody id="ledger-body">
-                    </tbody>
-            </table>
-        </div>
-    </div>
+        <section class="dashboard-hero">
+            <div class="hero-copy">
+                <div class="hero-eyebrow">YOUR POSTURAL WELLNESS CONSOLE</div>
+                <h1>Welcome to the Summitra Beta</h1>
+                <p class="hero-text">
+                    Launch your real-time monitoring, review your posture analytics, and track your session trends.
+                </p>
+            </div>
 
-</section>
-</main>
+            <div class="hero-pills">
+                <div class="metric-pill">
+                    <span class="material-symbols-rounded">monitoring</span>
+                    Realtime Guidance
+                </div>
 
-<script>
-function renderLedger() {
-    const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
-    const tbody = document.getElementById("ledger-body");
-    tbody.innerHTML = "";
+                <div class="metric-pill">
+                    <span class="material-symbols-rounded">query_stats</span>
+                    Session Trends
+                </div>
 
-    if (sessions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--blue-300);">No session data available in local storage.</td></tr>`;
-        return;
-    }
+                <div class="metric-pill">
+                    <span class="material-symbols-rounded">workspace_premium</span>
+                    Adaptive Calibration
+                </div>
+            </div>
+        </section>
 
-    sessions.slice().reverse().forEach((session, index) => {
-        const compliance = ((session.goodFrames / session.totalFrames) * 100).toFixed(1);
-        const row = document.createElement("tr");
-        
-        row.innerHTML = `
-            <td>#${sessions.length - index}</td>
-            <td>${session.totalFrames}</td>
+        <section class="feature-grid">
+
+            <div class="card feature-card">
+                <div class="feature-badge">
+                    <span class="material-symbols-rounded">center_focus_strong</span>
+                </div>
+                <h2>Start Monitoring</h2>
+                <p>Launch the Vision Engine to begin real-time posture tracking and live feedback.</p>
+                <div class="feature-points">
+                    <div>• Personalized calibration</div>
+                    <div>• Drift-aware feedback</div>
+                    <div>• Alert suppression logic (so you don't get annoyed!)</div>
+                </div>
+                <button class="btn" onclick="location.href='live.html'">
+                    Launch Live Monitor
+                    <span class="material-symbols-rounded">sensors</span>
+                </button>
+            </div>
+
+            <div class="card feature-card">
+                <div class="feature-badge" style="background: #E0F2FE; color: #0369A1;">
+                    <span class="material-symbols-rounded">analytics</span>
+                </div>
+                <h2>View Analytics</h2>
+                <p>Compare sessions, examine alert distributions, and track your compliance trend.</p>
+                <div class="feature-points">
+                    <div>• Session comparison</div>
+                    <div>• Alert distribution review</div>
+                    <div>• Trends</div>
+                </div>
+                <button class="btn" onclick="location.href='analytics.html'">
+                    View Analytics
+                    <span class="material-symbols-rounded">insights</span>
+                </button>
+            </div>
+
+            <div class="card feature-card">
+                <div class="feature-badge" style="background:#FEE2E2; color:#B91C1C;">
+                    <span class="material-symbols-rounded">bug_report</span>
+                </div>
+                <h2>Debug Console (Beta)</h2>
+                <p>Inspect system errors, crashes, and telemetry logs captured during sessions.</p>
+                <div class="feature-points">
+                    <div>• JS + Promise errors</div>
+                    <div>• System crash tracking</div>
+                    <div>• Debug telemetry</div>
+                </div>
+                <button class="btn" onclick="location.href='errorStats.html'">
+                    View Errors
+                    <span class="material-symbols-rounded">warning</span>
+                </button>
+            </div>
+
+            <div class="card feature-card">
+                <div class="feature-badge" style="background: #F1F5F9; color: #475569;">
+                    <span class="material-symbols-rounded">database</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h2>Local Storage</h2>
+                    <button class="secondary-btn delete-btn-danger" onclick="clearHistory()">
+                        <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                    </button>
+                </div>
+                <p>A view of your data currently cached in your browser's local storage.</p>
+
+                <div class="manifest-table-container">
+                    <table class="manifest-light-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>FRAMES</th>
+                                <th>TILT ALERTS</th>
+                                <th>NECK ALERTS</th>
+                                <th>SLOUCH ALERTS</th>
+                                <th>SCORE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        function renderLedger() {
+            const allSessions = JSON.parse(localStorage.getItem("sessions")) || [];
+            const currentUser = localStorage.getItem("currentUser");
+            const tbody = document.getElementById("ledger-body");
+            const currentName = localStorage.getItem("currentDisplayName");
+
+            const userSessions = allSessions.filter(s => s.owner === currentUser);
+
+            tbody.innerHTML = "";
+
+            if (userSessions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;">No private data available for you, ${currentName}.</td></tr>`;
+                return;
+            }
+
+            userSessions.slice().reverse().forEach((session, index) => {
+                const compliance = ((session.goodFrames / session.totalFrames) * 100).toFixed(1);
+
+                // Convert durationSeconds to readable format (e.g., 12m 45s)
+                const mins = Math.floor(session.durationSeconds / 60);
+                const secs = session.durationSeconds % 60;
+                const timeStr = `${mins}m ${secs}s`;
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+            <td>#${userSessions.length - index}</td>
+            <td>${timeStr}</td> <!-- Calculated Duration -->
             <td>${session.lateralAlerts}</td>
             <td>${session.forwardAlerts}</td>
             <td>${session.slouchAlerts}</td>
             <td style="font-weight: 800; color: var(--blue-primary)">${compliance}%</td>
         `;
-        tbody.appendChild(row);
-    });
-}
+                tbody.appendChild(row);
+            });
+        }
 
-function clearHistory() {
-    if (confirm("Are you sure you want to permanently delete all session data from this browser?")) {
-        localStorage.removeItem("sessions");
-        renderLedger();
-    }
-}
 
-document.addEventListener("DOMContentLoaded", renderLedger);
-</script>
+        function clearHistory() {
+            if (confirm("Are you sure you want to permanently delete all session data from this browser?")) {
+                localStorage.removeItem("sessions");
+                renderLedger();
+            }
+        }
 
+        document.addEventListener("DOMContentLoaded", renderLedger);
+    </script>
+    <script src="auth.js"></script>
 </body>
+
 </html>

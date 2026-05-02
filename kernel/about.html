@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        // AUTH GUARD: Prevents unauthorized access to platform documentation
+        (function () {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const currentUser = localStorage.getItem('currentUser');
+            if (isLoggedIn !== 'true' || !currentUser) {
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Summitra : The Vision Engine</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-content">
+            <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+            <div class="header-text-group">
+                <div class="header-title">Summitra</div>
+                <div class="header-subtitle">Reaching the Epitome of Wellness</div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
+                <span class="material-symbols-rounded">dashboard</span>
+                Dashboard
+            </button>
+
+            <div class="profile-container">
+                <button class="profile-trigger" onclick="toggleDropdown()">
+                    <span class="material-symbols-rounded">account_circle</span>
+                    <span id="display-user">User</span>
+                    <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
+                </button>
+
+                <div id="profile-dropdown" class="dropdown-menu">
+                    <div class="dropdown-header">
+                        <span class="label">Authenticated As</span>
+                        <div class="user-email" id="user-detail">user@summitra</div>
+                    </div>
+                    <hr class="dropdown-divider">
+                    <div class="dropdown-header"><span class="label">Summitra</span></div>
+                    <button class="dropdown-item secondary-item" onclick="location.href='privacyPolicy.html'">
+                        <span class="material-symbols-rounded">shield</span> Our Policy
+                    </button>
+                    <hr class="dropdown-divider">
+                    <button class="dropdown-item" onclick="logout()">
+                        <span class="material-symbols-rounded">logout</span> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-main-pro">
+        <!-- Hero Section utilizing existing dashboard-hero styles -->
+        <section class="dashboard-hero">
+            <div class="hero-copy">
+                <div class="hero-eyebrow">THE ARCHITECTURE OF POSTURE</div>
+                <h1>About the Vision Engine</h1>
+                <p class="hero-text">
+                    Summitra combines real-time computer vision with ergonomic principles to mitigate the physiological
+                    strain of modern workspace habits.
+                </p>
+            </div>
+
+            <div class="hero-pills">
+                <div class="metric-pill">
+                    <span class="material-symbols-rounded">psychology</span>
+                    Neural Intelligence
+                </div>
+                <div class="metric-pill">
+                    <span class="material-symbols-rounded">health_and_safety</span>
+                    Preventative Care
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Grid repurposed for informational content[cite: 4, 5] -->
+        <section class="feature-grid">
+            <div class="card feature-card">
+                <div class="feature-badge">
+                    <span class="material-symbols-rounded">visibility</span>
+                </div>
+                <h2>Real-time Analysis</h2>
+                <p>Our proprietary monitoring logic detects three specific postural deviations using frame-by-frame
+                    coordinate mapping.</p>
+                <div class="feature-points">
+                    <div>• Lateral Head Tilt</div>
+                    <div>• Forward Neck Protrusion</div>
+                    <div>• Spinal Slouching</div>
+                </div>
+            </div>
+
+            <div class="card feature-card">
+                <div class="feature-badge" style="background: #E0F2FE; color: #0369A1;">
+                    <span class="material-symbols-rounded">encrypted</span>
+                </div>
+                <h2>Local-First Privacy</h2>
+                <p>Data sovereignty is our priority. Your biometric telemetry never leaves your device[cite: 4].</p>
+                <div class="feature-points">
+                    <div>• LocalStorage persistence</div>
+                    <div>• No cloud processing</div>
+                    <div>• Client-side inference</div>
+                </div>
+            </div>
+
+            <div class="card feature-card">
+                <div class="feature-badge" style="background: #F1F5F9; color: #475569;">
+                    <span class="material-symbols-rounded">history_edu</span>
+                </div>
+                <h2>Project Mission</h2>
+                <p>To provide an atomic, technical interface for health-conscious professionals seeking technical depth
+                    in their wellness tracking[cite: 4].</p>
+                <button class="btn" style="margin-top: auto;" onclick="location.href='dashboard.html'">
+                    Return to Console
+                    <span class="material-symbols-rounded">arrow_forward</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script src="auth.js"></script>
+</body>
+
+</html>

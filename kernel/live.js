@@ -10,7 +10,10 @@ const CALIBRATION_FRAMES = 112;
 // SESSION DATA
 // ----------------------------
 const sessionData = {
+    owner: localStorage.getItem('currentUser'),
     sessionStart: new Date().toISOString(),
+    sessionEnd: null,
+    durationSeconds: 0,
     logs: [],
     alerts: [],
     calibration: [],
@@ -159,6 +162,11 @@ cancelExitBtn.addEventListener('click', () => {
 confirmExitBtn.addEventListener('click', () => {
     running = false;
 
+    sessionData.sessionEnd = new Date().toISOString();
+    const start = new Date(sessionData.sessionStart);
+    const end = new Date(sessionData.sessionEnd);
+    sessionData.durationSeconds = Math.floor((end - start) / 1000);
+
     const video = document.getElementById('webcam');
     if (video.srcObject) {
         video.srcObject.getTracks().forEach(t => t.stop());
@@ -261,7 +269,7 @@ async function startCoach() {
         video.srcObject = stream;
         await new Promise(r => video.onloadedmetadata = r);
         await video.play();
-        
+
         logText.textContent = 'System Active';
         pulse.classList.add('active-pulse');
         running = true;
@@ -282,19 +290,19 @@ async function startCoach() {
                 const eyeAngle = Math.atan2(l[263].y - l[33].y, l[263].x - l[33].x) * 180 / Math.PI;
                 const shoulderAngle = Math.atan2(p[12].y - p[11].y, p[12].x - p[11].x) * 180 / Math.PI;
 
-let rawTilt = (eyeAngle - shoulderAngle);
+                let rawTilt = (eyeAngle - shoulderAngle);
 
-// 1. Shift the boundary so 180 becomes 0
-let tilt = rawTilt + 180;
+                // 1. Shift the boundary so 180 becomes 0
+                let tilt = rawTilt + 180;
 
-// 2. Wrap back to [-180, 180] range
-if (tilt > 180) tilt -= 360;
-if (tilt < -180) tilt += 360;
+                // 2. Wrap back to [-180, 180] range
+                if (tilt > 180) tilt -= 360;
+                if (tilt < -180) tilt += 360;
 
-// 3. Remove Math.abs() to keep the sign
-// Right tilt will be positive, Left will be negative.
-// If signs are swapped for your specific camera, use: tilt = -tilt;
-const degrees = tilt; 
+                // 3. Remove Math.abs() to keep the sign
+                // Right tilt will be positive, Left will be negative.
+                // If signs are swapped for your specific camera, use: tilt = -tilt;
+                const degrees = tilt;
 
                 const dxL = Math.abs(l[454].x - p[12].x);
                 const dyL = p[12].y - l[454].y;
@@ -309,7 +317,7 @@ const degrees = tilt;
                 const sWidth = Math.sqrt(Math.pow(p[11].x - p[12].x, 2) + Math.pow(p[11].y - p[12].y, 2));
                 const vGapL = p[11].y - l[454].y;
                 const vGapR = p[12].y - l[234].y;
-                const verticalRatio = 10*((vGapL + vGapR) / 2) / sWidth;
+                const verticalRatio = 10 * ((vGapL + vGapR) / 2) / sWidth;
 
                 const isMasterMuted = master.checked;
                 const tiltOn = subs[0].checked;
@@ -348,7 +356,7 @@ const degrees = tilt;
                     display.innerHTML = feedback;
                     rawText.innerHTML = `Tilt: ${degrees.toFixed(1)}° | Neck: ${neckAngle.toFixed(1)}° | Slouch: ${verticalRatio.toFixed(2)}`;
 
-                    display.style.color = feedback.includes('Alert') ? 'var(--error-state)' : 
+                    display.style.color = feedback.includes('Alert') ? 'var(--error-state)' :
                         (feedback.includes('Good') || feedback.includes('Optimal')) ? '#16A34A' : 'var(--blue-primary)';
 
                     const posture = (feedback.includes('Good') || feedback.includes('Optimal')) ? 'good' : 'bad';
@@ -366,7 +374,7 @@ const degrees = tilt;
                         if (feedback.includes('Lateral')) { sessionData.lateralAlerts++; }
                         else if (feedback.includes('Forward')) { sessionData.forwardAlerts++; }
                         else if (feedback.includes('Slouch')) { sessionData.slouchAlerts++; }
-                        else if(feedback.includes('Multiple')) {sessionData.multipleAlerts++;}
+                        else if (feedback.includes('Multiple')) { sessionData.multipleAlerts++; }
 
                         let logAngle = '';
                         if (feedback.includes('Multiple')) { logAngle = `T ${degrees.toFixed(1)} / N ${neckAngle.toFixed(1)} /N ${verticalRatio.toFixed(1)}`; }

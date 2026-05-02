@@ -1,117 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Local Storage Viewer</title>
 
-<style>
-body {
-    font-family: monospace;
-    background: #0f172a;
-    color: #e2e8f0;
-    padding: 20px;
-}
+    <script>
+        //AUTH GUARD GATEKEEPING
+        (function () {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const currentUser = localStorage.getItem('currentUser');
 
-h1 {
-    margin-bottom: 10px;
-}
+            // If flags are missing or false, bounce the user to login
+            if (isLoggedIn !== 'true' || !currentUser) {
+                // Optional: Clean any corrupted state
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
 
-.section {
-    margin-bottom: 30px;
-}
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
 
-.box {
-    background: #020617;
-    padding: 12px;
-    border-radius: 10px;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-    border: 1px solid #1e293b;
-}
 
-button {
-    margin-right: 10px;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 6px;
-    background: #2563eb;
-    color: white;
-    cursor: pointer;
-}
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summitra : Debug Console</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <style>
+        pre {
+            margin: 0;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--blue-900);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
 
-button.danger {
-    background: #dc2626;
-}
-</style>
+        /* Custom adjustment for the debug main container */
+        .dashboard-main-pro {
+            gap: 24px;
+            padding: 40px;
+        }
+    </style>
 </head>
 
 <body>
 
-<h1>Local Storage Inspector</h1>
+    <header>
+        <div class="header-content">
+            <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+            <!-- Grouped branding text stays horizontally aligned with the logo -->
+            <div class="header-text-group">
+                <div class="header-title">Summitra</div>
+                <div class="header-subtitle">Reaching the Epitome of Wellness</div>
+            </div>
+        </div>
 
-<div>
-    <button onclick="loadStorage()">Refresh</button>
-    <button class="danger" onclick="clearStorage()">Clear All</button>
-</div>
+        <div class="header-actions">
+            <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
+                <span class="material-symbols-rounded">arrow_back</span>
+                Dashboard
+            </button>
+            <!-- Profile container with absolute positioning for the menu -->
+            <div class="profile-container">
+                <button class="profile-trigger" onclick="toggleDropdown()">
+                    <span class="material-symbols-rounded">account_circle</span>
+                    <!-- display-user will now show the human-readable Display Name -->
+                    <span id="display-user">User</span>
+                    <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
+                </button>
 
-<div class="section">
-    <h2>Sessions</h2>
-    <div id="sessions" class="box"></div>
-</div>
+                <div id="profile-dropdown" class="dropdown-menu">
+                    <!-- Section 1: Identity -->
+                    <div class="dropdown-header">
+                        <span class="label">Authenticated As</span>
+                        <div class="user-email" id="user-detail">user@summitra</div>
+                    </div>
 
-<div class="section">
-    <h2>Error Logs</h2>
-    <div id="errors" class="box"></div>
-</div>
+                    <hr class="dropdown-divider">
 
-<div class="section">
-    <h2>All Keys (Raw)</h2>
-    <div id="all" class="box"></div>
-</div>
+                    <!-- Section 2: Account Settings -->
+                    <div class="dropdown-header">
+                        <span class="label">Summitra</span>
+                    </div>
+                    <button class="dropdown-item secondary-item" onclick="location.href='privacyPolicy.html'">
+                        <span class="material-symbols-rounded">shield</span>
+                        Our Policy
+                    </button>
+                    <button class="dropdown-item secondary-item" onclick="location.href='about.html'">
+                        <span class="material-symbols-rounded">info</span>
+                        About Summitra
+                    </button>
 
-<script>
+                    <hr class="dropdown-divider">
 
-function pretty(data) {
-    try {
-        return JSON.stringify(data, null, 2);
-    } catch {
-        return String(data);
-    }
-}
+                    <div class="dropdown-header">
+                        <span class="label">System</span>
+                    </div>
+                    <button class="dropdown-item" onclick="logout()">
+                        <span class="material-symbols-rounded">logout</span>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-// Load everything
-function loadStorage() {
-    const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
-    const errors = JSON.parse(localStorage.getItem("errorLogs")) || [];
+    <main class="dashboard-main-pro">
 
-    document.getElementById("sessions").textContent = pretty(sessions);
-    document.getElementById("errors").textContent = pretty(errors);
+        <div class="card feature-card" style="flex-direction: row; gap: 16px; padding: 24px; align-items: center;">
+            <button class="btn" style="width: auto;" onclick="loadStorage()">
+                <span class="material-symbols-rounded">refresh</span> Refresh
+            </button>
+        </div>
 
-    // Show ALL keys
-    let allData = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        try {
-            allData[key] = JSON.parse(localStorage.getItem(key));
-        } catch {
-            allData[key] = localStorage.getItem(key);
+        <div class="feature-grid">
+            <!-- Targeted user-specific telemetry -->
+            <div class="card feature-card">
+                <div class="feature-badge"><span class="material-symbols-rounded">database</span></div>
+                <h2>Session Manifest</h2>
+                <div class="stats-table-dark-wrapper">
+                    <pre id="sessions">Loading manifest...</pre>
+                </div>
+            </div>
+
+            <div class="card feature-card">
+                <div class="feature-badge" style="background:#FEE2E2; color:#B91C1C;"><span
+                        class="material-symbols-rounded">bug_report</span></div>
+                <h2>Error Logs</h2>
+                <div class="stats-table-dark-wrapper">
+                    <pre id="errors">No errors detected.</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALL STORAGE-->
+        <div class="card feature-card">
+            <h2>Global Raw Data</h2>
+            <div class="stats-table-dark-wrapper" style="max-height: 400px;">
+                <pre id="all"></pre>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+
+        function pretty(data) {
+            try {
+                return JSON.stringify(data, null, 2);
+            } catch {
+                return String(data);
+            }
         }
-    }
 
-    document.getElementById("all").textContent = pretty(allData);
-}
+        function loadStorage() {
+            const currentUser = localStorage.getItem('currentUser');
+            const allSessions = JSON.parse(localStorage.getItem("sessions")) || [];
+            const errors = JSON.parse(localStorage.getItem("errorLogs")) || [];
 
-function clearStorage() {
-    if (confirm("Are you sure you want to delete ALL local data?")) {
-        localStorage.clear();
+            // Filter sessions exclusively for THIS user
+            const userSessions = allSessions.filter(s => s.owner === currentUser);
+
+            document.getElementById("sessions").textContent = pretty(userSessions);
+            document.getElementById("errors").textContent = pretty(errors);
+
+            let allData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                try {
+                    allData[key] = JSON.parse(localStorage.getItem(key));
+                } catch {
+                    allData[key] = localStorage.getItem(key);
+                }
+            }
+            document.getElementById("all").textContent = pretty(allData);
+        }
+
         loadStorage();
-    }
-}
+    </script>
 
-loadStorage();
-
-</script>
-
+    <script src="auth.js"></script>
 </body>
+
 </html>

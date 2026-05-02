@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 : Coordinates Lost | Summitra</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 72px);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(80px, 15vw, 160px);
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--blue-primary), var(--blue-700));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 10px 20px rgba(0, 82, 204, 0.2));
+        }
+
+        .error-card {
+            max-width: 500px;
+            padding: 48px;
+            animation: cardEnter 0.6s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        .glitch-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--blue-500);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-content">
+            <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+            <div class="header-text-group">
+                <div class="header-title">Summitra</div>
+                <div class="header-subtitle">Reaching the Epitome of Wellness</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="error-container">
+        <div class="error-code">404</div>
+
+        <div class="card error-card">
+            <div class="glitch-text">Anomaly Detected</div>
+            <h2>You are lost</h2>
+            <p style="color: var(--blue-500); margin-bottom: 32px;">
+                The requested URI does not exist within Summitra's pages.
+            </p>
+
+            <button class="btn" onclick="location.href='dashboard.html'">
+                <span class="material-symbols-rounded">home</span>
+                Return to Dashboard
+            </button>
+
+            <button class="secondary-btn" style="margin-top: 12px; width: 100%;" onclick="history.back()">
+                <span class="material-symbols-rounded">arrow_back</span>
+                Go back
+            </button>
+        </div>
+    </main>
+
+</body>
+
+</html>

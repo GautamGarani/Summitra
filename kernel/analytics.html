@@ -1,383 +1,473 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<link rel="icon" type="image/png" href="logo.jpg">
-<title>Analytics</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-<link href="styles.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-    /* Header layout for button placement */
-    header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 40px;
-    }
-    .header-content {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-    /* 2x2 Grid Logic for Charts */
-    .charts-matrix {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-        gap: 24px;
-        width: 100%;
-    }
-    .chart-pro-card {
-        min-height: 400px;
-        display: flex;
-        flex-direction: column;
-    }
-    .chart-container-pro {
-        flex: 1;
-        position: relative;
-        min-height: 250px;
-    }
-    @media (max-width: 900px) {
-        .charts-matrix { grid-template-columns: 1fr; }
-        header { padding: 20px; }
-    }
-</style>
+
+    <script>
+        //AUTH GUARD GATEKEEPING
+        (function () {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const currentUser = localStorage.getItem('currentUser');
+
+            // If flags are missing or false, bounce the user to login
+            if (isLoggedIn !== 'true' || !currentUser) {
+                // Optional: Clean any corrupted state
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+
+
+
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <title>Analytics</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Header layout for button placement */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* 2x2 Grid Logic for Charts */
+        .charts-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            width: 100%;
+        }
+
+        .chart-pro-card {
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-container-pro {
+            flex: 1;
+            position: relative;
+            min-height: 250px;
+        }
+
+        @media (max-width: 900px) {
+            .charts-matrix {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<header>
-    <div class="header-content">
-        <img src="logo.jpg" class="logo-watermark" alt="Summitra">
-        <div>
-            <div class="header-title">Summitra</div>
-            <div class="header-subtitle">Reaching the Epitome of Wellness</div>
-        </div>
-    </div>
-    
-    <button class="back-btn" onclick="goBack()" style="margin: 0; padding: 10px 20px;">
-        <span class="material-symbols-rounded">arrow_back</span>
-        Back to Dashboard
-    </button>
-</header>
-
-<main class="analytics-main-pro">
-
-<section class="analytics-hero">
-<div>
-<div class="hero-eyebrow">SESSION INTELLIGENCE</div>
-<h1>Posture performance analytics</h1>
-<p class="hero-text">Unified behavioral matrix of your kinetic health.</p>
-</div>
-</section>
-
-<section class="analytics-kpi-grid">
-    <div class="card analytics-kpi">
-        <div class="kpi-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
-        <div class="kpi-label">Compliance</div>
-        <div class="kpi-value" id="curr-score">0</div>
-        <div class="kpi-mini">Total session health calculated as the ratio of optimal frames to total captured frames.</div>
-    </div>
-
-    <div class="card analytics-kpi">
-        <div class="kpi-icon"><span class="material-symbols-rounded">timer</span></div>
-        <div class="kpi-label">Resilience</div>
-        <div class="kpi-value" id="resilience-ratio">0s</div>
-        <div class="kpi-mini">Measures behavioral agility by averaging the time delta between an alert trigger and a corrected state.</div>
-    </div>
-
-    <div class="card analytics-kpi">
-        <div class="kpi-icon"><span class="material-symbols-rounded">receipt_long</span></div>
-        <div class="kpi-label">Ergonomic Debt</div>
-        <div class="kpi-value" id="ergo-debt">0m</div>
-        <div class="kpi-mini">Estimated physiological recovery time calculated using a 2:1 ratio of bad-posture duration to restorative rest. (ROUNDED UP to next minute)</div>
-    </div>
-
-    <div class="card analytics-kpi">
-        <div class="kpi-icon"><span class="material-symbols-rounded">trending_up</span></div>
-        <div class="kpi-label">Improvement</div>
-        <div class="kpi-value" id="improvement-score">0%</div>
-        <div class="kpi-mini">The percentage variance between your current compliance and the rolling average of all previous sessions.</div>
-    </div>
-</section>
-
-<div class="charts-matrix">
-    <section class="card chart-pro-card">
-        <div class="chart-heading-row">
-            <div>
-                <span class="label">Cognitive Load</span>
-                <h2>Your Fatigue</h2>
-                <p class="kpi-mini">A timeline mapping focus decay to identify muscular strain over session duration.</p>
+    <header>
+        <div class="header-content">
+            <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+            <!-- Grouped branding text stays horizontally aligned with the logo -->
+            <div class="header-text-group">
+                <div class="header-title">Summitra</div>
+                <div class="header-subtitle">Reaching the Epitome of Wellness</div>
             </div>
         </div>
-        <div class="chart-container-pro" id="fatigue-container">
-            <canvas id="fatigueChart"></canvas>
-        </div>
-    </section>
 
-    <section class="card chart-pro-card">
-        <div class="chart-heading-row">
-            <div>
-                <span class="label">Distribution</span>
-                <h2>Alert Composition</h2>
-                <p class="kpi-mini">A categorical breakdown of posture failures to pinpoint whether your primary strain is lateral, forward, or vertical.</p>
+        <div class="header-actions">
+            <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
+                <span class="material-symbols-rounded">arrow_back</span>
+                Dashboard
+            </button>
+            <!-- Profile container with absolute positioning for the menu -->
+            <div class="profile-container">
+                <button class="profile-trigger" onclick="toggleDropdown()">
+                    <span class="material-symbols-rounded">account_circle</span>
+                    <!-- display-user will now show the human-readable Display Name -->
+                    <span id="display-user">User</span>
+                    <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
+                </button>
+
+                <div id="profile-dropdown" class="dropdown-menu">
+                    <!-- Section 1: Identity -->
+                    <div class="dropdown-header">
+                        <span class="label">Authenticated As</span>
+                        <div class="user-email" id="user-detail">user@summitra</div>
+                    </div>
+
+                    <hr class="dropdown-divider">
+
+                    <!-- Section 2: Account Settings -->
+                    <div class="dropdown-header">
+                        <span class="label">Summitra</span>
+                    </div>
+                    <button class="dropdown-item secondary-item" onclick="location.href='privacyPolicy.html'">
+                        <span class="material-symbols-rounded">shield</span>
+                        Our Policy
+                    </button>
+                    <button class="dropdown-item secondary-item" onclick="location.href='about.html'">
+                        <span class="material-symbols-rounded">info</span>
+                        About Summitra
+                    </button>
+
+                    <hr class="dropdown-divider">
+
+                    <div class="dropdown-header">
+                        <span class="label">System</span>
+                    </div>
+                    <button class="dropdown-item" onclick="logout()">
+                        <span class="material-symbols-rounded">logout</span>
+                        Logout
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="chart-container-pro">
-            <canvas id="chart"></canvas>
+    </header>
+
+    <main class="analytics-main-pro">
+
+        <section class="analytics-hero">
+            <div>
+                <div class="hero-eyebrow">SESSION INTELLIGENCE</div>
+                <h1>Posture performance analytics</h1>
+                <p class="hero-text">Unified behavioral matrix of your kinetic health.</p>
+            </div>
+        </section>
+
+        <section class="analytics-kpi-grid">
+            <div class="card analytics-kpi">
+                <div class="kpi-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
+                <div class="kpi-label">Compliance</div>
+                <div class="kpi-value" id="curr-score">0</div>
+                <div class="kpi-mini">Total session health calculated as the ratio of optimal frames to total captured
+                    frames.</div>
+            </div>
+
+            <div class="card analytics-kpi">
+                <div class="kpi-icon"><span class="material-symbols-rounded">timer</span></div>
+                <div class="kpi-label">Resilience</div>
+                <div class="kpi-value" id="resilience-ratio">0s</div>
+                <div class="kpi-mini">Measures behavioral agility by averaging the time delta between an alert trigger
+                    and a corrected state.</div>
+            </div>
+
+            <div class="card analytics-kpi">
+                <div class="kpi-icon"><span class="material-symbols-rounded">receipt_long</span></div>
+                <div class="kpi-label">Ergonomic Debt</div>
+                <div class="kpi-value" id="ergo-debt">0m</div>
+                <div class="kpi-mini">Estimated physiological recovery time calculated using a 2:1 ratio of bad-posture
+                    duration to restorative rest. (ROUNDED UP to next minute)</div>
+            </div>
+
+            <div class="card analytics-kpi">
+                <div class="kpi-icon"><span class="material-symbols-rounded">trending_up</span></div>
+                <div class="kpi-label">Improvement</div>
+                <div class="kpi-value" id="improvement-score">0%</div>
+                <div class="kpi-mini">The percentage variance between your current compliance and the rolling average of
+                    all previous sessions.</div>
+            </div>
+        </section>
+
+        <div class="charts-matrix">
+            <section class="card chart-pro-card">
+                <div class="chart-heading-row">
+                    <div>
+                        <span class="label">Cognitive Load</span>
+                        <h2>Your Fatigue</h2>
+                        <p class="kpi-mini">A timeline mapping focus decay to identify muscular strain over session
+                            duration.</p>
+                    </div>
+                </div>
+                <div class="chart-container-pro" id="fatigue-container">
+                    <canvas id="fatigueChart"></canvas>
+                </div>
+            </section>
+
+            <section class="card chart-pro-card">
+                <div class="chart-heading-row">
+                    <div>
+                        <span class="label">Distribution</span>
+                        <h2>Alert Composition</h2>
+                        <p class="kpi-mini">A categorical breakdown of posture failures to pinpoint whether your primary
+                            strain is lateral, forward, or vertical.</p>
+                    </div>
+                </div>
+                <div class="chart-container-pro">
+                    <canvas id="chart"></canvas>
+                </div>
+            </section>
         </div>
-    </section>
-</div>
 
-<section class="feature-grid insight-grid">
-    <div class="card feature-card insight-card">
-        <div class="feature-badge insight-badge-accent">
-            <span class="material-symbols-rounded">neurology</span>
-        </div>
-        <h3>Alert Correlation</h3>
-        <p id="correlation-text">Insufficient data to determine behavioral patterns.</p>
-        <p class="kpi-mini" style="margin-top:10px;">Analyzes sequential alerts to see if specific deviations (like forward leaning) statistically trigger secondary failures.</p>
-    </div>
-</section>
+        <section class="feature-grid insight-grid">
+            <div class="card feature-card insight-card">
+                <div class="feature-badge insight-badge-accent">
+                    <span class="material-symbols-rounded">neurology</span>
+                </div>
+                <h3>Alert Correlation</h3>
+                <p id="correlation-text">Insufficient data to determine behavioral patterns.</p>
+                <p class="kpi-mini" style="margin-top:10px;">Analyzes sequential alerts to see if specific deviations
+                    (like forward leaning) statistically trigger secondary failures.</p>
+            </div>
+        </section>
 
-</main>
+    </main>
 
-<script>
-function goBack() { window.location.href = "dashboard.html"; }
+    <script>
+        function goBack() { window.location.href = "dashboard.html"; }
 
-function getSessionPct(session) {
-    if (!session || !session.totalFrames || session.totalFrames === 0) return 0;
-    return (session.goodFrames / (session.totalFrames-110)) * 100;
-}
-
-// ----------------------------
-// LOCAL STORAGE RETRIEVAL SYSTEM
-// ----------------------------
-
-// Get all sessions
-function getAllSessions() {
-    try {
-        return JSON.parse(localStorage.getItem("sessions")) || [];
-    } catch (e) {
-        console.error("Failed to parse sessions", e);
-        return [];
-    }
-}
-
-// Get latest session
-function getLatestSession() {
-    const sessions = getAllSessions();
-    return sessions.length ? sessions[sessions.length - 1] : null;
-}
-
-// Get all error logs
-function getAllErrors() {
-    try {
-        return JSON.parse(localStorage.getItem("errorLogs")) || [];
-    } catch (e) {
-        console.error("Failed to parse error logs", e);
-        return [];
-    }
-}
-
-// Get errors for latest session (if stored inside sessionData)
-function getLatestSessionErrors() {
-    const session = getLatestSession();
-    return session?.errors || [];
-}
-
-// Debug helper (prints everything cleanly)
-function debugStorage() {
-    const sessions = getAllSessions();
-    const errors = getAllErrors();
-
-    console.log("=== SESSIONS ===");
-    console.log(sessions);
-
-    console.log("=== LATEST SESSION ===");
-    console.log(getLatestSession());
-
-    console.log("=== ERROR LOGS ===");
-    console.log(errors);
-
-    console.log("=== SESSION ERRORS ===");
-    console.log(getLatestSessionErrors());
-}
-
-// Optional: clear everything (useful during testing)
-function clearAllStorage() {
-    localStorage.removeItem("sessions");
-    localStorage.removeItem("errorLogs");
-    console.log("Local storage cleared");
-}
-
-// ----------------------------
-// AUTO LOAD INTO YOUR ANALYTICS
-// ----------------------------
-
-function loadAllData() {
-    const sessions = getAllSessions();
-    const currentSession = getLatestSession();
-    const errors = getAllErrors();
-
-    if (!sessions.length) {
-        console.warn("No session data found");
-        return;
-    }
-
-    console.log("Loaded Sessions:", sessions);
-    console.log("Current Session:", currentSession);
-    console.log("Error Logs:", errors);
-}
-
-// Run on page load
-document.addEventListener("DOMContentLoaded", loadAllData)
-
-function loadAnalytics() {
-    const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
-    if (!sessions.length) return;
-
-    const currentSession = sessions.at(-1);
-    const logs = currentSession.logs || [];
-    
-    // KPI CALCULATIONS
-    const currentVal = getSessionPct(currentSession);
-    const previousSessions = sessions.slice(0, -1);
-
-    let historicalAvg = null;
-    if (previousSessions.length > 0) {
-        historicalAvg = previousSessions.reduce((acc, s) => acc + getSessionPct(s), 0) / previousSessions.length;
-    }
-
-    document.getElementById("curr-score").textContent = currentVal.toFixed(1) + "%";
-    const improvementElement = document.getElementById("improvement-score");
-    if (historicalAvg !== null) {
-        const delta = (currentVal - historicalAvg).toFixed(1);
-        improvementElement.textContent = (delta > 0 ? "+" : "") + delta + "%";
-        improvementElement.style.color = delta < 0 ? "var(--danger)" : "#16A34A";
-    }
-
-    let totalRecoveryTime = 0;
-    let recoveryCount = 0;
-
-    for (let i = 0; i < logs.length - 1; i++) {
-        if (logs[i].status === 'ALERT' && logs[i+1].status === 'GOOD') {
-            const diff = (new Date(logs[i+1].timestamp) - new Date(logs[i].timestamp)) / 1000;
-            totalRecoveryTime += diff;
-            recoveryCount++;
+        function getSessionPct(session) {
+            if (!session || !session.totalFrames || session.totalFrames === 0) return 0;
+            return (session.goodFrames / (session.totalFrames - 110)) * 100;
         }
-    }
-    const resilience = recoveryCount > 0 ? (totalRecoveryTime / recoveryCount).toFixed(1) : "N/A";
-    document.getElementById("resilience-ratio").textContent = resilience + (resilience !== "N/A" ? "s" : "");
 
-    const badSeconds = (currentSession.badFrames * 0.18);
-    const debtMinutes = Math.ceil((badSeconds * 2) / 60);
-    document.getElementById("ergo-debt").textContent = debtMinutes + "m";
+        // ----------------------------
+        // LOCAL STORAGE RETRIEVAL SYSTEM
+        // ----------------------------
 
-    // FATIGUE CHART
-    
-// --- FATIGUE CHART: DYNAMIC DENSITY LOGIC ---
-const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
-
-if (currentSession.totalFrames < 100) {
-    document.getElementById('fatigue-container').innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--blue-500); font-weight:700; font-family:'JetBrains Mono';">
-            INSUFFICIENT TELEMETRY FOR ANALYSIS
-        </div>`;
-} else {
-    const logs = currentSession.logs;
-    const binCount = 5; // 5 segments for the 20m timeline
-    
-    // Initialize dual-stream accumulators
-    const goodCounts = new Array(binCount).fill(0);
-    const totalSamplesPerBin = new Array(binCount).fill(0);
-
-    // 1. DYNAMIC BINNING: Distribute logs proportionally across the session
-    logs.forEach((log, index) => {
-        // Calculate which 20% slice of the session this log belongs to
-        const binIndex = Math.min(binCount - 1, Math.floor((index / logs.length) * binCount));
-        
-        totalSamplesPerBin[binIndex]++;
-        if (log.status === "GOOD") {
-            goodCounts[binIndex]++;
-        }
-    });
-
-    // 2. NORMALIZATION: Calculate percentage based on LOCAL density
-    const fatigueDataPoints = goodCounts.map((good, i) => {
-        const total = totalSamplesPerBin[i];
-        return total > 0 ? (good / total) * 100 : 0;
-    });
-
-    // 3. RENDER: Chart.js Implementation
-    new Chart(fatigueCtx, {
-        type: 'line',
-        data: {
-            labels: ['Start', '25%', '50%', '75%', 'End'],
-            datasets: [{
-                label: 'Postural Efficiency %',
-                data: fatigueDataPoints,
-                borderColor: '#0052CC',
-                backgroundColor: 'rgba(0, 82, 204, 0.08)',
-                fill: true,
-                tension: 0.45, // Smooths the "Fatigue Curve"
-                pointRadius: 4,
-                pointBackgroundColor: '#FFFFFF',
-                pointBorderColor: '#0052CC',
-                pointBorderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: { callback: value => value + '%' }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: (context) => `Efficiency: ${context.parsed.y.toFixed(1)}%`
-                    }
-                }
+        // Get all sessions
+        function getAllSessions() {
+            try {
+                return JSON.parse(localStorage.getItem("sessions")) || [];
+            } catch (e) {
+                console.error("Failed to parse sessions", e);
+                return [];
             }
         }
-    });
-}
 
-    // PIE CHART
-    const ctx = document.getElementById("chart");
-    new Chart(ctx, {
-        type: "pie",
-        data: {
-            labels: ["Lateral", "Forward", "Slouch", "Multiple"],
-            datasets: [{
-                data: [currentSession.lateralAlerts || 0, currentSession.forwardAlerts || 0, currentSession.slouchAlerts || 0, currentSession.multipleAlerts || 0],
-                backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "#000000"],
-                borderWidth: 0
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-    });
-
-    // CORRELATION
-    const corrText = document.getElementById('correlation-text');
-    if (currentSession.alerts && currentSession.alerts.length > 3) {
-        let forwardToSlouch = 0;
-        for (let i = 0; i < currentSession.alerts.length - 1; i++) {
-            if (currentSession.alerts[i].type.includes("Forward") && currentSession.alerts[i+1].type.includes("Slouch")) forwardToSlouch++;
+        // Get latest session
+        function getLatestSession() {
+            const sessions = getAllSessions();
+            return sessions.length ? sessions[sessions.length - 1] : null;
         }
-        corrText.textContent = forwardToSlouch > 1 ? "Pattern: Forward leaning precedes slouching." : "No significant trigger patterns detected.";
-    }
-}
 
-document.addEventListener("DOMContentLoaded", loadAnalytics);
-</script>
+        // Get all error logs
+        function getAllErrors() {
+            try {
+                return JSON.parse(localStorage.getItem("errorLogs")) || [];
+            } catch (e) {
+                console.error("Failed to parse error logs", e);
+                return [];
+            }
+        }
+
+        // Get errors for latest session (if stored inside sessionData)
+        function getLatestSessionErrors() {
+            const session = getLatestSession();
+            return session?.errors || [];
+        }
+
+        // Debug helper (prints everything cleanly)
+        function debugStorage() {
+            const sessions = getAllSessions();
+            const errors = getAllErrors();
+
+            console.log("=== SESSIONS ===");
+            console.log(sessions);
+
+            console.log("=== LATEST SESSION ===");
+            console.log(getLatestSession());
+
+            console.log("=== ERROR LOGS ===");
+            console.log(errors);
+
+            console.log("=== SESSION ERRORS ===");
+            console.log(getLatestSessionErrors());
+        }
+
+        // Optional: clear everything (useful during testing)
+        function clearAllStorage() {
+            localStorage.removeItem("sessions");
+            localStorage.removeItem("errorLogs");
+            console.log("Local storage cleared");
+        }
+
+        // ----------------------------
+        // AUTO LOAD INTO YOUR ANALYTICS
+        // ----------------------------
+
+        function loadAllData() {
+            const sessions = getAllSessions();
+            const currentSession = getLatestSession();
+            const errors = getAllErrors();
+
+            if (!sessions.length) {
+                console.warn("No session data found");
+                return;
+            }
+
+            console.log("Loaded Sessions:", sessions);
+            console.log("Current Session:", currentSession);
+            console.log("Error Logs:", errors);
+        }
+
+        // Run on page load
+        document.addEventListener("DOMContentLoaded", loadAllData)
+
+        /**
+         * Fully integrated LoadAnalytics function for Summitra.
+         * Handles user-specific data filtering, KPI calculations, and 
+         * dynamic Chart.js rendering.
+         */
+        function loadAnalytics() {
+            // 1. DATA RETRIEVAL & USER FILTERING
+            const allSessions = JSON.parse(localStorage.getItem("sessions")) || [];
+            const currentUser = localStorage.getItem("currentUser");
+            const currentName = localStorage.getItem("currentDisplayName");
+            // FILTER: Essential to prevent data-bleeding between user accounts
+            const sessions = allSessions.filter(s => s.owner === currentUser);
+
+            // UI FALLBACK: If no data exists for this specific user
+            if (!sessions.length) {
+                document.querySelector('.analytics-main-pro').innerHTML = `
+            <div style="padding:100px; text-align:center;">
+                <h2 style="color:var(--blue-900);">There is no session history for you, ${currentName}</h2>
+                <p style="color:var(--blue-500); margin-bottom:24px;">Start a live session to generate intelligence reports.</p>
+                <button class="primary-btn" style="width:fit-content; margin:0 auto;" onclick="goBack()">
+                    Return to Dashboard
+                </button>
+            </div>`;
+                return;
+            }
+
+            // 2. VARIABLE INITIALIZATION
+            const currentSession = sessions.at(-1);
+            const previousSessions = sessions.slice(0, -1);
+            const currentVal = getSessionPct(currentSession); // Fixed reference error
+            const logs = currentSession.logs || [];
+
+            // 3. KPI CALCULATIONS
+            // Compliance Score
+            document.getElementById("curr-score").textContent = currentVal.toFixed(1) + "%";
+
+            // Improvement Delta
+            let historicalAvg = null;
+            if (previousSessions.length > 0) {
+                historicalAvg = previousSessions.reduce((acc, s) => acc + getSessionPct(s), 0) / previousSessions.length;
+            }
+
+            const improvementElement = document.getElementById("improvement-score");
+            if (historicalAvg !== null) {
+                const delta = (currentVal - historicalAvg).toFixed(1);
+                improvementElement.textContent = (delta > 0 ? "+" : "") + delta + "%";
+                improvementElement.style.color = delta < 0 ? "var(--danger)" : "#16A34A";
+            }
+
+            // Resilience (Correction Speed)
+            let totalRecoveryTime = 0;
+            let recoveryCount = 0;
+
+            for (let i = 0; i < logs.length - 1; i++) {
+                if (logs[i].status === 'ALERT' && logs[i + 1].status === 'GOOD') {
+                    const diff = (new Date(logs[i + 1].timestamp) - new Date(logs[i].timestamp)) / 1000;
+                    totalRecoveryTime += diff;
+                    recoveryCount++;
+                }
+            }
+            const resilience = recoveryCount > 0 ? (totalRecoveryTime / recoveryCount).toFixed(1) : "N/A";
+            document.getElementById("resilience-ratio").textContent = resilience + (resilience !== "N/A" ? "s" : "");
+
+            // Ergonomic Debt (Physiological Recovery Time)
+            const badSeconds = (currentSession.badFrames * 0.18); // Based on ~5.5fps processing
+            const debtMinutes = Math.ceil((badSeconds * 2) / 60);
+            document.getElementById("ergo-debt").textContent = debtMinutes + "m";
+
+            // 4. CHART RENDERING
+            // Fatigue Curve: Dynamic Density Logic
+            const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
+
+            if (currentSession.totalFrames < 100) {
+                document.getElementById('fatigue-container').innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--blue-500); font-weight:700; font-family:'JetBrains Mono';">
+                INSUFFICIENT TELEMETRY FOR ANALYSIS
+            </div>`;
+            } else {
+                const binCount = 5;
+                const goodCounts = new Array(binCount).fill(0);
+                const totalSamplesPerBin = new Array(binCount).fill(0);
+
+                logs.forEach((log, index) => {
+                    const binIndex = Math.min(binCount - 1, Math.floor((index / logs.length) * binCount));
+                    totalSamplesPerBin[binIndex]++;
+                    if (log.status === "GOOD") goodCounts[binIndex]++;
+                });
+
+                const fatigueDataPoints = goodCounts.map((good, i) => {
+                    const total = totalSamplesPerBin[i];
+                    return total > 0 ? (good / total) * 100 : 0;
+                });
+
+                new Chart(fatigueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Start', '25%', '50%', '75%', 'End'],
+                        datasets: [{
+                            label: 'Postural Efficiency %',
+                            data: fatigueDataPoints,
+                            borderColor: '#0052CC',
+                            backgroundColor: 'rgba(0, 82, 204, 0.08)',
+                            fill: true,
+                            tension: 0.45,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+                });
+            }
+
+            // Alert Composition Pie Chart
+            const pieCtx = document.getElementById("chart");
+            new Chart(pieCtx, {
+                type: "pie",
+                data: {
+                    labels: ["Lateral", "Forward", "Slouch", "Multiple"],
+                    datasets: [{
+                        data: [
+                            currentSession.lateralAlerts || 0,
+                            currentSession.forwardAlerts || 0,
+                            currentSession.slouchAlerts || 0,
+                            currentSession.multipleAlerts || 0
+                        ],
+                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "#000000"],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            // 5. BEHAVIORAL PATTERN CORRELATION
+            const corrText = document.getElementById('correlation-text');
+            if (currentSession.alerts && currentSession.alerts.length > 3) {
+                let forwardToSlouch = 0;
+                for (let i = 0; i < currentSession.alerts.length - 1; i++) {
+                    if (currentSession.alerts[i].type.includes("Forward") && currentSession.alerts[i + 1].type.includes("Slouch")) {
+                        forwardToSlouch++;
+                    }
+                }
+                corrText.textContent = forwardToSlouch > 1 ? "Pattern: Forward leaning precedes slouching." : "No significant trigger patterns detected.";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadAnalytics);
+    </script>
+    <script src="auth.js"></script>
 </body>
+
 </html>

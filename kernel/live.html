@@ -2,328 +2,301 @@
 <html lang="en">
 
 <head>
-<link rel="icon" type="image/png" href="logo.jpg">
-<meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-<title>Live Monitoring</title>
+  <link rel="icon" type="image/png" href="logo.jpg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Monitoring</title>
 
-<link
-href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
-rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+    rel="stylesheet">
 
-<link
-href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
-rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet">
 
-<link href="styles.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
 </head>
 
 <body>
 
-<div id="welcome-modal" class="modal-overlay">
-<div class="modal-content">
-<div class="modal-icon">
-<span class="material-symbols-rounded"
-style="font-size:40px;">
-rocket_launch
-</span>
-</div>
+  <div id="welcome-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-icon">
+        <span class="material-symbols-rounded" style="font-size:40px;">
+          rocket_launch
+        </span>
+      </div>
 
-<h2 class="modal-title">
-Ready?
-</h2>
+      <h2 class="modal-title">
+        Ready?
+      </h2>
 
-<div class="stats-table-dark-wrapper">
-  <table class="stats-table-dark">
-    <thead>
-      <tr>
-        <th>Seconds</th>
-        <th>Instruction</th>
-      </tr>
-    </thead>
+      <div class="stats-table-dark-wrapper">
+        <table class="stats-table-dark">
+          <thead>
+            <tr>
+              <th>Seconds</th>
+              <th>Instruction</th>
+            </tr>
+          </thead>
 
-    <tbody>
-      <tr>
-        <td>0–5</td>
-        <td><b>Tilt your head laterally</b> on both sides in your <span style = "color: red;" ><b>target range</b></span></td>
-      </tr>
+          <tbody>
+            <tr>
+              <td>0–5</td>
+              <td><b>Tilt your head laterally</b> on both sides in your <span style="color: red;"><b>target
+                    range</b></span></td>
+            </tr>
 
-      <tr>
-        <td>5–10</td>
-        <td><b>Tilt your neck</b> forwards in your <span style = "color: red;" ><b>target range</b></span></td>
-      </tr>
+            <tr>
+              <td>5–10</td>
+              <td><b>Tilt your neck</b> forwards in your <span style="color: red;"><b>target range</b></span></td>
+            </tr>
 
-      <tr>
-        <td>10–15</td>
-        <td><b>Sit straight</b>, or slightly slouch within your <span style = "color: red;" ><b>comfort range</b></span></td>
-      </tr>
-    </tbody>
-  </table>
-  
-</div>
-<br>
-<!--<p class="modal-text">
+            <tr>
+              <td>10–15</td>
+              <td><b>Sit straight</b>, or slightly slouch within your <span style="color: red;"><b>comfort
+                    range</b></span></td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <br>
+      <!--<p class="modal-text">
   Position Yourself!!
 </p>
 -->
 
-<button id="modal-start-btn"
-class="primary-btn">
-Get Started
-<span class="material-symbols-rounded">
-arrow_forward
-</span>
-</button>
+      <button id="modal-start-btn" class="primary-btn">
+        Get Started
+        <span class="material-symbols-rounded">
+          arrow_forward
+        </span>
+      </button>
 
-</div>
-</div>
+    </div>
+  </div>
 
 
-<div id="exit-modal"
-class="modal-overlay modal-hidden">
+  <div id="exit-modal" class="modal-overlay modal-hidden">
 
-<div class="modal-content">
+    <div class="modal-content">
 
-<div class="modal-icon danger">
-<span class="material-symbols-rounded"
-style="font-size:40px;">
-logout
-</span>
-</div>
+      <div class="modal-icon danger">
+        <span class="material-symbols-rounded" style="font-size:40px;">
+          logout
+        </span>
+      </div>
 
-<h2 class="modal-title">
-Terminate Session?
-</h2>
+      <h2 class="modal-title">
+        Terminate Session?
+      </h2>
 
-<p class="modal-text">
-Are you sure you want to exit?
-Your current session kinetic data
-will be uploaded to the server.
-</p>
+      <p class="modal-text">
+        Are you sure you want to exit?
+        Your current session kinetic data
+        will be uploaded to the server.
+      </p>
 
-<div class="btn-group">
+      <div class="btn-group">
 
-<button id="confirm-exit-btn"
-class="danger-btn">
-Yes, Stop Session
-</button>
+        <button id="confirm-exit-btn" class="danger-btn">
+          Yes, Stop Session
+        </button>
 
-<button id="cancel-exit-btn"
-class="secondary-btn">
-Continue Calibration
-</button>
+        <button id="cancel-exit-btn" class="secondary-btn">
+          Continue Calibration
+        </button>
 
-</div>
-</div>
-</div>
+      </div>
+    </div>
+  </div>
 
 
-<header>
+  <header>
 
-<img src="logo.jpg"
-alt="Summitra Logo"
-class="logo-watermark"
-onerror="this.src='https://via.placeholder.com/64'">
+    <img src="logo.jpg" alt="Summitra Logo" class="logo-watermark" onerror="this.src='https://via.placeholder.com/64'">
 
-<div>
-<div class="header-title">
-Summitra
-</div>
+    <div>
+      <div class="header-title">
+        Summitra
+      </div>
 
-<div class="header-subtitle">
-Reaching the epitome of wellness
-</div>
-</div>
+      <div class="header-subtitle">
+        Reaching the epitome of wellness
+      </div>
+    </div>
 
-</header>
+  </header>
 
 
-<main>
+  <main>
 
-<section class="viewport-container">
+    <section class="viewport-container">
 
-<div class="video-wrapper">
+      <div class="video-wrapper">
 
-<video id="webcam"
-autoplay
-playsinline>
-</video>
+        <video id="webcam" autoplay playsinline>
+        </video>
 
-<div class="video-vignette"></div>
+        <div class="video-vignette"></div>
 
-<img src="logo.jpg"
-alt="Summitra Logo"
-class="video-watermark"
-onerror="this.src='https://via.placeholder.com/64'">
+        <img src="logo.jpg" alt="Summitra Logo" class="video-watermark"
+          onerror="this.src='https://via.placeholder.com/64'">
 
 
-<!-- NEW CALIBRATION OVERLAY -->
-<div id="calibration-overlay"
-class="calibration-card cal-blue">
+        <!-- NEW CALIBRATION OVERLAY -->
+        <div id="calibration-overlay" class="calibration-card cal-blue">
 
-<div class="cal-step">
-Step 1 of 4
-</div>
+          <div class="cal-step">
+            Step 1 of 4
+          </div>
 
-<div id="calibration-message">
-Rotate head gently left and right
-</div>
+          <div id="calibration-message">
+            Rotate head gently left and right
+          </div>
 
-</div>
-<!-- END NEW -->
+        </div>
+        <!-- END NEW -->
 
 
-</div>
+      </div>
 
 
-<div class="viewport-controls">
+      <div class="viewport-controls">
 
-<div class="control-item">
-<span class="control-label">
-Mute All
-</span>
+        <div class="control-item">
+          <span class="control-label">
+            Mute All
+          </span>
 
-<label class="switch">
-<input type="checkbox"
-id="toggle-master">
-<span class="slider"></span>
-</label>
-</div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-master">
+            <span class="slider"></span>
+          </label>
+        </div>
 
-<div class="control-divider"></div>
+        <div class="control-divider"></div>
 
 
-<div class="control-item">
-<span class="control-label">
-Track Lateral Alerts
-</span>
+        <div class="control-item">
+          <span class="control-label">
+            Track Lateral Alerts
+          </span>
 
-<label class="switch">
-<input
-type="checkbox"
-id="toggle-tilt"
-checked>
-<span class="slider"></span>
-</label>
-</div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-tilt" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
 
-<div class="control-divider"></div>
+        <div class="control-divider"></div>
 
 
-<div class="control-item">
-<span class="control-label">
-Track Forward Lean Alerts
-</span>
+        <div class="control-item">
+          <span class="control-label">
+            Track Forward Lean Alerts
+          </span>
 
-<label class="switch">
-<input
-type="checkbox"
-id="toggle-forward"
-checked>
-<span class="slider"></span>
-</label>
-</div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-forward" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
 
-<div class="control-divider"></div>
+        <div class="control-divider"></div>
 
 
-<div class="control-item">
-<span class="control-label">
-Track Slouching Alerts
-</span>
+        <div class="control-item">
+          <span class="control-label">
+            Track Slouching Alerts
+          </span>
 
-<label class="switch">
-<input
-type="checkbox"
-id="toggle-slouch"
-checked>
-<span class="slider"></span>
-</label>
-</div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-slouch" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
 
-</div>
-</section>
+      </div>
+    </section>
 
 
-<section id="monitor-card">
+    <section id="monitor-card">
 
-<div class="card-segment">
+      <div class="card-segment">
 
-<span class="label">
-Kinetic Feedback
-</span>
+        <span class="label">
+          Kinetic Feedback
+        </span>
 
-<div id="feedback-value">
-Awaiting Calibration...
-</div>
+        <div id="feedback-value">
+          Awaiting Calibration...
+        </div>
 
-<div id="raw-angle">
-Tilt Vector: --°
-</div>
+        <div id="raw-angle">
+          Tilt Vector: --°
+        </div>
 
 
-</div>
+      </div>
 
 
-<div class="card-segment stats-panel">
+      <div class="card-segment stats-panel">
 
-<span class="label">
-Session STATS
-</span>
+        <span class="label">
+          Session STATS
+        </span>
 
-<div class="stats-table-wrapper">
+        <div class="stats-table-wrapper">
 
-<table class="stats-table">
+          <table class="stats-table">
 
-<thead>
-<tr>
-<th>TIME</th>
-<th>ALERT</th>
-<th>ANGLE</th>
-</tr>
-</thead>
+            <thead>
+              <tr>
+                <th>TIME</th>
+                <th>ALERT</th>
+                <th>ANGLE</th>
+              </tr>
+            </thead>
 
-<tbody id="stats-body">
-</tbody>
+            <tbody id="stats-body">
+            </tbody>
 
-</table>
+          </table>
 
-</div>
+        </div>
 
-<button id="stop-session-btn"
-class="danger-btn"
-style="width:100%;margin-top:18px;">
+        <button id="stop-session-btn" class="danger-btn" style="width:100%;margin-top:18px;">
 
-<span class="material-symbols-rounded">
-cancel
-</span>
+          <span class="material-symbols-rounded">
+            cancel
+          </span>
 
-Terminate Session
+          Terminate Session
 
-</button>
+        </button>
 
-</div>
+      </div>
 
 
-<div class="log-container">
-<div id="log-pulse"
-class="pulse">
-</div>
+      <div class="log-container">
+        <div id="log-pulse" class="pulse">
+        </div>
 
-<span id="log-text">
-Initializing Vision Systems...
-</span>
+        <span id="log-text">
+          Initializing Vision Systems...
+        </span>
 
-</div>
+      </div>
 
-</section>
+    </section>
 
-</main>
+  </main>
 
-<script type="module"
-src="live.js">
-</script>
+  <script type="module" src="live.js">
+  </script>
 
 </body>
+
 </html>
