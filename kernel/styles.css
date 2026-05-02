@@ -14,6 +14,7 @@
     --card-bg: #FFFFFF;
     --error-state: #D32F2F;
     --border-soft: #E2E8F0;
+    --border-hard: #0D1B2A;
     --danger: #EF4444;
     --success: #16A34A;
 }
@@ -686,11 +687,11 @@ body:has(#monitor-card) main {
 
 .secondary-btn {
     background: transparent;
-    border: 1px solid var(--border-soft);
+    border: 1px solid var(--border-hard);
     padding: 14px 24px;
     border-radius: 14px;
     font-weight: 600;
-    color: var(--blue-500);
+    color: var(--border-hard);
 }
 
 .back-btn {
