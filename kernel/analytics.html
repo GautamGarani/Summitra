@@ -184,6 +184,12 @@
                 <div class="kpi-mini">The percentage variance between your current compliance and the rolling average of
                     all previous sessions.</div>
             </div>
+           <div class="card analytics-kpi">
+                <div class="kpi-icon"><span class="material-symbols-rounded">psychology</span></div>
+                <div class="kpi-label">Proprioception Score</div>
+                <div class="kpi-value" id="proprio-score">0</div>
+                <div class="kpi-mini">Weighted synthesis of compliance, recovery speed, and strain load.</div>
+    </div>
         </section>
 
         <div class="charts-matrix">
@@ -463,6 +469,39 @@
                 }
                 corrText.textContent = forwardToSlouch > 1 ? "Pattern: Forward leaning precedes slouching." : "No significant trigger patterns detected.";
             }
+// ----------------------------
+// PROPRIOCEPTION SCORE
+// ----------------------------
+
+// 1. Compliance (already %)
+const complianceScore = currentVal;
+
+// 2. Resilience normalization (lower time = better)
+let resilienceScore = 0;
+if (resilience !== "N/A") {
+    const r = parseFloat(resilience);
+    resilienceScore = Math.max(0, Math.min(100, 100 - (r * 10)));
+}
+
+// 3. Ergonomic Debt normalization (lower = better)
+const d = debtMinutes;
+const debtScore = Math.max(0, Math.min(100, 100 - (d * 3.3)));
+
+// 4. Weighted final score
+const proprioScore = (
+    0.35 * complianceScore +
+    0.25 * resilienceScore +
+    0.4 * debtScore
+).toFixed(1);
+
+// 5. Display
+const proprioEl = document.getElementById("proprio-score");
+proprioEl.textContent = proprioScore;
+
+// Color coding
+if (proprioScore >= 80) proprioEl.style.color = "#16A34A";
+else if (proprioScore >= 50) proprioEl.style.color = "#F59E0B";
+else proprioEl.style.color = "#EF4444";
         }
 
         document.addEventListener("DOMContentLoaded", loadAnalytics);
