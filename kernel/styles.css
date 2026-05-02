@@ -1514,45 +1514,59 @@ header {
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
 }
 
+/* Restored and Enhanced Manifest Container */
 .manifest-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin: 20px 0;
+    
+    /* --- RESTORED STYLES --- */
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: 24px;       /* Consistent with .card-segment */
+    padding: 24px;             /* Provides internal breathing room */
+    
+    /* --- SCROLLABLE LOGIC --- */
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 12px;       /* Adjusted for scrollbar clearance */
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue-300) transparent;
 }
 
+/* Scrollbar refinement to match --blue-primary palette */
+.manifest-list::-webkit-scrollbar-thumb {
+    background-color: var(--blue-300); 
+    border-radius: 20px;
+}
+
+/* --- MATERIAL ICON INTEGRATION --- */
 .manifest-item {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-soft);
 }
 
-.manifest-icon-box {
-    width: 36px;
-    height: 36px;
-    background: var(--blue-accent);
+.manifest-item:last-child {
+    border-bottom: none;
+}
+
+.manifest-item .material-symbols-rounded {
+    font-size: 20px; /* Precise technical scale */
     color: var(--blue-primary);
+    background: var(--blue-accent);
+    padding: 8px;
     border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.manifest-info {
-    display: flex;
-    flex-direction: column;
+    flex-shrink: 0;
 }
 
 .manifest-label {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--blue-300);
-}
-
-.manifest-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     color: var(--blue-900);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
 }

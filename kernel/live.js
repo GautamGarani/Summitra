@@ -31,6 +31,31 @@ const sessionData = {
     },
     errors: []
 };
+// ----------------------------
+//ADVANCED TELEMETRY COLLECTION
+//-----------------------------
+
+// --- Advanced Telemetry Collection ---
+function getExtendedTelemetry() {
+    return {
+        // Hardware performance
+        cpuCores: navigator.hardwareConcurrency || "Unknown",
+        ram: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown",
+        
+        // Network environment
+        connection: navigator.connection ? {
+            type: navigator.connection.effectiveType.toUpperCase(),
+            downlink: `${navigator.connection.downlink} Mbps`
+        } : { type: "N/A", downlink: "N/A" },
+        
+        // Locale & Time
+        language: navigator.language.toUpperCase(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+    };
+}
+
+
+sessionData.environment.telemetry = getExtendedTelemetry();
 
 // ----------------------------
 // BROWSER INFO
@@ -117,6 +142,87 @@ console.error = function (...args) {
     });
     originalConsoleError.apply(console, args);
 };
+
+//-------------------
+//OS DATA-----------
+//==================
+
+function getOS() {
+    const userAgent = window.navigator.userAgent;
+    const platform = window.navigator.platform;
+    const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+    const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+    const iosPlatforms = ['iPhone', 'iPad', 'iPod'];
+    let os = 'Unknown OS';
+
+    if (macosPlatforms.indexOf(platform) !== -1) {
+        os = 'macOS';
+    } else if (iosPlatforms.indexOf(platform) !== -1) {
+        os = 'iOS';
+    } else if (windowsPlatforms.indexOf(platform) !== -1) {
+        os = 'Windows';
+    } else if (/Android/.test(userAgent)) {
+        os = 'Android';
+    } else if (/Linux/.test(platform)) {
+        os = 'Linux';
+    }
+
+    return os;
+}
+
+sessionData.environment.os = getOS();
+
+
+//-------------------------------
+//BATTERY TRACKING--------------
+//-------------------------------
+
+async function trackBatteryMetrics() {
+    if ('getBattery' in navigator) {
+        const battery = await navigator.getBattery();
+        
+        const updateBatteryStats = () => {
+            sessionData.environment.telemetry.power = {
+                level: (battery.level * 100).toFixed(0) + '%',
+                charging: battery.charging,
+                dischargingTime: battery.dischargingTime === Infinity ? 'N/A' : battery.dischargingTime + 's'
+            };
+        };
+
+        battery.addEventListener('levelchange', updateBatteryStats);
+        battery.addEventListener('chargingchange', updateBatteryStats);
+        updateBatteryStats();
+    }
+}
+
+//THERMAL OR FPS DEGRADATION TRACKING
+
+let lastFrameTime = performance.now();
+const fpsHistory = [];
+
+function monitorPerformance(currentTime) {
+    const delta = currentTime - lastFrameTime;
+    lastFrameTime = currentTime;
+    
+    const currentFPS = 1000 / delta;
+    fpsHistory.push(currentFPS);
+
+    // Maintain a rolling window of 50 frames
+    if (fpsHistory.length > 50) fpsHistory.shift();
+
+    const avgFPS = fpsHistory.reduce((a, b) => a + b) / fpsHistory.length;
+
+    // Detect significant drops (e.g., >30% below baseline)
+    if (avgFPS < 3.5) { // Assuming ~5.5 FPS is baseline for 180ms loop
+        storeError({
+            type: "THERMAL_THROTTLE_WARNING",
+            message: `Degraded performance detected: ${avgFPS.toFixed(1)} FPS`,
+            context: { avgFPS, delta }
+        });
+    }
+}
+
+
 
 import init, { process_feedback } from './pkg/math_engine.js';
 
@@ -518,10 +624,14 @@ const diagOverlay = document.getElementById('diagnostic-overlay');
 const manifestContent = document.getElementById('manifest-content');
 
 document.getElementById('view-manifest-btn').addEventListener('click', () => {
-    // Extract current data from sessionData object
     const env = sessionData.environment;
-
+    const tel = env.telemetry;
+    const thermalStatus = (tel.lastDelta > 250) ? "Throttled (High Latency)" : "Optimal (Stable)";
+    const batteryString = tel.power ? 
+        `${tel.power.level}% (${tel.power.charging ? 'Charging' : 'Discharging'})` : 
+        "N/A";
     manifestContent.innerHTML = `
+        <!-- EXISTING ENTRIES (Browser, OS, Resolution) -->
         <div class="manifest-item">
             <div class="manifest-icon-box"><span class="material-symbols-rounded">browser_updated</span></div>
             <div class="manifest-info">
@@ -529,22 +639,62 @@ document.getElementById('view-manifest-btn').addEventListener('click', () => {
                 <span class="manifest-value">${env.browser.name} v${env.browser.version}</span>
             </div>
         </div>
+        
         <div class="manifest-item">
-            <div class="manifest-icon-box"><span class="material-symbols-rounded">aspect_ratio</span></div>
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">memory</span></div>
             <div class="manifest-info">
-                <span class="manifest-label">Viewport Resolution</span>
-                <span class="manifest-value">${env.resolution}</span>
+                <span class="manifest-label">Your OS</span>
+                <span class="manifest-value">${env.os}</span>
             </div>
         </div>
-        <div class="manifest-item">
-            <div class="manifest-icon-box"><span class="material-symbols-rounded">history</span></div>
-            <div class="manifest-info">
-                <span class="manifest-label">Session Start</span>
-                <span class="manifest-value">${new Date(sessionData.sessionStart).toLocaleTimeString()}</span>
-            </div>
-        </div>
-    `;
 
+        <!-- NEW: HARDWARE SECTION[cite: 11, 12] -->
+        <div class="manifest-item">
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">memory</span></div>
+            <div class="manifest-info">
+                <span class="manifest-label">Hardware (Cores / RAM)</span>
+                <span class="manifest-value">${tel.cpuCores} Cores / ${tel.ram}</span>
+            </div>
+        </div>
+
+        <!-- NEW: NETWORK SECTION[cite: 11, 12] -->
+        <div class="manifest-item">
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">speed</span></div>
+            <div class="manifest-info">
+                <span class="manifest-label">Network Bandwidth</span>
+                <span class="manifest-value">${tel.connection.type} (${tel.connection.downlink})</span>
+            </div>
+        </div>
+
+        <!-- NEW: LOCALE SECTION[cite: 11, 12] -->
+        <div class="manifest-item">
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">language</span></div>
+            <div class="manifest-info">
+                <span class="manifest-label">Locale & Region</span>
+                <span class="manifest-value">${tel.language} / ${tel.timezone}</span>
+            </div>
+        </div>
+        
+        <div class="manifest-item">
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">battery_charging_full</span></div>
+            <div class="manifest-info">
+                <span class="manifest-label">Power Efficiency</span>
+                <span class="manifest-value">${batteryString}</span>
+            </div>
+        </div>
+
+        <div class="manifest-item">
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">thermostat</span></div>
+            <div class="manifest-info">
+                <span class="manifest-label">Thermal Profile</span>
+                <span class="manifest-value" style="color: ${tel.lastDelta > 250 ? 'var(--danger)' : 'inherit'}">
+                    ${thermalStatus}
+                </span>
+            </div>
+        </div>
+        
+    `;
+    
     diagOverlay.classList.remove('modal-hidden');
 });
 

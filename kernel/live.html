@@ -353,6 +353,24 @@
 
       <div id="manifest-content" class="manifest-list">
         <!-- Data will be injected here via JS -->
+        
+        <div class="manifest-item">
+        <div class="manifest-icon-box"><span class="material-symbols-rounded">battery_charging_full</span></div>
+        <div class="manifest-info">
+            <span class="manifest-label">Power Efficiency</span>
+            <span id="manifest-battery" class="manifest-value">Fetching...</span>
+        </div>
+    </div>
+
+    <!-- NEW: THERMAL SECTION -->
+    <div class="manifest-item">
+        <div class="manifest-icon-box"><span class="material-symbols-rounded">thermostat</span></div>
+        <div class="manifest-info">
+            <span class="manifest-label">Thermal Profile</span>
+            <span id="manifest-thermal" class="manifest-value">Stable</span>
+        </div>
+    </div>
+    
       </div>
 
       <button id="close-diagnostic-btn" class="primary-btn" style="margin-top: 20px; padding: 12px;">
