@@ -98,54 +98,61 @@
 
 
   <div id="exit-modal" class="modal-overlay modal-hidden">
-
     <div class="modal-content">
-
-      <div class="modal-icon danger">
-        <span class="material-symbols-rounded" style="font-size:40px;">
-          logout
-        </span>
-      </div>
-
-      <h2 class="modal-title">
-        Terminate Session?
-      </h2>
-
-      <p class="modal-text">
+      <p class="modal-text" id="exit-modal-description">
         Are you sure you want to exit?
-        Your current session kinetic data
-        will be uploaded to the server.
       </p>
+      <br>
 
       <div class="btn-group">
+        <!-- Saves to localStorage and goes to analytics -->
+        <button id="confirm-exit-btn" class="danger-btn">Stop & Save</button>
+        <br>
 
-        <button id="confirm-exit-btn" class="danger-btn">
-          Yes, Stop Session
-        </button>
+        <!-- Discards data and goes to analytics -->
+        <button id="confirm-exit-purge-btn" class="danger-btn">Yes, Discard Session</button>
+        <br>
 
-        <button id="cancel-exit-btn" class="secondary-btn">
-          Continue Calibration
-        </button>
-
+        <button id="cancel-exit-btn" class="secondary-btn">Continue</button>
       </div>
     </div>
   </div>
-
+  </div>
 
   <header>
-
-    <img src="logo.jpg" alt="Summitra Logo" class="logo-watermark" onerror="this.src='https://via.placeholder.com/64'">
-
-    <div>
-      <div class="header-title">
-        Summitra
-      </div>
-
-      <div class="header-subtitle">
-        Reaching the epitome of wellness
+    <div class="header-content">
+      <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+      <div class="header-text-group">
+        <div class="header-title">Summitra</div>
+        <div class="header-subtitle">Reaching the Epitome of Wellness</div>
       </div>
     </div>
 
+    <div class="header-actions">
+      <div class="profile-container">
+        <button class="profile-trigger" onclick="toggleDropdown()">
+          <span class="material-symbols-rounded">account_circle</span>
+          <!-- display-user will now show the human-readable Display Name -->
+          <span id="display-user">User</span>
+          <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
+        </button>
+
+        <div id="profile-dropdown" class="dropdown-menu">
+          <!-- Section 1: User -->
+          <div class="dropdown-header">
+            <span class="label">Authenticated As</span>
+            <div class="user-email" id="user-detail">user@summitra</div>
+          </div>
+
+          <hr class="dropdown-divider">
+
+          <button class="dropdown-item" onclick="logout()">
+            <span class="material-symbols-rounded">logout</span>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
   </header>
 
 
@@ -286,32 +293,73 @@
 
         </div>
 
-        <button id="stop-session-btn" class="danger-btn" style="width:100%;margin-top:18px;">
+        <button id="stop-session-btn" class="primary-btn" style="width:100%; margin-top:12px;">
+          <span class="material-symbols-rounded">stop_circle</span>
+          Stop & Save Session
+        </button>
 
-          <span class="material-symbols-rounded">
-            cancel
-          </span>
-
-          Terminate Session
-
+        <button id="stop-session-purge-btn" class="danger-btn" style="width:100%; margin-top:12px;">
+          <span class="material-symbols-rounded">delete_forever</span>
+          Terminate & Purge Session Data
         </button>
 
       </div>
 
 
-      <div class="log-container">
-        <div id="log-pulse" class="pulse">
+      <!-- SYSTEM STATUS BOX (REPLACES log-container) -->
+      <div class="card-segment system-status-card">
+        <div class="status-header">
+          <div class="status-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span class="label">System Health</span>
+              <div id="status-indicator">
+                <div id="log-pulse" class="pulse"></div>
+                <span id="log-text">Initializing...</span>
+              </div>
+            </div>
+            <!-- NEW: Manifest Trigger -->
+            <button id="view-manifest-btn" class="secondary-btn"
+              style="padding: 6px 12px; font-size: 10px; border-radius: 8px;">
+              <span class="material-symbols-rounded" style="font-size: 14px;">terminal</span>
+              VIEW MANIFEST
+            </button>
+          </div>
         </div>
 
-        <span id="log-text">
-          Initializing Vision Systems...
-        </span>
-
+        <div class="status-meta">
+          <div class="meta-item">
+            <span class="material-symbols-rounded">videocam</span>
+            <span id="camera-status">Active</span>
+          </div>
+          <div class="meta-item">
+            <span class="material-symbols-rounded">memory</span>
+            <span id="engine-status">Rust-WASM Loaded</span>
+          </div>
+        </div>
       </div>
 
     </section>
 
   </main>
+
+  <div id="diagnostic-overlay" class="modal-overlay modal-hidden" style="z-index: 3000;">
+    <div class="modal-content" style="text-align: left; max-width: 350px; padding: 32px;">
+      <h3 style="margin-top: 0; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+        <span class="material-symbols-rounded" style="color: var(--blue-primary);">live_tv</span>
+        Your Device
+      </h3>
+      <p>We use this data to diagnose errors.</p>
+      <hr class="dropdown-divider">
+
+      <div id="manifest-content" class="manifest-list">
+        <!-- Data will be injected here via JS -->
+      </div>
+
+      <button id="close-diagnostic-btn" class="primary-btn" style="margin-top: 20px; padding: 12px;">
+        Close 
+      </button>
+    </div>
+  </div>
 
   <script type="module" src="live.js">
   </script>

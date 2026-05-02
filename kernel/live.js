@@ -130,6 +130,8 @@ const welcomeModal = document.getElementById('welcome-modal');
 const exitModal = document.getElementById('exit-modal');
 const startBtn = document.getElementById('modal-start-btn');
 const stopBtn = document.getElementById('stop-session-btn');
+const stopPurgeBtn = document.getElementById('stop-session-purge-btn');
+const confirmExitPurgeBtn = document.getElementById('confirm-exit-purge-btn');
 const confirmExitBtn = document.getElementById('confirm-exit-btn');
 const cancelExitBtn = document.getElementById('cancel-exit-btn');
 
@@ -152,6 +154,18 @@ startBtn.addEventListener('click', () => {
 });
 
 stopBtn.addEventListener('click', () => {
+    exitModal.classList.remove('modal-hidden');
+});
+
+stopPurgeBtn.addEventListener('click', () => {
+    // Update the modal text dynamically to reflect the destructive action
+    const modalText = exitModal.querySelector('.modal-text');
+    if (modalText) {
+        modalText.innerHTML = `
+            <b style="color: var(--error-state);">WARNING:</b> 
+            This will end your session.
+        `;
+    }
     exitModal.classList.remove('modal-hidden');
 });
 
@@ -181,6 +195,26 @@ confirmExitBtn.addEventListener('click', () => {
 
     localStorage.setItem('sessions', JSON.stringify(sessions));
     window.location.href = 'analytics.html';
+});
+
+confirmExitPurgeBtn.addEventListener('click', () => {
+    // 1. Halt the processing loop
+    running = false;
+
+    // 2. Terminate hardware access (Webcam)
+    const video = document.getElementById('webcam');
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+    }
+
+    // 3. Optional: Clear sessionData object in memory
+    // (Technically redundant as we are redirecting, but good for security)
+    sessionData.logs = [];
+    sessionData.alerts = [];
+
+    // 4. Redirect immediately to analytics or dashboard
+    // No localStorage.setItem('sessions', ...) is called here.
+    window.location.href = 'dashboard.html';
 });
 
 // ----------------------------
@@ -478,3 +512,42 @@ function updateStatsInUI(latestAlert) {
     `;
     tbody.prepend(row);
 }
+
+// --- DIAGNOSTIC MODAL LOGIC ---
+const diagOverlay = document.getElementById('diagnostic-overlay');
+const manifestContent = document.getElementById('manifest-content');
+
+document.getElementById('view-manifest-btn').addEventListener('click', () => {
+    // Extract current data from sessionData object
+    const env = sessionData.environment;
+
+    manifestContent.innerHTML = `
+        <div class="manifest-item">
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">browser_updated</span></div>
+            <div class="manifest-info">
+                <span class="manifest-label">Engine / Browser</span>
+                <span class="manifest-value">${env.browser.name} v${env.browser.version}</span>
+            </div>
+        </div>
+        <div class="manifest-item">
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">aspect_ratio</span></div>
+            <div class="manifest-info">
+                <span class="manifest-label">Viewport Resolution</span>
+                <span class="manifest-value">${env.resolution}</span>
+            </div>
+        </div>
+        <div class="manifest-item">
+            <div class="manifest-icon-box"><span class="material-symbols-rounded">history</span></div>
+            <div class="manifest-info">
+                <span class="manifest-label">Session Start</span>
+                <span class="manifest-value">${new Date(sessionData.sessionStart).toLocaleTimeString()}</span>
+            </div>
+        </div>
+    `;
+
+    diagOverlay.classList.remove('modal-hidden');
+});
+
+document.getElementById('close-diagnostic-btn').addEventListener('click', () => {
+    diagOverlay.classList.add('modal-hidden');
+});
