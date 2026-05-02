@@ -152,6 +152,89 @@ function getSessionPct(session) {
     return (session.goodFrames / (session.totalFrames-110)) * 100;
 }
 
+// ----------------------------
+// LOCAL STORAGE RETRIEVAL SYSTEM
+// ----------------------------
+
+// Get all sessions
+function getAllSessions() {
+    try {
+        return JSON.parse(localStorage.getItem("sessions")) || [];
+    } catch (e) {
+        console.error("Failed to parse sessions", e);
+        return [];
+    }
+}
+
+// Get latest session
+function getLatestSession() {
+    const sessions = getAllSessions();
+    return sessions.length ? sessions[sessions.length - 1] : null;
+}
+
+// Get all error logs
+function getAllErrors() {
+    try {
+        return JSON.parse(localStorage.getItem("errorLogs")) || [];
+    } catch (e) {
+        console.error("Failed to parse error logs", e);
+        return [];
+    }
+}
+
+// Get errors for latest session (if stored inside sessionData)
+function getLatestSessionErrors() {
+    const session = getLatestSession();
+    return session?.errors || [];
+}
+
+// Debug helper (prints everything cleanly)
+function debugStorage() {
+    const sessions = getAllSessions();
+    const errors = getAllErrors();
+
+    console.log("=== SESSIONS ===");
+    console.log(sessions);
+
+    console.log("=== LATEST SESSION ===");
+    console.log(getLatestSession());
+
+    console.log("=== ERROR LOGS ===");
+    console.log(errors);
+
+    console.log("=== SESSION ERRORS ===");
+    console.log(getLatestSessionErrors());
+}
+
+// Optional: clear everything (useful during testing)
+function clearAllStorage() {
+    localStorage.removeItem("sessions");
+    localStorage.removeItem("errorLogs");
+    console.log("Local storage cleared");
+}
+
+// ----------------------------
+// AUTO LOAD INTO YOUR ANALYTICS
+// ----------------------------
+
+function loadAllData() {
+    const sessions = getAllSessions();
+    const currentSession = getLatestSession();
+    const errors = getAllErrors();
+
+    if (!sessions.length) {
+        console.warn("No session data found");
+        return;
+    }
+
+    console.log("Loaded Sessions:", sessions);
+    console.log("Current Session:", currentSession);
+    console.log("Error Logs:", errors);
+}
+
+// Run on page load
+document.addEventListener("DOMContentLoaded", loadAllData)
+
 function loadAnalytics() {
     const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
     if (!sessions.length) return;

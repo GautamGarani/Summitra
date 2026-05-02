@@ -2,16 +2,16 @@ let latestFeedback = null;
 let starting = false;
 
 // ----------------------------
-// CALIBRATION (FRAME-DRIVEN)
+// CALIBRATION
 // ----------------------------
 const CALIBRATION_FRAMES = 112;
 
 // ----------------------------
-// SESSION DATA
+// SESSION DATA (DEFINE FIRST)
 // ----------------------------
 const sessionData = {
     sessionStart: new Date().toISOString(),
-    logs: [], // Full timeline of state transitions (Good vs. Bad)
+    logs: [],
     alerts: [],
     calibration: [],
     totalFrames: 0,
@@ -20,7 +20,99 @@ const sessionData = {
     lateralAlerts: 0,
     forwardAlerts: 0,
     slouchAlerts: 0,
-    multipleAlerts: 0
+    multipleAlerts: 0,
+    environment: {
+        userAgent: navigator.userAgent,
+        resolution: `${window.innerWidth}x${window.innerHeight}`,
+        browser: getBrowserInfo()
+    },
+    errors: []
+};
+
+// ----------------------------
+// BROWSER INFO
+// ----------------------------
+function getBrowserInfo() {
+    const ua = navigator.userAgent;
+
+    let name = "Unknown";
+    let version = "Unknown";
+
+    if (ua.includes("Chrome") && !ua.includes("Edg")) {
+        name = "Chrome";
+        version = ua.match(/Chrome\/([\d.]+)/)?.[1];
+    } else if (ua.includes("Edg")) {
+        name = "Edge";
+        version = ua.match(/Edg\/([\d.]+)/)?.[1];
+    } else if (ua.includes("Firefox")) {
+        name = "Firefox";
+        version = ua.match(/Firefox\/([\d.]+)/)?.[1];
+    } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
+        name = "Safari";
+        version = ua.match(/Version\/([\d.]+)/)?.[1];
+    }
+
+    return { name, version };
+}
+
+// ----------------------------
+// ERROR + TELEMETRY SYSTEM
+// ----------------------------
+function storeError(errorObj) {
+    try {
+        let errors = JSON.parse(localStorage.getItem("errorLogs")) || [];
+
+        const enrichedError = {
+            type: errorObj.type || "UNKNOWN",
+            message: errorObj.message || "No message",
+            stack: errorObj.stack || null,
+            time: new Date().toISOString(),
+            context: {
+                frame: sessionData?.totalFrames || 0,
+                goodFrames: sessionData?.goodFrames || 0,
+                badFrames: sessionData?.badFrames || 0,
+                lastFeedback: latestFeedback || null
+            }
+        };
+
+        errors.push(enrichedError);
+        if (errors.length > 50) errors = errors.slice(-50);
+
+        localStorage.setItem("errorLogs", JSON.stringify(errors));
+
+        sessionData.errors.push(enrichedError);
+
+    } catch (e) {
+        console.warn("Error logging failed", e);
+    }
+}
+
+// Global error capture
+window.onerror = function (message, source, lineno, colno, error) {
+    storeError({
+        type: "JS_ERROR",
+        message,
+        stack: error?.stack
+    });
+};
+
+// Promise errors
+window.addEventListener("unhandledrejection", function (event) {
+    storeError({
+        type: "PROMISE_ERROR",
+        message: event.reason?.message || String(event.reason),
+        stack: event.reason?.stack
+    });
+});
+
+// Console errors
+const originalConsoleError = console.error;
+console.error = function (...args) {
+    storeError({
+        type: "CONSOLE_ERROR",
+        message: args.map(a => typeof a === "object" ? JSON.stringify(a) : a).join(" ")
+    });
+    originalConsoleError.apply(console, args);
 };
 
 import init, { process_feedback } from './pkg/math_engine.js';
@@ -29,9 +121,7 @@ const {
     FaceLandmarker,
     PoseLandmarker,
     FilesetResolver
-} = await import(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3"
-);
+} = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3");
 
 const welcomeModal = document.getElementById('welcome-modal');
 const exitModal = document.getElementById('exit-modal');
@@ -68,6 +158,7 @@ cancelExitBtn.addEventListener('click', () => {
 
 confirmExitBtn.addEventListener('click', () => {
     running = false;
+
     const video = document.getElementById('webcam');
     if (video.srcObject) {
         video.srcObject.getTracks().forEach(t => t.stop());
@@ -124,7 +215,6 @@ subs.forEach(s => {
 // ----------------------------
 // MAIN
 // ----------------------------
-
 async function startCoach() {
     if (running || starting) return;
     starting = true;
@@ -171,7 +261,7 @@ async function startCoach() {
         video.srcObject = stream;
         await new Promise(r => video.onloadedmetadata = r);
         await video.play();
-
+        
         logText.textContent = 'System Active';
         pulse.classList.add('active-pulse');
         running = true;
@@ -317,10 +407,19 @@ const degrees = tilt;
 
             setTimeout(process, 180);
         }
+
         process();
+
     } catch (error) {
         starting = false;
         running = false;
+
+        storeError({
+            type: "SYSTEM_CRASH",
+            message: error.message,
+            stack: error.stack
+        });
+
         console.error(error);
     }
 }

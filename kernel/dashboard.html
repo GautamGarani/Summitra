@@ -85,6 +85,24 @@ Adaptive Calibration
         </button>
     </div>
 
+    <!-- ✅ NEW ERROR ANALYTICS CARD -->
+    <div class="card feature-card">
+        <div class="feature-badge" style="background:#FEE2E2; color:#B91C1C;">
+            <span class="material-symbols-rounded">bug_report</span>
+        </div>
+        <h2>Error Analytics</h2>
+        <p>Inspect system errors, crashes, and telemetry logs captured during sessions.</p>
+        <div class="feature-points">
+            <div>• JS + Promise errors</div>
+            <div>• System crash tracking</div>
+            <div>• Debug telemetry</div>
+        </div>
+        <button class="btn" onclick="location.href='errorStats.html'">
+            View Errors
+            <span class="material-symbols-rounded">warning</span>
+        </button>
+    </div>
+
     <div class="card feature-card">
         <div class="feature-badge" style="background: #F1F5F9; color: #475569;">
             <span class="material-symbols-rounded">database</span>
@@ -117,6 +135,7 @@ Adaptive Calibration
 
 </section>
 </main>
+
 <script>
 function renderLedger() {
     const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
@@ -128,7 +147,6 @@ function renderLedger() {
         return;
     }
 
-    // Reverse to show the most recent session first
     sessions.slice().reverse().forEach((session, index) => {
         const compliance = ((session.goodFrames / session.totalFrames) * 100).toFixed(1);
         const row = document.createElement("tr");
@@ -152,11 +170,8 @@ function clearHistory() {
     }
 }
 
-// Initial Render
 document.addEventListener("DOMContentLoaded", renderLedger);
 </script>
+
 </body>
 </html>
-
-
-
