@@ -3,20 +3,22 @@
  */
 
 const FORM_ID = "1FAIpQLSdJo84it9DO_4TZKfFM3sFT7iV8NEpcOeu7CHmeeRtaYGO5lA";
-const ENTRY_USERNAME = "entry.251959277"; 
-const ENTRY_MSG = "entry.679347941";   
+const ENTRY_USERNAME = "entry.251959277";
+const ENTRY_MSG = "entry.679347941";
+const USER_BROWSER = "entry.1365845890";
+const USER_OS = "entry.721529810";
 
 const QUICK_FIXES = [
     "Clear your browser cache",
     "Force reload the page (Ctrl+Shift+R)",
     "Check the broswer console and paste the message here",
-    "Update JavaScript", 
+    "Update your browser",
     "Try another browser with JS support"
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
     const root = document.getElementById('summitra-help-root');
-    
+
     // Themed UI Injection using Summitra Design Tokens
     root.innerHTML = `
         <div id="summitra-launcher" class="primary-btn">
@@ -69,7 +71,7 @@ function populateFixes() {
             <span class="material-symbols-rounded">build</span>
             <span class="manifest-label">${fix}</span>
         `;
-        item.onclick = () => { 
+        item.onclick = () => {
             document.getElementById('help-msg').value = `Technical Issue: ${fix}`;
             document.getElementById('help-msg').focus();
         };
@@ -84,38 +86,41 @@ function setupListeners() {
     const sendBtn = document.getElementById('send-help');
 
     const toggleBox = () => helpBox.classList.toggle('modal-active');
-    
+
     launcher.onclick = toggleBox;
     closeBtn.onclick = toggleBox;
 
-    sendBtn.onclick = async () => {
-        const msg = document.getElementById('help-msg').value;
-        if (!msg.trim()) return alert("Message body cannot be empty.");
+sendBtn.onclick = async () => {
+    const msg = document.getElementById('help-msg').value;
+    if (!msg.trim()) return alert("Message body cannot be empty.");
 
-        const userEmail = localStorage.getItem('currentUser') || "guest_user";
-        
-        // Visual Feedback
-        sendBtn.innerHTML = `<span class="material-symbols-rounded pulse">sync</span> Sending...`;
-        
-        await submitToGoogle(userEmail, msg);
-        
-        alert("Transmission successful.");
-        document.getElementById('help-msg').value = "";
-        sendBtn.innerHTML = `<span class="material-symbols-rounded">send</span> Send Message`;
-        toggleBox();
-    };
+    const storedBrowser = JSON.parse(localStorage.getItem('browser_data')) || { name: "Unknown", version: "N/A" };
+    const storedOS = localStorage.getItem('os_data') || "Unknown OS";
+    const browserString = `${storedBrowser.name} ${storedBrowser.version}`;
+    const osString = storedOS;
+    const userEmail = localStorage.getItem('currentUser') || "guest_user";
+    sendBtn.innerHTML = `<span class="material-symbols-rounded pulse">sync</span> Sending...`;
+    await submitToGoogle(userEmail, msg, browserString, osString);
+    alert("Your feedback has been transmitted!");
+    document.getElementById('help-msg').value = "";
+    sendBtn.innerHTML = `<span class="material-symbols-rounded">send</span> Send Message`;
+    toggleBox();
+};
 }
 
-async function submitToGoogle(email, message) {
+async function submitToGoogle(email, message, browserInfo, osInfo) {
     const url = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
     const formData = new URLSearchParams();
     formData.append(ENTRY_USERNAME, email);
     formData.append(ENTRY_MSG, message);
+    formData.append(USER_BROWSER, browserInfo);
+    formData.append(USER_OS, osInfo);
+
 
     try {
         await fetch(url, {
             method: 'POST',
-            mode: 'no-cors', 
+            mode: 'no-cors',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: formData.toString()
         });

@@ -41,13 +41,13 @@ function getExtendedTelemetry() {
         // Hardware performance
         cpuCores: navigator.hardwareConcurrency || "Unknown",
         ram: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown",
-        
+
         // Network environment
         connection: navigator.connection ? {
             type: navigator.connection.effectiveType.toUpperCase(),
             downlink: `${navigator.connection.downlink} Mbps`
         } : { type: "N/A", downlink: "N/A" },
-        
+
         // Locale & Time
         language: navigator.language.toUpperCase(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -171,6 +171,8 @@ function getOS() {
 }
 
 sessionData.environment.os = getOS();
+localStorage.setItem('browser_data', JSON.stringify(sessionData.environment.browser));
+localStorage.setItem('os_data', sessionData.environment.os);
 
 
 //-------------------------------
@@ -180,7 +182,7 @@ sessionData.environment.os = getOS();
 async function trackBatteryMetrics() {
     if ('getBattery' in navigator) {
         const battery = await navigator.getBattery();
-        
+
         const updateBatteryStats = () => {
             sessionData.environment.telemetry.power = {
                 level: (battery.level * 100).toFixed(0) + '%',
@@ -203,7 +205,7 @@ const fpsHistory = [];
 function monitorPerformance(currentTime) {
     const delta = currentTime - lastFrameTime;
     lastFrameTime = currentTime;
-    
+
     const currentFPS = 1000 / delta;
     fpsHistory.push(currentFPS);
 
@@ -627,8 +629,8 @@ document.getElementById('view-manifest-btn').addEventListener('click', () => {
     const env = sessionData.environment;
     const tel = env.telemetry;
     const thermalStatus = (tel.lastDelta > 250) ? "Throttled (High Latency)" : "Optimal (Stable)";
-    const batteryString = tel.power ? 
-        `${tel.power.level}% (${tel.power.charging ? 'Charging' : 'Discharging'})` : 
+    const batteryString = tel.power ?
+        `${tel.power.level}% (${tel.power.charging ? 'Charging' : 'Discharging'})` :
         "N/A";
     manifestContent.innerHTML = `
         <!-- EXISTING ENTRIES (Browser, OS, Resolution) -->
@@ -694,7 +696,7 @@ document.getElementById('view-manifest-btn').addEventListener('click', () => {
         </div>
         
     `;
-    
+
     diagOverlay.classList.remove('modal-hidden');
 });
 
