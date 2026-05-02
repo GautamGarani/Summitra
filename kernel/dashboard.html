@@ -6,6 +6,7 @@
     <script>
         //AUTH GUARD GATEKEEPING
         (function () {
+            const currentUserId = localStorage.getItem('currentUserId');
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const currentUser = localStorage.getItem('currentUser');
 
@@ -13,6 +14,7 @@
                 // Optional: Clean any corrupted state
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('currentUser');
+                localStorage.getItem('currentUserId');
 
                 window.location.href = 'login.html';
             }
@@ -45,6 +47,16 @@
         </div>
 
         <div class="header-actions">
+
+            <button class="secondary-btn logout-pill" onclick="location.href='about.html'">
+                <span class="material-symbols-rounded">info</span>
+                About Summitra
+            </button>
+            <button class="secondary-btn logout-pill" onclick="location.href='privacyPolicy.html'">
+                <span class="material-symbols-rounded">shield</span>
+                Our Policy
+            </button>
+
             <div class="profile-container">
                 <button class="profile-trigger" onclick="toggleDropdown()">
                     <span class="material-symbols-rounded">account_circle</span>
@@ -220,7 +232,7 @@
             }
 
             userSessions.slice().reverse().forEach((session, index) => {
-                const compliance = ((session.goodFrames / (session.totalFrames-110)) * 100).toFixed(1);
+                const compliance = ((session.goodFrames / (session.totalFrames - 110)) * 100).toFixed(1);
                 const mins = Math.floor(session.durationSeconds / 60);
                 const secs = session.durationSeconds % 60;
                 const timeStr = `${mins}m ${secs}s`;

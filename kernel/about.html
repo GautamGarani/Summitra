@@ -7,9 +7,16 @@
 
         // AUTH GUARD: Prevents unauthorized access to platform documentation
         (function () {
+            const currentUserId = localStorage.getItem('currentUserId');
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const currentUser = localStorage.getItem('currentUser');
+
             if (isLoggedIn !== 'true' || !currentUser) {
+                // Optional: Clean any corrupted state
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                localStorage.getItem('currentUserId');
+
                 window.location.href = 'login.html';
             }
         })();
@@ -40,6 +47,14 @@
         </div>
 
         <div class="header-actions">
+            <button class="secondary-btn logout-pill" onclick="location.href='live.html'">
+                <span class="material-symbols-rounded">sensors</span>
+                Live Monitor
+            </button>
+            <button class="secondary-btn logout-pill" onclick="location.href='analytics.html'">
+                <span class="material-symbols-rounded">insights</span>
+                Analytics
+            </button>
             <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
                 <span class="material-symbols-rounded">dashboard</span>
                 Dashboard

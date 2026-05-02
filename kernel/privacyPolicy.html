@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // AUTH GUARD: Ensures policy access is restricted to authenticated sessions
         (function () {
@@ -38,8 +39,16 @@
         </div>
 
         <div class="header-actions">
+            <button class="secondary-btn logout-pill" onclick="location.href='live.html'">
+                <span class="material-symbols-rounded">sensors</span>
+                Live Monitor
+            </button>
+            <button class="secondary-btn logout-pill" onclick="location.href='analytics.html'">
+                <span class="material-symbols-rounded">insights</span>
+                Analytics
+            </button>
             <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
-                <span class="material-symbols-rounded">arrow_back</span>
+                <span class="material-symbols-rounded">dashboard</span>
                 Dashboard
             </button>
 
@@ -99,7 +108,8 @@
                 </div>
                 <h2>LocalStorage Governance</h2>
                 <p>All session analytics, alert logs, and credential hashes are stored exclusively in your browser's
-                    <strong>LocalStorage</strong>.</p>
+                    <strong>LocalStorage</strong>.
+                </p>
                 <div class="feature-points">
                     <div>• Persistent until manual clearance</div>
                     <div>• Accessible only via this domain</div>

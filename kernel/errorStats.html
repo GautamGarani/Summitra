@@ -6,14 +6,15 @@
     <script>
         //AUTH GUARD GATEKEEPING
         (function () {
+            const currentUserId = localStorage.getItem('currentUserId');
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const currentUser = localStorage.getItem('currentUser');
 
-            // If flags are missing or false, bounce the user to login
             if (isLoggedIn !== 'true' || !currentUser) {
                 // Optional: Clean any corrupted state
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('currentUser');
+                localStorage.getItem('currentUserId');
 
                 window.location.href = 'login.html';
             }
@@ -65,11 +66,9 @@
         <div class="header-actions">
             <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
                 <span class="material-symbols-rounded">arrow_back</span>
-                Dashboard
             </button>
             <button class="secondary-btn logout-pill" onclick="loadStorage()">
                 <span class="material-symbols-rounded">refresh</span>
-                refresh
             </button>
             <!-- Profile container with absolute positioning for the menu -->
             <div class="profile-container">
@@ -137,7 +136,7 @@
             <div class="card feature-card">
                 <div class="feature-badge" style="background:#FEE2E2; color:#B91C1C;"><span
                         class="material-symbols-rounded">bug_report</span></div>
-                <h2>Error Logs</h2>
+                <h2>Console Logs</h2>
                 <div class="stats-table-dark-wrapper">
                     <pre id="errors">No errors detected.</pre>
                 </div>
