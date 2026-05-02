@@ -67,6 +67,10 @@
                 <span class="material-symbols-rounded">arrow_back</span>
                 Dashboard
             </button>
+            <button class="secondary-btn logout-pill" onclick="loadStorage()">
+                <span class="material-symbols-rounded">refresh</span>
+                refresh
+            </button>
             <!-- Profile container with absolute positioning for the menu -->
             <div class="profile-container">
                 <button class="profile-trigger" onclick="toggleDropdown()">
@@ -114,11 +118,11 @@
 
     <main class="dashboard-main-pro">
 
-        <div class="card feature-card" style="flex-direction: row; gap: 16px; padding: 24px; align-items: center;">
+        <!--<div class="card feature-card" style="flex-direction: row; gap: 16px; padding: 24px; align-items: center;">
             <button class="btn" style="width: auto;" onclick="loadStorage()">
                 <span class="material-symbols-rounded">refresh</span> Refresh
             </button>
-        </div>
+        </div>-->
 
         <div class="feature-grid">
             <!-- Targeted user-specific telemetry -->
