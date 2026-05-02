@@ -1,3 +1,8 @@
+const supabaseUrl = 'https://gigpodszdjckhvpzmuuh.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpZ3BvZHN6ZGpja2h2cHptdXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTU2NzcsImV4cCI6MjA5MzI5MTY3N30.UjO4Fyw5nq9zpZim_9UFNEpHi-oceTWsQSLHGrkH6_c';
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+/*
 function initializeUserDB() {
     const existingDB = localStorage.getItem('userDB');
     if (!existingDB) {
@@ -17,18 +22,25 @@ function initializeUserDB() {
 }
 
 initializeUserDB();
+*/
 
-function attemptLogin() {
+async function attemptLogin() {
+    
     const userField = document.getElementById("username").value;
     const passField = document.getElementById("password").value;
-    const userDB = JSON.parse(localStorage.getItem('userDB'));
 
-    const userData = userDB[userField];
+    const {data, error} = await _supabase
+    .from('profiles')
+    .select('id, username, password, display_name')
+    .eq('username', userField)
+    .eq('password', passField)
+    .single();
 
     // Check if user exists and password matches the nested property
-    if (userData && userData.password === passField) {
-        localStorage.setItem('currentUser', userField);
-        localStorage.setItem('currentDisplayName', userData.displayName); // Store new field
+    if (data&&!error) {
+        localStorage.setItem('currentUserId', data.id)
+        localStorage.setItem('currentUser', data.username);
+        localStorage.setItem('currentDisplayName', data.display_name); // Store new field
         localStorage.setItem('isLoggedIn', 'true');
         
         window.location.href = 'dashboard.html';
@@ -39,6 +51,7 @@ function attemptLogin() {
 }
 
 function logout(){
+    localStorage.removeItem('currentUserId');
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('currentDisplayName'); // Clear the new field

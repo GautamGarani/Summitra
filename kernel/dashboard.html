@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         //AUTH GUARD GATEKEEPING
         (function () {
@@ -221,9 +221,6 @@
 
             userSessions.slice().reverse().forEach((session, index) => {
                 const compliance = ((session.goodFrames / (session.totalFrames-110)) * 100).toFixed(1);
-                
-
-                // Convert durationSeconds to readable format (e.g., 12m 45s)
                 const mins = Math.floor(session.durationSeconds / 60);
                 const secs = session.durationSeconds % 60;
                 const timeStr = `${mins}m ${secs}s`;
