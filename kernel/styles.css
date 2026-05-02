@@ -1570,3 +1570,104 @@ header {
     text-transform: uppercase;
     letter-spacing: 0.02em;
 }
+
+
+#summitra-launcher {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#help-box {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+    font-family: sans-serif;
+}
+
+.modal-active { display: flex !important; }
+
+/* --- Help Box Specific Refinements --- */
+#help-box {
+    width: 350px;
+    bottom: 100px;
+    right: 32px;
+    border: 2px solid var(--blue-accent);
+    display: none;
+    flex-direction: column;
+    animation: cardEnter 0.3s cubic-bezier(.2, .8, .2, 1);
+}
+
+.help-header {
+    padding: 20px;
+    background: var(--blue-accent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.help-body {
+    padding: 24px;
+    background: white;
+}
+
+.help-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-soft);
+    background: var(--surface);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#help-msg {
+    width: 100%;
+    min-height: 100px;
+    resize: none;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-soft);
+    padding: 12px;
+    font-family: inherit;
+}
+
+#summitra-launcher {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgba(0, 82, 204, 0.3);
+}
+
+.manifest-item {
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 8px;
+    margin-bottom: 4px;
+}
+
+.manifest-item:hover {
+    background: white;
+}
