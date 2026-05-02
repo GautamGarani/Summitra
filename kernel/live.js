@@ -7,7 +7,7 @@ let starting = false;
 const CALIBRATION_FRAMES = 112;
 
 // ----------------------------
-// SESSION DATA (DEFINE FIRST)
+// SESSION DATA
 // ----------------------------
 const sessionData = {
     sessionStart: new Date().toISOString(),
@@ -56,7 +56,7 @@ function getBrowserInfo() {
 }
 
 // ----------------------------
-// ERROR + TELEMETRY SYSTEM
+// ERROR
 // ----------------------------
 function storeError(errorObj) {
     try {

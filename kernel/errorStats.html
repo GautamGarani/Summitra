@@ -72,7 +72,6 @@ button.danger {
 
 <script>
 
-// Pretty print JSON safely
 function pretty(data) {
     try {
         return JSON.stringify(data, null, 2);
@@ -103,7 +102,6 @@ function loadStorage() {
     document.getElementById("all").textContent = pretty(allData);
 }
 
-// Clear storage
 function clearStorage() {
     if (confirm("Are you sure you want to delete ALL local data?")) {
         localStorage.clear();
@@ -111,7 +109,6 @@ function clearStorage() {
     }
 }
 
-// Auto load
 loadStorage();
 
 </script>
