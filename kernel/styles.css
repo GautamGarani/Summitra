@@ -1671,3 +1671,47 @@ header {
 .manifest-item:hover {
     background: white;
 }
+
+/* Apply Login Page floating logic to Textarea */
+#help-box .input-group textarea {
+    width: 100%;
+    min-height: 120px; /* Larger area for detailed feedback */
+    padding: 18px 14px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border-soft);
+    background: transparent;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.25s ease;
+    resize: none; /* Keeps the UI clean */
+}
+
+/* Floating Label positioning for Textarea */
+#help-box .input-group label {
+    position: absolute;
+    top: 24px; /* Adjusted for the taller textarea box */
+    left: 14px;
+    transform: translateY(-50%);
+    background: white;
+    padding: 0 6px;
+    color: var(--blue-300);
+    pointer-events: none;
+    transition: all 0.2s ease;
+}
+
+/* Float trigger for Textarea focus/content */
+#help-box .input-group textarea:focus + label,
+#help-box .input-group textarea:not(:placeholder-shown) + label {
+    top: -8px;
+    font-size: 11px;
+    color: var(--blue-primary);
+    font-weight: 700;
+}
+
+/* Match the focus glow from the login page */
+#help-box .input-group textarea:focus {
+    border-color: var(--blue-primary);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.08);
+    transform: scale(1.01);
+}

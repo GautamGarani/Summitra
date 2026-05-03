@@ -38,17 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <!-- Input Segment -->
-            <div class="help-body">
-                <div class="input-group">
-                    <textarea id="help-msg" placeholder=" " required></textarea>
-                    <label>Describe your feedback in DETAIL</label>
-                </div>
-                <p>We will respond as fast as we can!</p>
-                <button id="send-help" class="btn">
-                    <span class="material-symbols-rounded">send</span>
-                    Send Message
-                </button>
-            </div>
+<div class="help-body">
+    <div class="input-group">
+        <!-- The placeholder must be a space for the floating label logic -->
+        <textarea id="help-msg" placeholder=" " required></textarea>
+        <label>Describe your feedback in DETAIL</label>
+    </div>
+    <p class="label" style="margin-top:-10px; margin-bottom:20px;">We will capture your browser metadata and respond as fast as we can!</p>
+    <button id="send-help" class="btn">
+        <span class="material-symbols-rounded">send</span>
+        Send Message
+    </button>
+</div>
 
             <!-- Suggestions Segment -->
             <div class="help-footer">
@@ -90,22 +91,22 @@ function setupListeners() {
     launcher.onclick = toggleBox;
     closeBtn.onclick = toggleBox;
 
-sendBtn.onclick = async () => {
-    const msg = document.getElementById('help-msg').value;
-    if (!msg.trim()) return alert("Message body cannot be empty.");
+    sendBtn.onclick = async () => {
+        const msg = document.getElementById('help-msg').value;
+        if (!msg.trim()) return alert("Message body cannot be empty.");
 
-    const storedBrowser = JSON.parse(localStorage.getItem('browser_data')) || { name: "Unknown", version: "N/A" };
-    const storedOS = localStorage.getItem('os_data') || "Unknown OS";
-    const browserString = `${storedBrowser.name} ${storedBrowser.version}`;
-    const osString = storedOS;
-    const userEmail = localStorage.getItem('currentUser') || "guest_user";
-    sendBtn.innerHTML = `<span class="material-symbols-rounded pulse">sync</span> Sending...`;
-    await submitToGoogle(userEmail, msg, browserString, osString);
-    alert("Your feedback has been transmitted!");
-    document.getElementById('help-msg').value = "";
-    sendBtn.innerHTML = `<span class="material-symbols-rounded">send</span> Send Message`;
-    toggleBox();
-};
+        const storedBrowser = JSON.parse(localStorage.getItem('browser_data')) || { name: "Unknown", version: "N/A" };
+        const storedOS = localStorage.getItem('os_data') || "Unknown OS";
+        const browserString = `${storedBrowser.name} ${storedBrowser.version}`;
+        const osString = storedOS;
+        const userEmail = localStorage.getItem('currentUser') || "guest_user";
+        sendBtn.innerHTML = `<span class="material-symbols-rounded pulse">sync</span> Sending...`;
+        await submitToGoogle(userEmail, msg, browserString, osString);
+        alert("Your feedback has been transmitted!");
+        document.getElementById('help-msg').value = "";
+        sendBtn.innerHTML = `<span class="material-symbols-rounded">send</span> Send Message`;
+        toggleBox();
+    };
 }
 
 async function submitToGoogle(email, message, browserInfo, osInfo) {
