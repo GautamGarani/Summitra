@@ -1,3 +1,7 @@
+const supabaseUrl = 'https://gigpodszdjckhvpzmuuh.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpZ3BvZHN6ZGpja2h2cHptdXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTU2NzcsImV4cCI6MjA5MzI5MTY3N30.UjO4Fyw5nq9zpZim_9UFNEpHi-oceTWsQSLHGrkH6_c';
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
 let latestFeedback = null;
 let starting = false;
 
@@ -281,7 +285,14 @@ cancelExitBtn.addEventListener('click', () => {
     exitModal.classList.add('modal-hidden');
 });
 
-confirmExitBtn.addEventListener('click', () => {
+
+
+//-------------------------------------
+//VERY IMPORTANT SECTION, DO NOT TAMPER
+//-------------------------------------
+
+
+confirmExitBtn.addEventListener('click', async () => {
     running = false;
 
     sessionData.sessionEnd = new Date().toISOString();
@@ -294,34 +305,47 @@ confirmExitBtn.addEventListener('click', () => {
         video.srcObject.getTracks().forEach(t => t.stop());
     }
 
+    // ATTEMPT THE CLOUD LOG
+    try {
+        console.log("Syncing to cloud...");
+        const { error } = await _supabase
+            .from('sessions')
+            .insert([{
+                owner: sessionData.owner,
+                session_id: `${sessionData.owner}-${Date.now()}`,
+                duration: sessionData.durationSeconds,
+                lateral_alerts: sessionData.lateralAlerts,
+                slouch_alerts: sessionData.slouchAlerts,
+                forward_alerts: sessionData.forwardAlerts,
+                good_frames: sessionData.goodFrames,
+                bad_frames: sessionData.badFrames,
+                total_frames: sessionData.totalFrames,
+                multiple_alerts: sessionData.multipleAlerts,
+                session_end: sessionData.sessionEnd,
+                browser_data: `${sessionData.environment.browser.name}-${sessionData.environment.browser.version}`
+            }]);
+
+        if (error) throw error;
+        console.log("Cloud log successful.");
+
+    } catch (dbError) {
+        console.error("Cloud Sync Failed:", dbError.message);
+    }
     let sessions = JSON.parse(localStorage.getItem('sessions')) || [];
     sessions.push(sessionData);
-
-    if (sessions.length > 20) {
-        sessions = sessions.slice(-20);
-    }
-
+    if (sessions.length > 20) sessions = sessions.slice(-20);
     localStorage.setItem('sessions', JSON.stringify(sessions));
     window.location.href = 'analytics.html';
 });
 
 confirmExitPurgeBtn.addEventListener('click', () => {
-    // 1. Halt the processing loop
     running = false;
-
-    // 2. Terminate hardware access (Webcam)
     const video = document.getElementById('webcam');
     if (video.srcObject) {
         video.srcObject.getTracks().forEach(track => track.stop());
     }
-
-    // 3. Optional: Clear sessionData object in memory
-    // (Technically redundant as we are redirecting, but good for security)
     sessionData.logs = [];
     sessionData.alerts = [];
-
-    // 4. Redirect immediately to analytics or dashboard
-    // No localStorage.setItem('sessions', ...) is called here.
     window.location.href = 'dashboard.html';
 });
 
@@ -362,9 +386,12 @@ subs.forEach(s => {
     });
 });
 
+
 // ----------------------------
 // MAIN
 // ----------------------------
+
+
 async function startCoach() {
     if (running || starting) return;
     starting = true;
@@ -434,16 +461,11 @@ async function startCoach() {
 
                 let rawTilt = (eyeAngle - shoulderAngle);
 
-                // 1. Shift the boundary so 180 becomes 0
                 let tilt = rawTilt + 180;
 
-                // 2. Wrap back to [-180, 180] range
                 if (tilt > 180) tilt -= 360;
                 if (tilt < -180) tilt += 360;
 
-                // 3. Remove Math.abs() to keep the sign
-                // Right tilt will be positive, Left will be negative.
-                // If signs are swapped for your specific camera, use: tilt = -tilt;
                 const degrees = tilt;
 
                 const dxL = Math.abs(l[454].x - p[12].x);
@@ -511,7 +533,6 @@ async function startCoach() {
 
                     const normalized = feedback.trim();
 
-                    // --- STATE CHANGE LOGGING (ENHANCED) ---
                     if (feedback.includes('Alert') && normalized !== latestFeedback) {
                         if (feedback.includes('Lateral')) { sessionData.lateralAlerts++; }
                         else if (feedback.includes('Forward')) { sessionData.forwardAlerts++; }
@@ -621,7 +642,7 @@ function updateStatsInUI(latestAlert) {
     tbody.prepend(row);
 }
 
-// --- DIAGNOSTIC MODAL LOGIC ---
+
 const diagOverlay = document.getElementById('diagnostic-overlay');
 const manifestContent = document.getElementById('manifest-content');
 
