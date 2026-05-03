@@ -3,6 +3,7 @@
 
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
     <script>
         //AUTH GUARD GATEKEEPING
         (function () {
@@ -20,7 +21,6 @@
             }
         })();
     </script>
-
 
 
     <link rel="icon" type="image/png" href="logo.jpg">
@@ -246,34 +246,54 @@
     </main>
 
     <script>
+        const currentUser = localStorage.getItem('currentUser');
+
         function goBack() { window.location.href = "dashboard.html"; }
 
         function getSessionPct(session) {
-            if (!session || !session.totalFrames || session.totalFrames === 0) return 0;
-            return (session.goodFrames / (session.totalFrames - 110)) * 100;
+            if (!session || !session.duration) return 0;
+            return (session.good_frames/((session.total_frames-110))*100);
         }
 
-        // ----------------------------
-        // LOCAL STORAGE RETRIEVAL SYSTEM
-        // ----------------------------
 
-        // Get all sessions
-        function getAllSessions() {
+        async function getAllSessions() {
+            let sessions = [];
+
             try {
-                return JSON.parse(localStorage.getItem("sessions")) || [];
+                const { data, error } = await _supabase
+                    .from('sessions')
+                    .select('*')
+                    .eq('owner', currentUser)
+                    .order('session_id', { ascending: true });
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    console.log("Successfully retrieved Cloud logs");
+                    sessions = data;
+                } else {
+                    throw new Error("NO DATA IN DATABASE");
+                }
+
             } catch (e) {
-                console.error("Failed to parse sessions", e);
-                return [];
+                console.warn("Failed to connect to DB, using local storage", e);
+
+                const statusMsg = document.createElement('div');
+                statusMsg.style = "background:#fee2e2; color:#b91c1c; padding:12px; border-radius:12px; margin-bottom:20px; font-size:14px; font-weight:600; text-align:center;";
+                statusMsg.innerHTML = `<span class="material-symbols-rounded" style="vertical-align:middle; font-size:18px;">cloud_off</span> No connection to Database. Displaying local data.`;
+                document.querySelector('main').prepend(statusMsg);
+
+                sessions = JSON.parse(localStorage.getItem("sessions")) || [];
             }
+
+            return sessions;
         }
 
-        // Get latest session
-        function getLatestSession() {
-            const sessions = getAllSessions();
-            return sessions.length ? sessions[sessions.length - 1] : null;
+ 
+        async function getLatestSession() {
+            const sessions = await getAllSessions();
+            return sessions.length ? sessions.at(-1) : null;
         }
-
-        // Get all error logs
         function getAllErrors() {
             try {
                 return JSON.parse(localStorage.getItem("errorLogs")) || [];
@@ -283,45 +303,9 @@
             }
         }
 
-        // Get errors for latest session (if stored inside sessionData)
-        function getLatestSessionErrors() {
-            const session = getLatestSession();
-            return session?.errors || [];
-        }
-
-        // Debug helper (prints everything cleanly)
-        function debugStorage() {
-            const sessions = getAllSessions();
-            const errors = getAllErrors();
-
-            console.log("=== SESSIONS ===");
-            console.log(sessions);
-
-            console.log("=== LATEST SESSION ===");
-            console.log(getLatestSession());
-
-            console.log("=== ERROR LOGS ===");
-            console.log(errors);
-
-            console.log("=== SESSION ERRORS ===");
-            console.log(getLatestSessionErrors());
-        }
-
-        // Optional: clear everything (useful during testing)
-        function clearAllStorage() {
-            localStorage.removeItem("sessions");
-            localStorage.removeItem("errorLogs");
-            console.log("Local storage cleared");
-        }
-
-        // ----------------------------
-        // AUTO LOAD INTO YOUR ANALYTICS
-        // ----------------------------
-
-        function loadAllData() {
-            const sessions = getAllSessions();
-            const currentSession = getLatestSession();
-            const errors = getAllErrors();
+        async function loadAllData() {
+            const sessions = await getAllSessions();
+            const currentSession = sessions.at(-1);
 
             if (!sessions.length) {
                 console.warn("No session data found");
@@ -330,49 +314,31 @@
 
             console.log("Loaded Sessions:", sessions);
             console.log("Current Session:", currentSession);
-            console.log("Error Logs:", errors);
         }
 
-        // Run on page load
-        document.addEventListener("DOMContentLoaded", loadAllData)
+        document.addEventListener("DOMContentLoaded", loadAllData);
 
-        /**
-         * Fully integrated LoadAnalytics function for Summitra.
-         * Handles user-specific data filtering, KPI calculations, and 
-         * dynamic Chart.js rendering.
-         */
-        function loadAnalytics() {
-            // 1. DATA RETRIEVAL & USER FILTERING
-            const allSessions = JSON.parse(localStorage.getItem("sessions")) || [];
-            const currentUser = localStorage.getItem("currentUser");
+        async function loadAnalytics() {
             const currentName = localStorage.getItem("currentDisplayName");
-            // FILTER: Essential to prevent data-bleeding between user accounts
-            const sessions = allSessions.filter(s => s.owner === currentUser);
+            const sessions = await getAllSessions();
 
-            // UI FALLBACK: If no data exists for this specific user
             if (!sessions.length) {
                 document.querySelector('.analytics-main-pro').innerHTML = `
-            <div style="padding:100px; text-align:center;">
-                <h2 style="color:var(--blue-900);">There is no session history for you, ${currentName}</h2>
-                <p style="color:var(--blue-500); margin-bottom:24px;">Start a live session to generate intelligence reports.</p>
-                <button class="primary-btn" style="width:fit-content; margin:0 auto;" onclick="goBack()">
-                    Return to Dashboard
-                </button>
-            </div>`;
+        <div style="padding:100px; text-align:center;">
+            <h2 style="color:var(--blue-900);">There is no session history for you, ${currentName}</h2>
+            <p style="color:var(--blue-500); margin-bottom:24px;">Start a live session to generate intelligence reports.</p>
+            <button class="primary-btn" style="width:fit-content; margin:0 auto;" onclick="goBack()">
+                Return to Dashboard
+            </button>
+        </div>`;
                 return;
             }
 
-            // 2. VARIABLE INITIALIZATION
             const currentSession = sessions.at(-1);
             const previousSessions = sessions.slice(0, -1);
-            const currentVal = getSessionPct(currentSession); // Fixed reference error
-            const logs = currentSession.logs || [];
-
-            // 3. KPI CALCULATIONS
-            // Compliance Score
+            const currentVal = getSessionPct(currentSession);
             document.getElementById("curr-score").textContent = currentVal.toFixed(1) + "%";
 
-            // Improvement Delta
             let historicalAvg = null;
             if (previousSessions.length > 0) {
                 historicalAvg = previousSessions.reduce((acc, s) => acc + getSessionPct(s), 0) / previousSessions.length;
@@ -385,129 +351,44 @@
                 improvementElement.style.color = delta < 0 ? "var(--danger)" : "#16A34A";
             }
 
-            // Resilience (Correction Speed)
-            let totalRecoveryTime = 0;
-            let recoveryCount = 0;
+            let avgBad = 0;
+            sessions.forEach(s => avgBad += (s.bad_frames || 0));
+            avgBad /= sessions.length;
 
-            for (let i = 0; i < logs.length - 1; i++) {
-                if (logs[i].status === 'ALERT' && logs[i + 1].status === 'GOOD') {
-                    const diff = (new Date(logs[i + 1].timestamp) - new Date(logs[i].timestamp)) / 1000;
-                    totalRecoveryTime += diff;
-                    recoveryCount++;
-                }
-            }
-            const resilience = recoveryCount > 0 ? (totalRecoveryTime / recoveryCount).toFixed(1) : "N/A";
-            document.getElementById("resilience-ratio").textContent = resilience + (resilience !== "N/A" ? "s" : "");
-
-            // Ergonomic Debt (Physiological Recovery Time)
-            const badSeconds = (currentSession.badFrames * 0.18); // Based on ~5.5fps processing
-            const debtMinutes = Math.ceil((badSeconds * 2) / 60);
+            const debtMinutes = Math.ceil((avgBad * 2) / 60);
             document.getElementById("ergo-debt").textContent = debtMinutes + "m";
 
-            // 4. CHART RENDERING
-            // Fatigue Curve: Dynamic Density Logic
-            const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
-
-            if (currentSession.totalFrames < 100) {
-                document.getElementById('fatigue-container').innerHTML = `
-            <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--blue-500); font-weight:700; font-family:'JetBrains Mono';">
-                INSUFFICIENT TELEMETRY FOR ANALYSIS
-            </div>`;
-            } else {
-                const binCount = 5;
-                const goodCounts = new Array(binCount).fill(0);
-                const totalSamplesPerBin = new Array(binCount).fill(0);
-
-                logs.forEach((log, index) => {
-                    const binIndex = Math.min(binCount - 1, Math.floor((index / logs.length) * binCount));
-                    totalSamplesPerBin[binIndex]++;
-                    if (log.status === "GOOD") goodCounts[binIndex]++;
-                });
-
-                const fatigueDataPoints = goodCounts.map((good, i) => {
-                    const total = totalSamplesPerBin[i];
-                    return total > 0 ? (good / total) * 100 : 0;
-                });
-
-                new Chart(fatigueCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Start', '25%', '50%', '75%', 'End'],
-                        datasets: [{
-                            label: 'Postural Efficiency %',
-                            data: fatigueDataPoints,
-                            borderColor: '#0052CC',
-                            backgroundColor: 'rgba(0, 82, 204, 0.08)',
-                            fill: true,
-                            tension: 0.45,
-                            pointRadius: 4
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
-                });
-            }
-
-            // Alert Composition Pie Chart
-            const pieCtx = document.getElementById("chart");
-            new Chart(pieCtx, {
+            new Chart(document.getElementById("chart"), {
                 type: "pie",
                 data: {
                     labels: ["Lateral", "Forward", "Slouch", "Multiple"],
                     datasets: [{
                         data: [
-                            currentSession.lateralAlerts || 0,
-                            currentSession.forwardAlerts || 0,
-                            currentSession.slouchAlerts || 0,
-                            currentSession.multipleAlerts || 0
+                            currentSession.lateral_alerts || 0,
+                            currentSession.forward_alerts || 0,
+                            currentSession.slouch_alerts || 0,
+                            currentSession.multiple_alerts || 0
                         ],
-                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "#000000"],
-                        borderWidth: 0
+                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "#000000"]
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // 5. BEHAVIORAL PATTERN CORRELATION
-            const corrText = document.getElementById('correlation-text');
-            if (currentSession.alerts && currentSession.alerts.length > 3) {
-                let forwardToSlouch = 0;
-                for (let i = 0; i < currentSession.alerts.length - 1; i++) {
-                    if (currentSession.alerts[i].type.includes("Forward") && currentSession.alerts[i + 1].type.includes("Slouch")) {
-                        forwardToSlouch++;
-                    }
-                }
-                corrText.textContent = forwardToSlouch > 1 ? "Pattern: Forward leaning precedes slouching." : "No significant trigger patterns detected.";
-            }
             // ----------------------------
-            // PROPRIOCEPTION SCORE
+            // PROPRIO SCORE
             // ----------------------------
-
-            // 1. Compliance (already %)
             const complianceScore = currentVal;
+            const debtScore = Math.max(0, 100 - (debtMinutes * 3.3));
 
-            // 2. Resilience normalization (lower time = better)
-            let resilienceScore = 0;
-            if (resilience !== "N/A") {
-                const r = parseFloat(resilience);
-                resilienceScore = Math.max(0, Math.min(100, 100 - (r * 10)));
-            }
-
-            // 3. Ergonomic Debt normalization (lower = better)
-            const d = debtMinutes;
-            const debtScore = Math.max(0, Math.min(100, 100 - (d * 3.3)));
-
-            // 4. Weighted final score
             const proprioScore = (
-                0.35 * complianceScore +
-                0.25 * resilienceScore +
+                0.6 * complianceScore +
                 0.4 * debtScore
             ).toFixed(1);
 
-            // 5. Display
             const proprioEl = document.getElementById("proprio-score");
             proprioEl.textContent = proprioScore;
 
-            // Color coding
             if (proprioScore >= 80) proprioEl.style.color = "#16A34A";
             else if (proprioScore >= 50) proprioEl.style.color = "#F59E0B";
             else proprioEl.style.color = "#EF4444";
@@ -515,7 +396,7 @@
 
         document.addEventListener("DOMContentLoaded", loadAnalytics);
     </script>
-    <script src="auth.js"></script>
+
     <div id="summitra-help-root"></div>
     <script src="help-system.js" defer></script>
 </body>

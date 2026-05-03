@@ -1,7 +1,7 @@
 // --- CONFIGURATION & INITIALIZATION ---
 const supabaseUrl = 'https://gigpodszdjckhvpzmuuh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpZ3BvZHN6ZGpja2h2cHptdXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTU2NzcsImV4cCI6MjA5MzI5MTY3N30.UjO4Fyw5nq9zpZim_9UFNEpHi-oceTWsQSLHGrkH6_c';
-const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+window._supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 // --- AUTHENTICATION 
 async function attemptLogin() {
