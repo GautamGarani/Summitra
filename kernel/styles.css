@@ -1715,3 +1715,46 @@ header {
     box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.08);
     transform: scale(1.01);
 }
+
+/* ----------  HERO OVERRIDE ---------- */
+
+.dashboard-hero {
+    /* Using the darkest theme color for maximum contrast */
+    background: var(--blue-900) !important; 
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dashboard-hero h1 {
+    /* Multi-color gradient implementation */
+    background: linear-gradient(
+        to right, 
+        #4285F4 0%, /* Blue */
+        #9B72CB 30%, /* Purple */
+        #D96570 70%, /* Red/Pink */
+        #4285F4 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% auto;
+    display: inline-block;
+    animation: geminiShimmer 5s linear infinite;
+}
+
+@keyframes geminiShimmer {
+    to { background-position: 200% center; }
+}
+
+/* Glassmorphism for pills to suit the dark background */
+.dashboard-hero .metric-pill {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    box-shadow: none;
+}
+
+.dashboard-hero .metric-pill .material-symbols-rounded {
+    color: var(--blue-300) !important; /* Lighter blue for iconography[cite: 1] */
+}

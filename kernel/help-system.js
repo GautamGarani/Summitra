@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="input-group">
         <!-- The placeholder must be a space for the floating label logic -->
         <textarea id="help-msg" placeholder=" " required></textarea>
-        <label>Describe your feedback in DETAIL</label>
+        <label>Describe your feedback in DETAIL. Which page are you on?</label>
     </div>
     <p class="label" style="margin-top:-10px; margin-bottom:20px;">We will capture your browser metadata and respond as fast as we can!</p>
     <button id="send-help" class="btn">
