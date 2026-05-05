@@ -20,7 +20,7 @@
                 window.location.href = 'login.html';
             }
         })();
-        
+
     </script>
     <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
@@ -279,12 +279,20 @@
             } catch (e) {
                 console.warn("Failed to connect to DB, using local storage", e);
 
-                const statusMsg = document.createElement('div');
-                statusMsg.style = "background:#fee2e2; color:#b91c1c; padding:12px; border-radius:12px; margin-bottom:20px; font-size:14px; font-weight:600; text-align:center;";
-                statusMsg.innerHTML = `<span class="material-symbols-rounded" style="vertical-align:middle; font-size:18px;">cloud_off</span> No connection to Database, or no data in DB. Displaying local data.`;
-                document.querySelector('main').prepend(statusMsg);
+                const localSessions = await getAllLocalSessions();
 
-                sessions = JSON.parse(localStorage.getItem("sessions")) || [];
+                const alreadyHasBanner = document.getElementById('offline-status-banner');
+
+                if (localSessions.length > 0 && !alreadyHasBanner) {
+                    const statusMsg = document.createElement('div');
+                    statusMsg.id = 'offline-status-banner';
+                    statusMsg.style = "background:#fee2e2; color:#b91c1c; padding:12px; border-radius:12px; margin-bottom:20px; font-size:14px; font-weight:600; text-align:center;";
+                    statusMsg.innerHTML = `<span class="material-symbols-rounded">cloud_off</span> No connection to Database. Displaying local data. ONLY resilience and fatigue show accurately now.`;
+                    document.querySelector('main').prepend(statusMsg);
+                }
+
+                // ✅ ALWAYS return valid array
+                return localSessions;
             }
 
             return sessions;
@@ -292,12 +300,14 @@
 
         async function getAllLocalSessions() {
             let localSessions = [];
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) return [];
+            console.log("Retrieving local sessions for:", currentUser);
+            const allStoredSessions = JSON.parse(localStorage.getItem("sessions")) || [];
+            localSessions = allStoredSessions.filter(session => session.owner === currentUser);
 
-            console.log("Retrieving the local sessions for resilience etc");
-            localSessions = JSON.parse(localStorage.getItem("sessions")) || [];
-            console.log("Retrieval of local sessions successful");
-            return localSessions;
-            console.log("Success with loading all local sessions")
+            console.log(`Found ${localSessions.length} local sessions for user.`);
+            return localSessions || [];
 
         }
 
