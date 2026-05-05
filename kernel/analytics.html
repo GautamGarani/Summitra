@@ -252,7 +252,7 @@
 
         function getSessionPct(session) {
             if (!session || !session.duration) return 0;
-            return (session.good_frames/((session.total_frames-110))*100);
+            return (session.good_frames / ((session.total_frames - 110)) * 100);
         }
 
 
@@ -288,16 +288,16 @@
 
             return sessions;
         }
-        
-        async function getAllLocalSessions(){
-         let localSessions = [];
-         console.log("Retrieving the local sessions for resilience etc");
-         localSessions = JSON.parse(localStorage.getItem("sessions")) || [];
-         console.log("Retrieval of local sessions successful");
-         return localSessions;
-        
+
+        async function getAllLocalSessions() {
+            let localSessions = [];
+            console.log("Retrieving the local sessions for resilience etc");
+            localSessions = JSON.parse(localStorage.getItem("sessions")) || [];
+            console.log("Retrieval of local sessions successful");
+            return localSessions;
+
         }
-        
+
         async function getLatestSession() {
             const sessions = await getAllSessions();
             const localSessions = await getAllLocalSessions();
@@ -348,8 +348,8 @@
             const currentSession = sessions.at(-1);
             //WE WILL USE CURRENT LOCAL SESSION ONLY IF IT EXISTS
             const currentLocalSession = (localSessions && localSessions.length)
-    ? localSessions.at(-1)
-    : null;
+                ? localSessions.at(-1)
+                : null;
             const previousSessions = sessions.slice(0, -1);
             const currentVal = getSessionPct(currentSession);
             document.getElementById("curr-score").textContent = currentVal.toFixed(1) + "%";
@@ -389,53 +389,53 @@
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
-            
-            
-            
+
+
+
             //RESILIENCE CALCULATIONS using local Storage
-let totalRecoveryTime = 0;
-let recoveryCount = 0;
+            let totalRecoveryTime = 0;
+            let recoveryCount = 0;
 
-const logsRes = currentLocalSession?.logs || [];
+            const logsRes = currentLocalSession?.logs || [];
 
-for (let i = 0; i < logsRes.length; i++) {
-    if (logsRes[i].status === "ALERT") {
+            for (let i = 0; i < logsRes.length; i++) {
+                if (logsRes[i].status === "ALERT") {
 
-        const alertTime = new Date(logsRes[i].timestamp);
+                    const alertTime = new Date(logsRes[i].timestamp);
 
-        for (let j = i + 1; j < logsRes.length; j++) {
-            if (logsRes[j].status === "GOOD") {
+                    for (let j = i + 1; j < logsRes.length; j++) {
+                        if (logsRes[j].status === "GOOD") {
 
-                const recoverTime = new Date(logsRes[j].timestamp);
-                const delta = (recoverTime - alertTime) / 1000;
+                            const recoverTime = new Date(logsRes[j].timestamp);
+                            const delta = (recoverTime - alertTime) / 1000;
 
-                if (delta > 0 && delta < 600) {
-                    totalRecoveryTime += delta;
-                    recoveryCount++;
+                            if (delta > 0 && delta < 600) {
+                                totalRecoveryTime += delta;
+                                recoveryCount++;
+                            }
+
+                            break;
+                        }
+                    }
                 }
-
-                break;
             }
-        }
-    }
-}
 
-const resilienceEl = document.getElementById("resilience-ratio");
-if (recoveryCount > 0) {
-    const avgRecovery = (totalRecoveryTime / recoveryCount).toFixed(1);
-    resilienceEl.textContent = avgRecovery + "s";
-} else {
-    resilienceEl.textContent = "No logs available";
-}
+            const resilienceEl = document.getElementById("resilience-ratio");
+            if (recoveryCount > 0) {
+                const avgRecovery = (totalRecoveryTime / recoveryCount).toFixed(1);
+                resilienceEl.textContent = avgRecovery + "s";
+            } else {
+                resilienceEl.textContent = "No logs available";
+            }
 
 
 
-if (recoveryCount > 0) {
-    const avgRecovery = (totalRecoveryTime / recoveryCount).toFixed(1);
-    resilienceEl.textContent = avgRecovery + "s";
-} else {
-    resilienceEl.textContent = "No local log";
-}
+            if (recoveryCount > 0) {
+                const avgRecovery = (totalRecoveryTime / recoveryCount).toFixed(1);
+                resilienceEl.textContent = avgRecovery + "s";
+            } else {
+                resilienceEl.textContent = "No local log";
+            }
 
 
             // ----------------------------
@@ -444,9 +444,9 @@ if (recoveryCount > 0) {
             console.log("Before proprio block");
             const complianceScore = currentVal;
             const debtScore = Math.max(0, 100 - (debtMinutes * 3.3));
-            
+
             console.log("complianceScore:", complianceScore);
-console.log("debtScore:", debtScore);
+            console.log("debtScore:", debtScore);
 
             const proprioScore = (
                 0.6 * complianceScore +
@@ -459,89 +459,89 @@ console.log("debtScore:", debtScore);
             if (proprioScore >= 80) proprioEl.style.color = "#16A34A";
             else if (proprioScore >= 50) proprioEl.style.color = "#F59E0B";
             else proprioEl.style.color = "#EF4444";
-            
-            
-            
 
-//-------------------------
-//THE FATIGUE CHART
-//-------------------------
 
-const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
 
-if (currentLocalSession?.totalFrames < 100) {
-    document.getElementById('fatigue-container').innerHTML = `
+
+            //-------------------------
+            //THE FATIGUE CHART
+            //-------------------------
+
+            const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
+
+            if (currentLocalSession?.totalFrames < 100) {
+                document.getElementById('fatigue-container').innerHTML = `
         <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--blue-500); font-weight:700; font-family:'JetBrains Mono';">
             INSUFFICIENT TELEMETRY FOR ANALYSIS
         </div>`;
-} else {
-    if (!currentLocalSession || !currentLocalSession.logs) {
-    document.getElementById('fatigue-container').innerHTML = "No local session data; start a live session now.";
-    return;
-}
-
-const logs = currentLocalSession?.logs;
-    const binCount = 5; 
-    
-
-    const goodCounts = new Array(binCount).fill(0);
-    const totalSamplesPerBin = new Array(binCount).fill(0);
-
-    logs.forEach((log, index) => {
-        
-        const binIndex = Math.min(binCount - 1, Math.floor((index / logs.length) * binCount));
-        
-        totalSamplesPerBin[binIndex]++;
-        if (log.status === "GOOD") {
-            goodCounts[binIndex]++;
-        }
-    });
-
-
-    const fatigueDataPoints = goodCounts.map((good, i) => {
-        const total = totalSamplesPerBin[i];
-        return total > 0 ? (good / total) * 100 : 0;
-    });
-
-
-    new Chart(fatigueCtx, {
-        type: 'line',
-        data: {
-            labels: ['Start', '25%', '50%', '75%', 'End'],
-            datasets: [{
-                label: 'Postural Efficiency %',
-                data: fatigueDataPoints,
-                borderColor: '#0052CC',
-                backgroundColor: 'rgba(0, 82, 204, 0.08)',
-                fill: true,
-                tension: 0.45, // Smooths the "Fatigue Curve"
-                pointRadius: 4,
-                pointBackgroundColor: '#FFFFFF',
-                pointBorderColor: '#0052CC',
-                pointBorderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: { callback: value => value + '%' }
+            } else {
+                if (!currentLocalSession || !currentLocalSession.logs) {
+                    document.getElementById('fatigue-container').innerHTML = "No local session data; start a live session now.";
+                    return;
                 }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: (context) => `Efficiency: ${context.parsed.y.toFixed(1)}%`
+
+                const logs = currentLocalSession?.logs;
+                const binCount = 5;
+
+
+                const goodCounts = new Array(binCount).fill(0);
+                const totalSamplesPerBin = new Array(binCount).fill(0);
+
+                logs.forEach((log, index) => {
+
+                    const binIndex = Math.min(binCount - 1, Math.floor((index / logs.length) * binCount));
+
+                    totalSamplesPerBin[binIndex]++;
+                    if (log.status === "GOOD") {
+                        goodCounts[binIndex]++;
                     }
-                }
+                });
+
+
+                const fatigueDataPoints = goodCounts.map((good, i) => {
+                    const total = totalSamplesPerBin[i];
+                    return total > 0 ? (good / total) * 100 : 0;
+                });
+
+
+                new Chart(fatigueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Start', '25%', '50%', '75%', 'End'],
+                        datasets: [{
+                            label: 'Postural Efficiency %',
+                            data: fatigueDataPoints,
+                            borderColor: '#0052CC',
+                            backgroundColor: 'rgba(0, 82, 204, 0.08)',
+                            fill: true,
+                            tension: 0.45, // Smooths the "Fatigue Curve"
+                            pointRadius: 4,
+                            pointBackgroundColor: '#FFFFFF',
+                            pointBorderColor: '#0052CC',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { callback: value => value + '%' }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `Efficiency: ${context.parsed.y.toFixed(1)}%`
+                                }
+                            }
+                        }
+                    }
+                });
             }
-        }
-    });
-}
 
         }
 
