@@ -30,7 +30,13 @@ async function attemptLogin() {
 }
 
 function logout() {
-    localStorage.clear();//WE CLEAN EVERYTHING ON LOGOUT
+    //localStorage.clear();//WE CAN CLEAN EVERYTHING ON LOGOUT, not doing it in this version
+    //We will only clear out the currentUser, currentUserId, isLoggedIn, currentDisplayName, errorLogs
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentUserId');
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentDisplayName');
+    localStorage.removeItem('errorLogs');
     window.location.href = "login.html";
 }
 
