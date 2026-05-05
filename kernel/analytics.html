@@ -173,7 +173,7 @@
             <div class="card analytics-kpi">
                 <div class="kpi-icon"><span class="material-symbols-rounded">timer</span></div>
                 <div class="kpi-label">Resilience</div>
-                <div class="kpi-value" id="resilience-ratio">0s</div>
+                <div class="kpi-value" id="resilience-ratio">No data</div>
                 <div class="kpi-mini">Measures behavioral agility by averaging the time delta between an alert trigger
                     and a corrected state.</div>
             </div>
@@ -181,7 +181,7 @@
             <div class="card analytics-kpi">
                 <div class="kpi-icon"><span class="material-symbols-rounded">receipt_long</span></div>
                 <div class="kpi-label">Ergonomic Debt</div>
-                <div class="kpi-value" id="ergo-debt">0m</div>
+                <div class="kpi-value" id="ergo-debt">No logs available</div>
                 <div class="kpi-mini">Estimated physiological recovery time calculated using a 2:1 ratio of bad-posture
                     duration to restorative rest. (ROUNDED UP to next minute)</div>
             </div>
@@ -288,10 +288,23 @@
 
             return sessions;
         }
-
+        
+        async function getAllLocalSessions(){
+         let localSessions = [];
+         console.log("Retrieving the local sessions for resilience etc");
+         localSessions = JSON.parse(localStorage.getItem("sessions")) || [];
+         console.log("Retrieval of local sessions successful");
+         return localSessions;
+        
+        }
+        
+        //LOAD ALL LOCAL SESSIONS FOR RESILIENCE, FATIGUE
+        
+        
  
         async function getLatestSession() {
             const sessions = await getAllSessions();
+            const localSessions = await getAllLocalSessions();
             return sessions.length ? sessions.at(-1) : null;
         }
         function getAllErrors() {
@@ -374,6 +387,46 @@
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
+            
+            
+            
+            //RESILIENCE CALCULATIONS using local Storage
+for (let i = 0; i < session.logs.length; i++) {
+    if (session.logs[i].status === "ALERT") {
+
+        const alertTime = new Date(session.logs[i].timestamp);
+
+        // find NEXT GOOD
+        for (let j = i + 1; j < session.logs.length; j++) {
+            if (session.logs[j].status === "GOOD") {
+
+                const recoverTime = new Date(session.logs[j].timestamp);
+                const delta = (recoverTime - alertTime) / 1000;
+
+                if (delta > 0 && delta < 600) {
+                    totalRecoveryTime += delta;
+                    recoveryCount++;
+                }
+
+                break; 
+            }
+        }
+    }
+}
+
+const resilienceEl = document.getElementById("resilience-ratio");
+
+if (recoveryCount > 0) {
+    const avgRecovery = (totalRecoveryTime / recoveryCount).toFixed(1);
+    resilienceEl.textContent = avgRecovery + "s";
+} else {
+    resilienceEl.textContent = "No logs avavilable";
+}
+
+//-------------------------
+//THE FATIGUE CHART
+//-------------------------
+
 
             // ----------------------------
             // PROPRIO SCORE
