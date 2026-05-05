@@ -298,10 +298,6 @@
         
         }
         
-        //LOAD ALL LOCAL SESSIONS FOR RESILIENCE, FATIGUE
-        
-        
- 
         async function getLatestSession() {
             const sessions = await getAllSessions();
             const localSessions = await getAllLocalSessions();
@@ -348,6 +344,7 @@
             }
 
             const currentSession = sessions.at(-1);
+            const currentLocalSession = localSessions.at(-1);
             const previousSessions = sessions.slice(0, -1);
             const currentVal = getSessionPct(currentSession);
             document.getElementById("curr-score").textContent = currentVal.toFixed(1) + "%";
@@ -391,16 +388,20 @@
             
             
             //RESILIENCE CALCULATIONS using local Storage
-for (let i = 0; i < session.logs.length; i++) {
-    if (session.logs[i].status === "ALERT") {
+let totalRecoveryTime = 0;
+let recoveryCount = 0;
 
-        const alertTime = new Date(session.logs[i].timestamp);
+const logsRes = currentLocalSession.logs || [];
 
-        // find NEXT GOOD
-        for (let j = i + 1; j < session.logs.length; j++) {
-            if (session.logs[j].status === "GOOD") {
+for (let i = 0; i < logsRes.length; i++) {
+    if (logsRes[i].status === "ALERT") {
 
-                const recoverTime = new Date(session.logs[j].timestamp);
+        const alertTime = new Date(logsRes[i].timestamp);
+
+        for (let j = i + 1; j < logsRes.length; j++) {
+            if (logsRes[j].status === "GOOD") {
+
+                const recoverTime = new Date(logsRes[j].timestamp);
                 const delta = (recoverTime - alertTime) / 1000;
 
                 if (delta > 0 && delta < 600) {
@@ -408,10 +409,19 @@ for (let i = 0; i < session.logs.length; i++) {
                     recoveryCount++;
                 }
 
-                break; 
+                break;
             }
         }
     }
+}
+
+const resilienceEl = document.getElementById("resilience-ratio");
+
+if (recoveryCount > 0) {
+    const avgRecovery = (totalRecoveryTime / recoveryCount).toFixed(1);
+    resilienceEl.textContent = avgRecovery + "s";
+} else {
+    resilienceEl.textContent = "No logs available";
 }
 
 const resilienceEl = document.getElementById("resilience-ratio");
@@ -426,6 +436,64 @@ if (recoveryCount > 0) {
 //-------------------------
 //THE FATIGUE CHART
 //-------------------------
+
+    const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
+    if (currentLocalSession.totalFrames < 100) {
+        document.getElementById('fatigue-container').innerHTML = "<div style='padding:40px; color:var(--blue-500); font-weight:700;'>MINIMAL DATA RECORDED</div>";
+    } else {
+
+        const logs = currentLocalSession.logs;
+        const buckets = [0, 0, 0, 0, 0];
+        const step = Math.max(1, Math.floor(logs.length)/5);
+
+        for(let i=0; i<logs.length; i++)
+    {
+        const idx = Math.min(4, Math.floor(i/step));
+        if(logs[i].status === "GOOD")
+    {
+        buckets[idx]+=1;
+    }
+    }
+
+    const bucketSize = Math.max(1, logs.length/5);
+
+    const dataBuckets = buckets.map(b=>
+    {
+        const pct = (b/bucketSize)*100;
+        return Math.max(0, Math.min(100, pct));
+    }
+    );
+
+
+        new Chart(fatigueCtx, {
+            type: 'line',
+            data: {
+                labels: ['0m', '5m', '10m', '15m', '20m'],
+                datasets: [{
+                    label: 'Posture Efficiency (Fatigue) %',
+                    data: dataBuckets,
+                    borderColor: '#0052CC',
+                    backgroundColor: 'rgba(0, 82, 204, 0.05)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3
+                }]
+            },
+            options: { responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { display: false }, 
+                    tooltip: {
+                        callbacks : {
+                            label: function(context){
+                                return `Efficiency: ${context.raw.toFixed(1)}%`;
+
+                            }
+                        }
+                    }
+                } }
+        });
+    }
 
 
             // ----------------------------
