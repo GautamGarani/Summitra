@@ -331,11 +331,13 @@ confirmExitBtn.addEventListener('click', async () => {
     } catch (dbError) {
         console.error("Cloud Sync Failed:", dbError.message);
     }
+
     let sessions = JSON.parse(localStorage.getItem('sessions')) || [];
     sessions.push(sessionData);
     if (sessions.length > 20) sessions = sessions.slice(-20);
     localStorage.setItem('sessions', JSON.stringify(sessions));
     window.location.href = 'analytics.html';
+    console.log("Redirecting to analytics.html...");
 });
 
 confirmExitPurgeBtn.addEventListener('click', () => {
@@ -346,6 +348,7 @@ confirmExitPurgeBtn.addEventListener('click', () => {
     }
     sessionData.logs = [];
     sessionData.alerts = [];
+    console.log("Redirecting to dashboard.html...");
     window.location.href = 'dashboard.html';
 });
 
@@ -396,6 +399,8 @@ async function startCoach() {
     if (running || starting) return;
     starting = true;
 
+    console.log("Starting the engine...");
+
     const display = document.getElementById('feedback-value');
     const rawText = document.getElementById('raw-angle');
     const logText = document.getElementById('log-text');
@@ -404,13 +409,17 @@ async function startCoach() {
     const overlay = document.getElementById('calibration-overlay');
 
     try {
+        console.log("Syncing rust wasm module...");
         logText.textContent = 'Syncing Rust Module...';
         await init();
 
+        console.log("Loading vision model...");
         logText.textContent = 'Loading Vision Models...';
         const vision = await FilesetResolver.forVisionTasks(
             'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
         );
+
+        console.log("initialising Face Landmarker...");
 
         landmarker = await FaceLandmarker.createFromOptions(vision, {
             baseOptions: {
@@ -421,6 +430,10 @@ async function startCoach() {
             numFaces: 1
         });
 
+        console.log("Face Landmarker Success...");
+        console.log("initialising Pose Landmarker...");
+
+
         poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
             baseOptions: {
                 modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',
@@ -429,6 +442,9 @@ async function startCoach() {
             runningMode: 'VIDEO',
             numPoses: 1
         });
+
+        console.log("Pose Landmarker Success...");
+        console.log("Accessing video stream...");
 
         logText.textContent = 'Accessing Media Stream...';
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -439,6 +455,7 @@ async function startCoach() {
         await new Promise(r => video.onloadedmetadata = r);
         await video.play();
 
+        console.log("System running...");
         logText.textContent = 'System Active';
         pulse.classList.add('active-pulse');
         running = true;

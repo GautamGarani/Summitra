@@ -658,6 +658,83 @@ body:has(#monitor-card) main {
     color: var(--blue-primary);
 }
 
+
+/* VARIANT TWO */
+
+
+.stats-table-dark-wrapper2 {
+    border-radius: 18px;
+    overflow-y: auto;
+    background: #ffffff;
+    max-height: 260px;
+    border: 1px solid var(--border-soft);
+}
+
+/* Table base */
+.stats-table-dark2 {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #111827;
+    /* black text */
+}
+
+/* Header */
+.stats-table-dark2 thead th {
+    position: sticky;
+    top: 0;
+    background: var(--blue-accent);
+    color: var(--blue-900);
+    padding: 14px 12px;
+    text-align: left;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--blue-primary);
+}
+
+/* Rows */
+.stats-table-dark2 td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--border-soft);
+    color: #111827;
+}
+
+/* Row hover accent */
+.stats-table-dark2 tbody tr {
+    transition: background 0.2s ease, border-left 0.2s ease;
+}
+
+.stats-table-dark2 tbody tr:hover {
+    background: var(--blue-accent);
+}
+
+/* Left accent stripe per row */
+.stats-table-dark2 tbody tr {
+    border-left: 4px solid transparent;
+}
+
+.stats-table-dark2 tbody tr:nth-child(1) {
+    border-left-color: var(--blue-primary);
+}
+
+.stats-table-dark2 tbody tr:nth-child(2) {
+    border-left-color: var(--blue-500);
+}
+
+.stats-table-dark2 tbody tr:nth-child(3) {
+    border-left-color: var(--success);
+}
+
+/* Optional emphasis cell */
+.stats-table-dark2 .score-cell {
+    font-weight: 800;
+    color: var(--blue-primary);
+}
+
+
 /* ---------- BUTTONS ---------- */
 
 .btn,
@@ -1757,4 +1834,70 @@ header {
 
 .dashboard-hero .metric-pill .material-symbols-rounded {
     color: var(--blue-300) !important; /* Lighter blue for iconography[cite: 1] */
+}
+
+/* ---------- GLOBAL CONNECTIVITY GUARD ---------- */
+
+/* Hide main content when offline */
+body.is-offline > *:not(#offline-overlay) {
+    display: none !important;
+}
+
+#offline-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.offline-card {
+    background: var(--card-bg);
+    padding: 3rem;
+    border-radius: 24px;
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 20px 40px rgba(13, 27, 42, 0.08);
+    max-width: 450px;
+    width: 100%;
+}
+
+.offline-icon {
+    font-size: 64px;
+    color: var(--blue-primary);
+    margin-bottom: 1.5rem;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+}
+
+.offline-title {
+    color: var(--blue-900);
+    font-weight: 800;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.offline-text {
+    color: var(--blue-500);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.retry-btn {
+    background: var(--blue-primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.retry-btn:hover {
+    transform: scale(1.05);
 }

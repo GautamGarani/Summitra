@@ -1,62 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-                (function () {
+        (function () {
             const currentUserId = localStorage.getItem('currentUserId');
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const currentUser = localStorage.getItem('currentUser');
 
-            if (isLoggedIn == 'true') {
+            if (isLoggedIn == 'true' && currentUserId) {
                 window.location.href = 'dashboard.html';
             }
         })();
+
+
     </script>
+    <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Summitra</title>
-    
-    <!-- External Assets -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <title>Summitra | Login</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
 </head>
 
 <body>
 
-<header>
-    <img src="logo.jpg" class="logo-watermark" alt="Summitra">
-    <div style="flex:1;">
-        <div class="header-title">Summitra</div>
-        <div class="header-subtitle">Login</div>
-    </div>
-</header>
+    <header>
+        <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+        <div style="flex:1;">
+            <div class="header-title">Summitra</div>
+            <div class="header-subtitle">Login</div>
+        </div>
+    </header>
 
-<!-- Apply 'dashboard-main-pro' to trigger the flex layout from styles.css -->
-<main class="dashboard-main-pro" style="justify-content: center; align-items: center; min-height: calc(100vh - 72px);">
+    <main class="dashboard-main-pro"
+        style="justify-content: center; align-items: center; min-height: calc(100vh - 72px);">
 
-    <!-- The 'feature-card' class triggers the 'cardEnter' animation -->
-    <div class="card feature-card" style="max-width: 420px; width: 100%;">
-        <h2>Login</h2>
 
-        <!-- Input groups rely on the placeholder=" " trick for floating labels -->
-        <div class="input-group">
-            <input id="username" type="text" placeholder=" " required>
-            <label for="username">Username</label>
+        <div class="card feature-card" style="max-width: 420px; width: 100%;">
+            <h2>Login</h2>
+            <div class="input-group">
+                <input id="username" type="text" placeholder=" " required>
+                <label for="username">Username</label>
+            </div>
+            <div class="input-group">
+                <input id="password" type="password" placeholder=" " required>
+                <label for="password">Password</label>
+            </div>
+            <button class="btn" onclick="attemptLogin()">Login</button>
         </div>
 
-        <div class="input-group">
-            <input id="password" type="password" placeholder=" " required>
-            <label for="password">Password</label>
-        </div>
 
-        <!-- 'btn' class triggers the shimmer animation and hover lift -->
-        <button class="btn" onclick="attemptLogin()">Login</button>
-    </div>
-
-</main>
-<script src="auth.js"></script>
+    </main>
+    <script src="auth.js"></script>
 </body>
+
 </html>

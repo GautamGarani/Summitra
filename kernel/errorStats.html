@@ -20,7 +20,7 @@
             }
         })();
     </script>
-
+    <script src="connectivity.js"></script>
 
     <link rel="icon" type="image/png" href="logo.jpg">
     <meta charset="UTF-8">
@@ -92,11 +92,11 @@
                     <div class="dropdown-header">
                         <span class="label">Summitra</span>
                     </div>
-                    <button class="dropdown-item secondary-item" onclick="location.href='privacyPolicy.html'">
+                    <button class="dropdown-item secondary-item" onclick="window.open('privacyPolicy.html', '_blank')">
                         <span class="material-symbols-rounded">shield</span>
                         Our Policy
                     </button>
-                    <button class="dropdown-item secondary-item" onclick="location.href='about.html'">
+                    <button class="dropdown-item secondary-item" onclick="window.open('about.html', '_blank')">
                         <span class="material-symbols-rounded">info</span>
                         About Summitra
                     </button>
@@ -132,7 +132,7 @@
             <div class="card feature-card">
                 <div class="feature-badge"><span class="material-symbols-rounded">database</span></div>
                 <h2>Session Manifest</h2>
-                <div class="stats-table-dark-wrapper">
+                <div class="stats-table-dark-wrapper2">
                     <pre id="sessions">Loading manifest...</pre>
                 </div>
             </div>
@@ -141,7 +141,7 @@
                 <div class="feature-badge" style="background:#FEE2E2; color:#B91C1C;"><span
                         class="material-symbols-rounded">bug_report</span></div>
                 <h2>Console Logs</h2>
-                <div class="stats-table-dark-wrapper">
+                <div class="stats-table-dark-wrapper2">
                     <pre id="errors">No errors detected.</pre>
                 </div>
             </div>
@@ -150,7 +150,7 @@
         <!-- ALL STORAGE-->
         <div class="card feature-card">
             <h2>Global Raw Data</h2>
-            <div class="stats-table-dark-wrapper" style="max-height: 400px;">
+            <div class="stats-table-dark-wrapper2" style="max-height: 400px;">
                 <pre id="all"></pre>
             </div>
         </div>

@@ -6,26 +6,25 @@
     <script>
 
         // AUTH GUARD: Prevents unauthorized access to platform documentation
-        (function () {
+        /*(function () {
             const currentUserId = localStorage.getItem('currentUserId');
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const currentUser = localStorage.getItem('currentUser');
 
             if (isLoggedIn !== 'true' || !currentUser) {
-                // Optional: Clean any corrupted state
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('currentUser');
                 localStorage.getItem('currentUserId');
 
                 window.location.href = 'login.html';
             }
-        })();
+        })();*/
     </script>
-
+    <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Summitra : The Vision Engine</title>
+    <title>About Summitra : Your Asana Mitra</title>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
@@ -47,15 +46,16 @@
         </div>
 
         <div class="header-actions">
-            <button class="secondary-btn logout-pill" onclick="location.href='live.html'">
-                <span class="material-symbols-rounded">sensors</span>
-                Live Monitor
+            <button class="secondary-btn logout-pill" onclick="window.open('privacyPolicy.html', '_blank')">
+                <span class="material-symbols-rounded">shield</span>
+                Our Policy
             </button>
-            <button class="secondary-btn logout-pill" onclick="location.href='analytics.html'">
-                <span class="material-symbols-rounded">insights</span>
-                Analytics
+            <button class="secondary-btn logout-pill" onclick="window.open('login.html', '_blank')">
+                <span class="material-symbols-rounded">person</span>
+                Dive in
             </button>
-            <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
+
+            <!--<button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
                 <span class="material-symbols-rounded">dashboard</span>
                 Dashboard
             </button>
@@ -86,7 +86,7 @@
                         <span class="material-symbols-rounded">logout</span> Logout
                     </button>
                 </div>
-            </div>
+            </div>-->
         </div>
     </header>
 
@@ -94,65 +94,83 @@
         <!-- Hero Section utilizing existing dashboard-hero styles -->
         <section class="dashboard-hero">
             <div class="hero-copy">
-                <div class="hero-eyebrow">THE ARCHITECTURE OF POSTURE</div>
-                <h1>About the Vision Engine</h1>
+                <div class="hero-eyebrow">YOUR SMART POSTURE MITRA</div>
+                <h1>Meet our Rust/WASM-based Vision Engine</h1>
                 <p class="hero-text">
-                    Summitra addresses the physical strain of modern desk work by pairing advanced computer vision with proven ergonomic principles.
+                    Summitra helps you stay healthy while you work. By using your computer's camera and smart
+                    technology, we help you fix bad sitting habits before they cause pain.
                 </p>
             </div>
 
             <div class="hero-pills">
                 <div class="metric-pill">
                     <span class="material-symbols-rounded">psychology</span>
-                    Computer Vision Analysis
+                    Smart Camera Analysis
                 </div>
                 <div class="metric-pill">
                     <span class="material-symbols-rounded">health_and_safety</span>
-                    Preventative Care
+                    Pain Prevention
                 </div>
             </div>
         </section>
 
-        <!-- Feature Grid repurposed for informational content[cite: 4, 5] -->
         <section class="feature-grid">
+
+            <div class="card feature-card">
+                <div class="feature-badge" style="background: #F1F5F9; color: #475569;">
+                    <span class="material-symbols-rounded">code</span>
+                </div>
+                <h2>Our Rust-based Technology</h2>
+                <p>Summitra is a <b>real-time system</b> that uses <b>RUST - BASED WASM</b> for real time posture
+                    analysis and feedback.</p>
+                <p>We alert users of improper feedback using temporal and speed filtering, on the basis of thier <b>OWN
+                        custom-defined</b> target thresholds, making our system a real <b>Asana mitraa!</b></p>
+                <button class="btn" style="margin-top: auto;" onclick="window.open('dashboard.html', '_blank')">
+                    Try it out
+                    <span class="material-symbols-rounded">arrow_forward</span>
+                </button>
+            </div>
+
             <div class="card feature-card">
                 <div class="feature-badge">
                     <span class="material-symbols-rounded">visibility</span>
                 </div>
-                <h2>Real-time Analysis</h2>
-                <p>Our system analyzes body landmarks in real time to detect three specific postural deviations using frame-by-frame
-                    coordinate mapping.</p>
+                <h2>Live Posture Check</h2>
+                <p>Our system looks at your body position in real-time. It maps out specific points on your head and
+                    back to catch three common problems:</p>
                 <div class="feature-points">
-                    <div>• Lateral Head Tilt</div>
-                    <div>• Forward Neck Protrusion</div>
-                    <div>• Spinal Slouching</div>
+                    <div>• Tilting your head to the side</div>
+                    <div>• Leaning your neck too far forward</div>
+                    <div>• Slouching your back</div>
                 </div>
+            </div>
+
+
+            <div class="card feature-card">
+                <div class="feature-badge" style="background: #F1F5F9; color: #475569;">
+                    <span class="material-symbols-rounded">history_edu</span>
+                </div>
+                <h2>Our Goal</h2>
+                <p>We want to give busy professionals a simple but powerful tool to track their physical health and
+                    improve their daily wellbeing at their desk.</p>
+                <button class="btn" style="margin-top: auto;" onclick="window.open('dashboard.html', '_blank')">
+                    Try it out
+                    <span class="material-symbols-rounded">arrow_forward</span>
+                </button>
             </div>
 
             <div class="card feature-card">
                 <div class="feature-badge" style="background: #E0F2FE; color: #0369A1;">
                     <span class="material-symbols-rounded">encrypted</span>
                 </div>
-                <h2>Privacy-Focused Design</h2>
-                <p>Posture data is processed locally in your browser, and no video data is stored or shared[cite: 4].</p>
+                <h2>Safe and Private</h2>
+                <p>All the "thinking" happens right inside your own internet browser. We never see your video, and we
+                    don't save any images of you.</p>
                 <div class="feature-points">
-                    <div>• LocalStorage persistence</div>
-                    <div>• Secure user authentication</div>
-                    <div>• Real-time processing in the browser</div>
+                    <div>• Image data is never stored or transmitted.</div>
+                    <div>• Secure login protection</div>
+                    <div>• No video is ever sent to the cloud</div>
                 </div>
-            </div>
-
-            <div class="card feature-card">
-                <div class="feature-badge" style="background: #F1F5F9; color: #475569;">
-                    <span class="material-symbols-rounded">history_edu</span>
-                </div>
-                <h2>Project Mission</h2>
-                <p>To provide an atomic, technical interface for health-conscious professionals seeking technical depth
-                    in their wellness tracking[cite: 4].</p>
-                <button class="btn" style="margin-top: auto;" onclick="location.href='dashboard.html'">
-                    Return to Console
-                    <span class="material-symbols-rounded">arrow_forward</span>
-                </button>
             </div>
         </section>
     </main>

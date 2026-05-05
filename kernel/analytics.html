@@ -20,9 +20,9 @@
                 window.location.href = 'login.html';
             }
         })();
+        
     </script>
-
-
+    <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <title>Analytics</title>
     <meta charset="UTF-8">
@@ -124,11 +124,11 @@
                     <div class="dropdown-header">
                         <span class="label">Summitra</span>
                     </div>
-                    <button class="dropdown-item secondary-item" onclick="location.href='privacyPolicy.html'">
+                    <button class="dropdown-item secondary-item" onclick="window.open('privacyPolicy.html', '_blank')">
                         <span class="material-symbols-rounded">shield</span>
                         Our Policy
                     </button>
-                    <button class="dropdown-item secondary-item" onclick="location.href='about.html'">
+                    <button class="dropdown-item secondary-item" onclick="window.open('about.html', '_blank')">
                         <span class="material-symbols-rounded">info</span>
                         About Summitra
                     </button>
@@ -165,25 +165,25 @@
             <div class="card analytics-kpi">
                 <div class="kpi-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
                 <div class="kpi-label">Compliance</div>
-                <div class="kpi-value" id="curr-score">0</div>
+                <div class="kpi-value" id="curr-score">Calculating...</div>
                 <div class="kpi-mini">Total session health calculated as the ratio of optimal frames to total captured
                     frames.</div>
             </div>
 
             <div class="card analytics-kpi">
                 <div class="kpi-icon"><span class="material-symbols-rounded">timer</span></div>
-                <div class="kpi-label">Resilience</div>
+                <div class="kpi-label">Resilience (local Log)</div>
                 <div class="kpi-value" id="resilience-ratio">Calculating...</div>
-                <div class="kpi-mini">Measures behavioral agility by averaging the time delta between an alert trigger
+                <div class="kpi-mini">Measures your agility by averaging the time difference between an alert trigger
                     and a corrected state.</div>
             </div>
 
             <div class="card analytics-kpi">
                 <div class="kpi-icon"><span class="material-symbols-rounded">receipt_long</span></div>
                 <div class="kpi-label">Ergonomic Debt</div>
-                <div class="kpi-value" id="ergo-debt">No logs available</div>
-                <div class="kpi-mini">Estimated physiological recovery time calculated using a 2:1 ratio of bad-posture
-                    duration to restorative rest. (ROUNDED UP to next minute)</div>
+                <div class="kpi-value" id="ergo-debt">Calculating...</div>
+                <div class="kpi-mini">Estimated recovery time (the time you need to spend in good posture to compensate,
+                    ROUNDED UP to next minute). </div>
             </div>
 
             <div class="card analytics-kpi">
@@ -197,7 +197,8 @@
                 <div class="kpi-icon"><span class="material-symbols-rounded">psychology</span></div>
                 <div class="kpi-label">Proprioception Score</div>
                 <div class="kpi-value" id="proprio-score">0</div>
-                <div class="kpi-mini">Weighted synthesis of compliance, recovery speed, and strain load.</div>
+                <div class="kpi-mini">Weighted synthesis of your compliance, recovery speed, and strain load. It
+                    reflects your posture-learning ability. </div>
             </div>
         </section>
 
@@ -291,10 +292,12 @@
 
         async function getAllLocalSessions() {
             let localSessions = [];
+
             console.log("Retrieving the local sessions for resilience etc");
             localSessions = JSON.parse(localStorage.getItem("sessions")) || [];
             console.log("Retrieval of local sessions successful");
             return localSessions;
+            console.log("Success with loading all local sessions")
 
         }
 
@@ -328,6 +331,7 @@
         document.addEventListener("DOMContentLoaded", loadAllData);
 
         async function loadAnalytics() {
+
             const currentName = localStorage.getItem("currentDisplayName");
             const sessions = await getAllSessions();
             const localSessions = await getAllLocalSessions();
@@ -337,7 +341,7 @@
                 document.querySelector('.analytics-main-pro').innerHTML = `
         <div style="padding:100px; text-align:center;">
             <h2 style="color:var(--blue-900);">There is no session history in the database for you, ${currentName}</h2>
-            <p style="color:var(--blue-500); margin-bottom:24px;">Start a live session to generate intelligence reports.</p>
+            <p style="color:var(--blue-500); margin-bottom:24px;">Start a live session to generate reports.</p>
             <button class="primary-btn" style="width:fit-content; margin:0 auto;" onclick="goBack()">
                 Return to Dashboard
             </button>
@@ -366,11 +370,9 @@
                 improvementElement.style.color = delta < 0 ? "var(--danger)" : "#16A34A";
             }
 
-            let avgBad = 0;
-            sessions.forEach(s => avgBad += (s.bad_frames || 0));
-            avgBad /= sessions.length;
-
-            const debtMinutes = Math.ceil((avgBad * 2) / 60);
+            let sumBad = 0;
+            sumBad = currentSession.bad_frames;
+            const debtMinutes = Math.ceil((sumBad * 0.181) / 60);
             document.getElementById("ergo-debt").textContent = debtMinutes + "m";
 
             new Chart(document.getElementById("chart"), {
@@ -440,7 +442,6 @@
             // ----------------------------
             // PROPRIO SCORE
             // ----------------------------
-            console.log("Before proprio block");
             const complianceScore = currentVal;
             const debtScore = Math.max(0, 100 - (debtMinutes * 3.3));
 

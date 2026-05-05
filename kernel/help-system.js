@@ -10,6 +10,7 @@ const USER_OS = "entry.721529810";
 
 const QUICK_FIXES = [
     "Clear your browser cache",
+    "Do not use incognito mode",
     "Force reload the page (Ctrl+Shift+R)",
     "Check the broswer console and paste the message here",
     "Update your browser",
@@ -93,7 +94,7 @@ function setupListeners() {
 
     sendBtn.onclick = async () => {
         const msg = document.getElementById('help-msg').value;
-        if (!msg.trim()) return alert("Message body cannot be empty.");
+        if (!msg.trim()) return alert("The message body cannot be empty.");
 
         const storedBrowser = JSON.parse(localStorage.getItem('browser_data')) || { name: "Unknown", version: "N/A" };
         const storedOS = localStorage.getItem('os_data') || "Unknown OS";
@@ -102,7 +103,7 @@ function setupListeners() {
         const userEmail = localStorage.getItem('currentUser') || "guest_user";
         sendBtn.innerHTML = `<span class="material-symbols-rounded pulse">sync</span> Sending...`;
         await submitToGoogle(userEmail, msg, browserString, osString);
-        alert("Your feedback has been transmitted!");
+        alert("Your feedback has been transmitted! We are grateful for your feedback and time.");
         document.getElementById('help-msg').value = "";
         sendBtn.innerHTML = `<span class="material-symbols-rounded">send</span> Send Message`;
         toggleBox();

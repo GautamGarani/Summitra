@@ -21,6 +21,8 @@
     })();
   </script>
 
+  //We will NOT include connectivity.js on this percentage
+
   <link rel="icon" type="image/png" href="logo.jpg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -106,11 +108,11 @@
 
       <div class="btn-group">
         <!-- Saves to localStorage and goes to analytics -->
-        <button id="confirm-exit-btn" class="danger-btn">Stop & Save</button>
+        <button id="confirm-exit-btn" class="danger-btn">Stop & Commit</button>
         <br>
 
         <!-- Discards data and goes to analytics -->
-        <button id="confirm-exit-purge-btn" class="danger-btn">Yes, Discard Session</button>
+        <button id="confirm-exit-purge-btn" class="danger-btn">Discard Session</button>
         <br>
 
         <button id="cancel-exit-btn" class="secondary-btn">Continue</button>
@@ -193,7 +195,7 @@
 
         <div class="control-item">
           <span class="control-label">
-            Mute All
+            Stop Tracking
           </span>
 
           <label class="switch">

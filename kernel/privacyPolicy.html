@@ -5,19 +5,19 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // AUTH GUARD: Ensures policy access is restricted to authenticated sessions
-        (function () {
+        /*(function () {
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const currentUser = localStorage.getItem('currentUser');
             if (isLoggedIn !== 'true' || !currentUser) {
                 window.location.href = 'login.html';
             }
-        })();
+        })();*/
     </script>
-
+    <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy : Summitra Data Sovereignty</title>
+    <title>Summitra: Privacy Policy</title>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
@@ -33,26 +33,26 @@
         <div class="header-content">
             <img src="logo.jpg" class="logo-watermark" alt="Summitra">
             <div class="header-text-group">
-                <div class="header-title">Summitra</div>
+                <div class="header-title">Summitra: Your Smart Asana Mitra</div>
                 <div class="header-subtitle">Reaching the Epitome of Wellness</div>
             </div>
         </div>
 
         <div class="header-actions">
-            <button class="secondary-btn logout-pill" onclick="location.href='live.html'">
-                <span class="material-symbols-rounded">sensors</span>
-                Live Monitor
+            <button class="secondary-btn logout-pill" onclick="window.open('about.html', '_blank')">
+                <span class="material-symbols-rounded">info</span>
+                About Summitra
             </button>
-            <button class="secondary-btn logout-pill" onclick="location.href='analytics.html'">
-                <span class="material-symbols-rounded">insights</span>
-                Analytics
+            <button class="secondary-btn logout-pill" onclick="window.open('login.html', '_blank')">
+                <span class="material-symbols-rounded">person</span>
+                Dive in
             </button>
-            <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
+            <!--<button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
                 <span class="material-symbols-rounded">dashboard</span>
                 Dashboard
-            </button>
+            </button>-->
 
-            <div class="profile-container">
+            <!--<div class="profile-container">
                 <button class="profile-trigger" onclick="toggleDropdown()">
                     <span class="material-symbols-rounded">account_circle</span>
                     <span id="display-user">User</span>
@@ -78,29 +78,32 @@
                         <span class="material-symbols-rounded">logout</span> Logout
                     </button>
                 </div>
-            </div>
+            </div>-->
         </div>
     </header>
 
     <main class="dashboard-main-pro">
         <section class="dashboard-hero" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
             <div class="hero-copy">
-                <div class="hero-eyebrow">PRIVACY AND DATA HANDLING</div>
-                <h1>Your Privacy, Decoupled</h1>
+                <div class="hero-eyebrow">Your privacy. Our priority.</div>
+                <h1>Your privacy. Our priority.</h1>
+
+                <br>
                 <p class="hero-text">
-                   To protect your privacy, Summitra generates insights using in-browser posture data. We never store biometric telemtry on our servers- you data stays with you.
+                    We built Summitra to help you. We use your camera to give you health tips, but we <b>never</b> store
+                    your personal video on our server. Your video information stays on your device.
                 </p>
             </div>
 
             <div class="hero-pills">
                 <div class="metric-pill">
                     <span class="material-symbols-rounded">key</span>
-                   User login System
+                    Secure Login
 
                 </div>
                 <div class="metric-pill">
                     <span class="material-symbols-rounded">cloud_off</span>
-                    No video recording
+                    No Video Recording
                 </div>
             </div>
         </section>
@@ -110,13 +113,14 @@
                 <div class="feature-badge" style="background: #F0FDF4; color: #166534;">
                     <span class="material-symbols-rounded">database</span>
                 </div>
-                <h2>Browser-Based Data</h2>
-                <p>Session details such as alerts and usage data are kept in your browser to support tracking and analysis.
+                <h2>In-Browser Storage</h2>
+                <p>Your session info, like posture alerts and how long you've used the app, is saved only as numbers in our database.
+                    We also provide a <b>local log</b> of your data. 
                 </p>
                 <div class="feature-points">
-                    <div>• Persistent until manual clearance</div>
-                    <div>• Accessible only via this domain</div>
-                    <div>• User-triggered clearing</div>
+                    <div>• Stored until you delete it</div>
+                    <div>• Only you can see it</div>
+                    <div>• You can clear it anytime</div>
                 </div>
             </div>
 
@@ -124,13 +128,13 @@
                 <div class="feature-badge" style="background: #FEF2F2; color: #991B1B;">
                     <span class="material-symbols-rounded">no_photography</span>
                 </div>
-                <h2>The No-Image Rule</h2>
-                <p>While we use the Vision Engine for tracking, Summitra <strong>never</strong> records, saves, or
-                    transmits video frames.</p>
+                <h2>Strict "No-Image" Rule</h2>
+                <p>Even though we use a "Vision Engine," Summitra <strong>never</strong> saves or shares any pictures or
+                    videos of you.</p>
                 <div class="feature-points">
-                    <div>• In-memory processing only</div>
-                    <div>• Instant frame disposal</div>
-                    <div>• Coordinate-only conversion</div>
+                    <div>• We process image data instantly</div>
+                    <div>• Every video frame is deleted immediately</div>
+                    <div>• We only use numbers to track posture</div>
                 </div>
             </div>
 
@@ -138,15 +142,15 @@
                 <div class="feature-badge">
                     <span class="material-symbols-rounded">terminal</span>
                 </div>
-                <h2>System Activity</h2>
-                <p>System error logs and debug data are stored locally to help you monitor performance without external
-                    oversight[cite: 5].</p>
+                <h2>App Performance</h2>
+                <p>We keep small logs on your computer to help the app run smoothly. This helps you see if the system is
+                    working correctly without needing our help.</p>
                 <div class="feature-points">
-                    <div>• Error handling[cite: 5]</div>
-                    <div>• Crash tracking[cite: 5]</div>
-                    <div>• System logs[cite: 5]</div>
+                    <div>• Tracking errors and crashes</div>
+                    <div>• Improving performance</div>
+                    <div>• Local system logs only</div>
                 </div>
-                <button class="btn" style="margin-top: auto;" onclick="location.href='dashboard.html'">
+                <button class="btn" style="margin-top: auto;" onclick="window.open('dashboard.html', '_blank')">
                     I Understand
                     <span class="material-symbols-rounded">check_circle</span>
                 </button>
