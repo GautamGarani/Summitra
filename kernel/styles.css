@@ -271,6 +271,7 @@ body:has(#monitor-card) main {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
     gap: 32px;
     width: 100%;
+    margin-left: 0px;
 }
 
 .card {
@@ -278,6 +279,7 @@ body:has(#monitor-card) main {
     border-radius: 32px;
     border: 1px solid var(--border-soft);
     box-shadow: 0 20px 40px -12px rgba(0, 82, 204, .08);
+    margin-left: 0px;
 }
 
 .feature-card {
@@ -285,6 +287,8 @@ body:has(#monitor-card) main {
     text-align: left;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    margin-left: 0px;
 }
 
 .feature-badge {
@@ -1900,4 +1904,179 @@ body.is-offline > *:not(#offline-overlay) {
 
 .retry-btn:hover {
     transform: scale(1.05);
+}
+
+
+/*ADD ONS*/
+
+/* --- ATOMIC ANIMATIONS & STYLING --- */
+
+.about-redesign {
+    scroll-behavior: smooth;
+}
+
+/* Cinematic Hero Expansion */
+.creative-hero {
+    overflow: hidden;
+    position: relative;
+    padding: 60px !important;
+}
+
+.hero-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.hero-stock-img {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 24px;
+    transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+    box-shadow: -20px 20px 50px rgba(0,0,0,0.5);
+    transition: transform 0.5s ease;
+}
+
+.creative-hero:hover .hero-stock-img {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.05);
+}
+
+/* Feature Grid Interaction */
+.interactive-grid {
+    margin-top: -40px; /* Slight overlap for depth */
+    position: relative;
+    z-index: 10;
+}
+
+.zoom-hover-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.zoom-hover-card:hover {
+    transform: scale(1.02) translateY(-10px);
+    z-index: 20;
+    box-shadow: 0 40px 80px rgba(0, 82, 204, 0.15);
+}
+
+/* Horizontal Card Variant */
+.card-horizontal-layout {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.card-inline-img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 20px;
+    filter: grayscale(0.5);
+    transition: 0.3s;
+}
+
+.zoom-hover-card:hover .card-inline-img {
+    filter: grayscale(0);
+}
+
+/* Points Enhancement */
+.point-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.point-item .material-symbols-rounded {
+    color: var(--success);
+    font-size: 18px;
+}
+
+/* Final CTA Styling */
+.final-cta-card {
+    margin: 40px 0;
+    padding: 60px;
+    background: var(--blue-accent);
+    border-radius: 40px;
+    text-align: center;
+    border: 2px dashed var(--blue-primary);
+}
+
+.cta-inner h2 {
+    font-size: 32px;
+    margin-bottom: 24px;
+    color: var(--blue-900);
+}
+
+.pulse-btn {
+    max-width: 300px;
+    margin: 0 auto;
+    animation: ctaPulse 2s infinite;
+}
+
+@keyframes ctaPulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 82, 204, 0.4); }
+    70% { box-shadow: 0 0 0 20px rgba(0, 82, 204, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 82, 204, 0); }
+}
+
+/* Tech Tag Styling */
+.tech-tag {
+    margin-top: 15px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--blue-900);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+
+/* --- KINETIC ENTRANCE ANIMATIONS --- */
+
+.entrance-container {
+    perspective: 1200px; /* Establishes the 3D space for the swirl */
+}
+
+.swirl-in {
+    opacity: 0;
+    transform-origin: center center;
+    animation: entranceSwirl 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation-delay: calc(var(--delay) * 0.15s);
+}
+
+.swirl-item {
+    opacity: 0;
+    animation: entranceSwirl 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation-delay: calc((var(--delay) * 0.15s) + (var(--sub-delay) * 0.1s));
+}
+
+@keyframes entranceSwirl {
+    0% {
+        opacity: 0;
+        transform: rotateX(-15deg) rotateY(20deg) scale(0.8) translateY(50px);
+        filter: blur(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* Specific adjustment for the Hero Image to swirl independently */
+.hero-stock-img {
+    animation: imageFloat 4s ease-in-out infinite;
+    animation-delay: 1s;
+}
+
+@keyframes imageFloat {
+    0%, 100% { transform: perspective(1000px) rotateY(-15deg) rotateX(5deg) translateY(0); }
+    50% { transform: perspective(1000px) rotateY(-10deg) rotateX(2deg) translateY(-15px); }
+}
+
+* {
+    box-sizing: border-box;
 }

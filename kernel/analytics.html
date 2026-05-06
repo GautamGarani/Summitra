@@ -35,18 +35,138 @@
     <link href="styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Header layout for button placement */
-        header {
+            body {
+            overflow-x: hidden;
+            background-color: var(--surface);
+        }
+
+        .entrance-container {
+            perspective: 2000px;
+            padding-bottom: 100px;
+        }
+
+        .swirl-in {
+            opacity: 0;
+            transform-origin: center center;
+            animation: entranceSwirl 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        @keyframes entranceSwirl {
+            0% {
+                opacity: 0;
+                transform: rotateX(-20deg) rotateY(15deg) scale(0.9) translateY(60px);
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        .fancy-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
+            padding: 1.5rem 4rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-soft);
         }
 
-        .header-content {
+        .header-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--blue-900);
+            letter-spacing: -0.5px;
+        }
+
+        /* Hero Section */
+        .policy-hero {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 80px 4rem !important;
+        }
+
+        .hero-stock-img {
+            width: 100%;
+            border-radius: 32px;
+            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+            box-shadow: -30px 30px 60px rgba(13, 27, 42, 0.15);
+            transition: transform 0.6s ease;
+        }
+
+        .hero-stock-img:hover {
+            transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02);
+        }
+
+        /* Feature Grid Adjustments */
+        .feature-grid {
+            padding: 0 4rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .zoom-hover-card {
+            display: flex;
+            flex-direction: column;
+            padding: 3rem;
+            border-radius: 32px;
+            background: white;
+            border: 1px solid var(--border-soft);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+        }
+
+        .zoom-hover-card:hover {
+            transform: scale(1.02) translateY(-10px);
+            box-shadow: 0 40px 80px rgba(13, 27, 42, 0.08);
+            border-color: var(--blue-primary);
+        }
+
+        .feature-badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 20px;
+            justify-content: center;
+            margin-bottom: 2rem;
+            background: var(--blue-accent);
+            color: var(--blue-primary);
+        }
+
+        .feature-points {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-points div {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--blue-700);
+        }
+
+        .feature-points div::before {
+            content: "check_circle";
+            font-family: 'Material Symbols Rounded';
+            color: var(--success);
+            font-size: 20px;
+        }
+
+        .btn-container {
+            margin-top: 4rem;
+            text-align: center;
         }
 
         /* 2x2 Grid Logic for Charts */
@@ -78,12 +198,128 @@
                 padding: 20px;
             }
         }
+
+@media (max-width: 768px) {
+
+    /* Global */
+    body {
+        font-size: 14px;
+    }
+
+    /* Header */
+    .fancy-header {
+        padding: 1rem 1.2rem;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    .header-title {
+        font-size: 1.1rem;
+    }
+
+    .header-subtitle {
+        display: none;
+    }
+
+    /* Profile dropdown trigger shrink */
+    .profile-trigger span:nth-child(2) {
+        display: none; /* hide username for space */
+    }
+
+    /* Hero Section */
+    .dashboard-hero {
+        padding: 40px 1.2rem !important;
+        text-align: left;
+    }
+
+    .gemini-greet {
+        font-size: 1.8rem;
+    }
+
+    .hero-pills {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .metric-pill {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    /* Grid → Stack */
+    .feature-grid {
+        grid-template-columns: 1fr;
+        padding: 0 1.2rem;
+    }
+
+    /* Cards */
+    .card,
+    .feature-card,
+    .zoom-hover-card {
+        padding: 1.5rem !important;
+        border-radius: 20px;
+    }
+
+    .feature-badge {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card h2 {
+        font-size: 1.2rem;
+    }
+
+    .feature-card p {
+        font-size: 0.9rem;
+    }
+
+    /* Buttons full width */
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* TABLE FIX (CRITICAL) */
+    .manifest-table-container {
+        overflow-x: auto;
+    }
+
+    .manifest-light-table {
+        min-width: 600px; /* allows horizontal scroll */
+        font-size: 0.8rem;
+    }
+
+    /* Reduce spacing */
+    .btn-container {
+        margin-top: 2rem;
+    }
+}
+
+
+/* Extra small devices */
+@media (max-width: 480px) {
+
+    .gemini-greet {
+        font-size: 1.5rem;
+    }
+
+    .metric-pill {
+        font-size: 0.7rem;
+    }
+
+    .feature-card h2 {
+        font-size: 1.05rem;
+    }
+}
+        
     </style>
+    
 </head>
 
 <body>
 
-    <header>
+    <header class = "fancy-header">
         <div class="header-content">
             <img src="logo.jpg" class="logo-watermark" alt="Summitra">
             <!-- Grouped branding text stays horizontally aligned with the logo -->
@@ -96,11 +332,9 @@
         <div class="header-actions">
             <button class="secondary-btn logout-pill" onclick="location.href='dashboard.html'">
                 <span class="material-symbols-rounded">dashboard</span>
-                Dashboard
             </button>
             <button class="secondary-btn logout-pill" onclick="location.href='live.html'">
                 <span class="material-symbols-rounded">sensors</span>
-                Live Monitoring
             </button>
             <!-- Profile container with absolute positioning for the menu -->
             <div class="profile-container">
@@ -197,8 +431,16 @@
                 <div class="kpi-icon"><span class="material-symbols-rounded">psychology</span></div>
                 <div class="kpi-label">Proprioception Score</div>
                 <div class="kpi-value" id="proprio-score">0</div>
+                <div class="kpi-value" id="proprio-feedback">No feedback</div>
                 <div class="kpi-mini">Weighted synthesis of your compliance, recovery speed, and strain load. It
                     reflects your posture-learning ability. </div>
+            </div>
+
+            <div class="card analytics-kpi">
+                <div class="kpi-icon"><span class="material-symbols-rounded">gavel</span></div>
+                <div class="kpi-label">Verdict</div>
+                <div class="kpi-value" id="proprio-verdict">No verdict</div>
+                <div class="kpi-mini">Our Judgement</div>
             </div>
         </section>
 
@@ -207,7 +449,7 @@
                 <div class="chart-heading-row">
                     <div>
                         <span class="label">Cognitive Load</span>
-                        <h2>Your Fatigue</h2>
+                        <h2>Your Compliance decay over last session</h2>
                         <p class="kpi-mini">A timeline mapping focus decay to identify muscular strain over session
                             duration.</p>
                     </div>
@@ -221,7 +463,7 @@
                 <div class="chart-heading-row">
                     <div>
                         <span class="label">Distribution</span>
-                        <h2>Alert Composition</h2>
+                        <h2>Alert Composition over last session</h2>
                         <p class="kpi-mini">A categorical breakdown of posture failures to pinpoint whether your primary
                             strain is lateral, forward, or vertical.</p>
                     </div>
@@ -232,15 +474,25 @@
             </section>
         </div>
 
-        <section class="feature-grid insight-grid">
+
+        <section class="analytics-hero">
+            <div>
+                <div class="hero-eyebrow">SESSION INTELLIGENCE</div>
+                <h1>Upcoming Posture performance analytics</h1>
+                <p class="hero-text">Unified behavioral matrix of your kinetic health.</p>
+            </div>
+        </section>
+
+        <section class="charts-matrix">
             <div class="card feature-card insight-card">
                 <div class="feature-badge insight-badge-accent">
                     <span class="material-symbols-rounded">neurology</span>
                 </div>
+                <div class="label" style="color: var(--blue-600); font-weight: 800; margin-bottom: 8px;">BETA</div>
                 <h3>Alert Correlation</h3>
-                <p id="correlation-text">Insufficient data to determine behavioral patterns.</p>
-                <p class="kpi-mini" style="margin-top:10px;">Analyzes sequential alerts to see if specific deviations
-                    (like forward leaning) statistically trigger secondary failures.</p>
+                <p id="correlation-text" class="kpi-mini" style="font-size: 0.9rem; line-height: 1.5;">
+                    Analyzing sequential deviations to determine if one postural imperfection of yours leads to another.
+                </p>
             </div>
         </section>
 
@@ -395,7 +647,7 @@
                             currentSession.slouch_alerts || 0,
                             currentSession.multiple_alerts || 0
                         ],
-                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "#000000"]
+                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "green"]
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -465,10 +717,39 @@
             const proprioEl = document.getElementById("proprio-score");
             proprioEl.textContent = proprioScore;
 
-            if (proprioScore >= 80) proprioEl.style.color = "#16A34A";
-            else if (proprioScore >= 50) proprioEl.style.color = "#F59E0B";
-            else proprioEl.style.color = "#EF4444";
+            const proprioFeedback = document.getElementById("proprio-feedback");
 
+            if (proprioScore >= 80) {
+                proprioEl.style.color = "#16A34A";
+                proprioFeedback.innerText = `GOOD`;
+            }
+            else if (proprioScore >= 50) {
+                proprioEl.style.color = "#F59E0B";
+                proprioFeedback.innerText = `Tweak your threshold next session!`;
+            }
+            else {
+                proprioEl.style.color = "#EF4444";
+                proprioFeedback.innerText = `Improve your compliance`;
+            }
+
+            const verdict = document.getElementById("proprio-verdict");
+
+            if (proprioScore >= 80 && complianceScore >= 90) {
+                verdict.innerText = `You're doing really well!`;
+                verdict.style.color = "#16A34A";
+            }
+
+            else if (proprioScore >= 80 && complianceScore >= 80) {
+                verdict.innerText = `You're nearly there!`;
+                verdict.style.color = "#F59E0B";
+
+            }
+
+            else if (proprioScore <= 80 && complianceScore >= 80 || proprioScore <= 80 && complianceScore <= 80)
+            {
+                verdict.innerText = `Focus on compliance!`;
+                verdict.style.color = "#EF4444";
+            }
             //-------------------------
             //THE FATIGUE CHART
             //-------------------------
@@ -547,6 +828,8 @@
                         }
                     }
                 });
+
+
             }
 
         }
