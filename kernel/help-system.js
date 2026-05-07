@@ -1,6 +1,3 @@
-/**
- * Summitra Help System - Professional Unified Version
- */
 
 const FORM_ID = "1FAIpQLSdJo84it9DO_4TZKfFM3sFT7iV8NEpcOeu7CHmeeRtaYGO5lA";
 const ENTRY_USERNAME = "entry.251959277";
@@ -20,7 +17,6 @@ const QUICK_FIXES = [
 document.addEventListener('DOMContentLoaded', () => {
     const root = document.getElementById('summitra-help-root');
 
-    // Themed UI Injection using Summitra Design Tokens
     root.innerHTML = `
         <div id="summitra-launcher" class="primary-btn">
             <span class="material-symbols-rounded">support_agent</span>

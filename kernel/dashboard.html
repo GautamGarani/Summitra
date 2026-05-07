@@ -88,7 +88,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* Hero Section */
         .policy-hero {
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
@@ -109,7 +108,7 @@
             transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02);
         }
 
-        /* Feature Grid Adjustments */
+
         .feature-grid {
             padding: 0 4rem;
             display: grid;
@@ -173,18 +172,16 @@
             text-align: center;
         }
 
-        /* =========================
-   MOBILE RESPONSIVENESS
-   ========================= */
+
 
 @media (max-width: 768px) {
 
-    /* Global */
+
     body {
         font-size: 14px;
     }
 
-    /* Header */
+
     .fancy-header {
         padding: 1rem 1.2rem;
         flex-direction: row;
@@ -199,9 +196,9 @@
         display: none;
     }
 
-    /* Profile dropdown trigger shrink */
+
     .profile-trigger span:nth-child(2) {
-        display: none; /* hide username for space */
+        display: none;
     }
 
     /* Hero Section */
@@ -224,15 +221,15 @@
         padding: 0.4rem 0.8rem;
     }
 
-    /* Grid → Stack */
+
     .feature-grid {
         grid-template-columns: 1fr;
-        padding: 0 1rem; /* Give it a little more breathing room */
+        padding: 0 1rem; 
         width: 100%;
         box-sizing: border-box;
     }
 
-    /* Cards */
+
     .card,
     .feature-card,
     .zoom-hover-card {
@@ -263,7 +260,7 @@
         font-size: 0.9rem;
     }
 
-    /* Buttons full width */
+
     .btn {
         width: 100%;
         justify-content: center;
@@ -275,11 +272,11 @@
     }
 
     .manifest-light-table {
-        min-width: 600px; /* allows horizontal scroll */
+        min-width: 600px; 
         font-size: 0.8rem;
     }
 
-    /* Reduce spacing */
+
     .btn-container {
         margin-top: 2rem;
     }
@@ -335,7 +332,7 @@
                 </button>
 
                 <div id="profile-dropdown" class="dropdown-menu">
-                    <!-- Section 1: User -->
+
                     <div class="dropdown-header">
                         <span class="label">Authenticated As</span>
                         <div class="user-email" id="user-detail">user@summitra</div>
@@ -343,7 +340,7 @@
 
                     <hr class="dropdown-divider">
 
-                    <!-- Section 2: Summitra -->
+
                     <div class="dropdown-header">
                         <span class="label">Summitra</span>
                     </div>
@@ -377,7 +374,7 @@
 
         <section class="dashboard-hero">
             <div class="hero-copy">
-                <!-- The gradient is applied to the entire H1 or just the name span -->
+
                 <h1 class="gemini-greet">Hello, <span id="welcome-name">Guest</span>!</h1>
             </div>
 
@@ -537,7 +534,6 @@
             }
         }
 
-        // Add this to your DOMContentLoaded listener
         document.addEventListener("DOMContentLoaded", () => {
             renderLedger();
             updateWelcomeMessage();

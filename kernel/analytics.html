@@ -322,7 +322,7 @@
     <header class = "fancy-header">
         <div class="header-content">
             <img src="logo.jpg" class="logo-watermark" alt="Summitra">
-            <!-- Grouped branding text stays horizontally aligned with the logo -->
+
             <div class="header-text-group">
                 <div class="header-title">Summitra</div>
                 <div class="header-subtitle">Reaching the Epitome of Wellness</div>
@@ -336,17 +336,16 @@
             <button class="secondary-btn logout-pill" onclick="location.href='live.html'">
                 <span class="material-symbols-rounded">sensors</span>
             </button>
-            <!-- Profile container with absolute positioning for the menu -->
+
             <div class="profile-container">
                 <button class="profile-trigger" onclick="toggleDropdown()">
                     <span class="material-symbols-rounded">account_circle</span>
-                    <!-- display-user will now show the human-readable Display Name -->
+
                     <span id="display-user">User</span>
                     <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
                 </button>
 
-                <div id="profile-dropdown" class="dropdown-menu">
-                    <!-- Section 1: Identity -->
+
                     <div class="dropdown-header">
                         <span class="label">Authenticated As</span>
                         <div class="user-email" id="user-detail">user@summitra</div>
@@ -354,7 +353,6 @@
 
                     <hr class="dropdown-divider">
 
-                    <!-- Section 2: Account Settings -->
                     <div class="dropdown-header">
                         <span class="label">Summitra</span>
                     </div>
@@ -703,6 +701,8 @@
             // ----------------------------
             // PROPRIO SCORE
             // ----------------------------
+
+
             const complianceScore = currentVal;
             const debtScore = Math.max(0, 100 - (debtMinutes * 3.3));
 
@@ -750,6 +750,8 @@
                 verdict.innerText = `Focus on compliance!`;
                 verdict.style.color = "#EF4444";
             }
+
+            
             //-------------------------
             //THE FATIGUE CHART
             //-------------------------

@@ -30,7 +30,7 @@ async function attemptLogin() {
 }
 
 function logout() {
-    //localStorage.clear();//WE CAN CLEAN EVERYTHING ON LOGOUT, not doing it in this version
+    //localStorage.clear(); //WE CAN CLEAN EVERYTHING ON LOGOUT, not doing it in this version
     //We will only clear out the currentUser, currentUserId, isLoggedIn, currentDisplayName, errorLogs
     localStorage.removeItem('currentUser');
     localStorage.removeItem('currentUserId');
@@ -46,7 +46,7 @@ function toggleDropdown() {
     if (menu) menu.classList.toggle('active');
 }
 
-// --- PAGE-SPECIFIC DATA FETCHING ---
+// --- PAGE-SPECIFIC DATA 
 async function syncProfileData() {
     const userId = localStorage.getItem('currentUserId');
     if (!userId || !window.location.pathname.includes('profile.html')) return;
@@ -86,7 +86,7 @@ async function syncProfileData() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Immediate UI hydration from LocalStorage
+
     const userEmail = localStorage.getItem('currentUser') || 'Guest';
     const displayName = localStorage.getItem('currentDisplayName') || userEmail.split('@')[0];
     const displayUser = document.getElementById('display-user'); 
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (displayUser) displayUser.textContent = displayName;
     if (userDetail) userDetail.textContent = userEmail;
 
-    // 2. Click-away listener for dropdown closure
+
     window.addEventListener('click', (e) => {
         const container = document.querySelector('.profile-container');
         const menu = document.getElementById('profile-dropdown');

@@ -11,7 +11,6 @@
       const currentUser = localStorage.getItem('currentUser');
 
       if (isLoggedIn !== 'true' || !currentUser) {
-        // Optional: Clean any corrupted state
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('currentUser');
         localStorage.getItem('currentUserId');
@@ -109,11 +108,9 @@
       <br>
 
       <div class="btn-group">
-        <!-- Saves to localStorage and goes to analytics -->
         <button id="confirm-exit-btn" class="danger-btn">Stop & Commit</button>
         <br>
 
-        <!-- Discards data and goes to analytics -->
         <button id="confirm-exit-purge-btn" class="danger-btn">Discard Session</button>
         <br>
 
@@ -136,7 +133,6 @@
       <div class="profile-container">
         <button class="profile-trigger" onclick="toggleDropdown()">
           <span class="material-symbols-rounded">account_circle</span>
-          <!-- display-user will now show the human-readable Display Name -->
           <span id="display-user">User</span>
           <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
         </button>
@@ -174,8 +170,6 @@
         <img src="logo.jpg" alt="Summitra Logo" class="video-watermark"
           onerror="this.src='https://via.placeholder.com/64'">
 
-
-        <!-- NEW CALIBRATION OVERLAY -->
         <div id="calibration-overlay" class="calibration-card cal-blue">
 
           <div class="cal-step">
@@ -187,9 +181,6 @@
           </div>
 
         </div>
-        <!-- END NEW -->
-
-
       </div>
 
 
@@ -309,8 +300,6 @@
 
       </div>
 
-
-      <!-- SYSTEM STATUS BOX (REPLACES log-container) -->
       <div class="card-segment system-status-card">
         <div class="status-header">
           <div class="status-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -321,7 +310,6 @@
                 <span id="log-text">Initializing...</span>
               </div>
             </div>
-            <!-- NEW: Manifest Trigger -->
             <button id="view-manifest-btn" class="secondary-btn"
               style="padding: 6px 12px; font-size: 10px; border-radius: 8px;">
               <span class="material-symbols-rounded" style="font-size: 14px;">computer</span>
@@ -356,7 +344,6 @@
       <hr class="dropdown-divider">
 
       <div id="manifest-content" class="manifest-list">
-        <!-- Data will be injected here via JS -->
 
         <div class="manifest-item">
           <div class="manifest-icon-box"><span class="material-symbols-rounded">battery_charging_full</span></div>
@@ -366,7 +353,6 @@
           </div>
         </div>
 
-        <!-- NEW: THERMAL SECTION -->
         <div class="manifest-item">
           <div class="manifest-icon-box"><span class="material-symbols-rounded">thermostat</span></div>
           <div class="manifest-info">
