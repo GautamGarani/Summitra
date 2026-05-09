@@ -510,13 +510,13 @@ async function startCoach() {
                     overlay.style.display = 'block';
                     if (sessionData.totalFrames < 28) {
                         overlay.className = 'calibration-card cal-blue';
-                        overlay.innerHTML = `<div class="cal-step">Step 1 of 4</div>Rotate head gently left and right`;
+                        overlay.innerHTML = `<div class="cal-step">Step 1 of 4</div>Rotate head gently left and right by <b>few degrees</b> in your comfort range`;
                     } else if (sessionData.totalFrames < 56) {
                         overlay.className = 'calibration-card cal-amber';
-                        overlay.innerHTML = `<div class="cal-step">Step 2 of 4</div>Lean forward naturally`;
+                        overlay.innerHTML = `<div class="cal-step">Step 2 of 4</div>Keep your neck straight`;
                     } else if (sessionData.totalFrames < 84) {
                         overlay.className = 'calibration-card cal-purple';
-                        overlay.innerHTML = `<div class="cal-step">Step 3 of 4</div>Straighten and slouch slightly`;
+                        overlay.innerHTML = `<div class="cal-step">Step 3 of 4</div>Straighten your back and shoulders`;
                     } else {
                         overlay.className = 'calibration-card cal-green';
                         overlay.innerHTML = `<div class="cal-step">Step 4 of 4</div>Settling baseline...`;
