@@ -519,7 +519,7 @@ async function startCoach() {
                         overlay.innerHTML = `<div class="cal-step">Step 3 of 4</div>Straighten your back and shoulders`;
                     } else {
                         overlay.className = 'calibration-card cal-green';
-                        overlay.innerHTML = `<div class="cal-step">Step 4 of 4</div>Settling baseline...`;
+                        overlay.innerHTML = `<div class="cal-step">Step 4 of 4</div>Hang tight; We are setting your baseline!`;
                     }
 
                     display.innerHTML = 'Calibration in progress';
