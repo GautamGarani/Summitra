@@ -12,7 +12,7 @@
             const currentUser = localStorage.getItem('currentUser');
 
             if (isLoggedIn !== 'true' || !currentUser) {
-                // Optional: Clean any corrupted state
+               
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('currentUser');
                 localStorage.getItem('currentUserId');
@@ -473,29 +473,6 @@
                 </div>
             </section>
         </div>
-
-
-        <section class="analytics-hero">
-            <div>
-                <div class="hero-eyebrow">SESSION INTELLIGENCE</div>
-                <h1>Upcoming Posture performance analytics</h1>
-                <p class="hero-text">Unified behavioral matrix of your kinetic health.</p>
-            </div>
-        </section>
-
-        <section class="charts-matrix">
-            <div class="card feature-card insight-card">
-                <div class="feature-badge insight-badge-accent">
-                    <span class="material-symbols-rounded">neurology</span>
-                </div>
-                <div class="label" style="color: var(--blue-600); font-weight: 800; margin-bottom: 8px;">BETA</div>
-                <h3>Alert Correlation</h3>
-                <p id="correlation-text" class="kpi-mini" style="font-size: 0.9rem; line-height: 1.5;">
-                    Analyzing sequential deviations to determine if one postural imperfection of yours leads to another.
-                </p>
-            </div>
-        </section>
-
     </main>
 
     <script>
