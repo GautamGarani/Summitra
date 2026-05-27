@@ -2168,3 +2168,127 @@ body.is-offline>*:not(#offline-overlay) {
     /* Shifting accent to primary brand marker */
     font-weight: 600;
 }
+
+/* ---------- CUSTOM CHECKBOX SYSTEM ---------- */
+
+.checkbox-group {
+    margin-bottom: 22px;
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+.custom-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    gap: 12px;
+}
+
+/* Hide the default system input completely */
+.custom-checkbox-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Base custom box construction */
+.checkbox-box {
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid var(--border-soft);
+    border-radius: 6px;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Text typography scaling */
+.checkbox-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--blue-700);
+    line-height: 1.4;
+    transition: color 0.2s ease;
+}
+
+/* Focus and Hover states mirroring standard form interactions */
+.custom-checkbox-label:hover .checkbox-box {
+    border-color: var(--blue-primary);
+    background: var(--blue-accent);
+}
+
+.custom-checkbox-label input:focus-visible + .checkbox-box {
+    border-color: var(--blue-primary);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.15);
+}
+
+/* Checked UI Configuration */
+.custom-checkbox-label input:checked + .checkbox-box {
+    background: var(--blue-primary);
+    border-color: var(--blue-primary);
+}
+
+/* Micro-rendering checkmark symbol using vector drawing code */
+.custom-checkbox-label input:checked + .checkbox-box::after {
+    content: "";
+    width: 6px;
+    height: 11px;
+    border: solid #FFFFFF;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg) translate(-0.5px, -1px);
+    display: block;
+    animation: checkboxCheckScale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Label textual emphasis shift when verified */
+.custom-checkbox-label input:checked ~ .checkbox-text {
+    color: var(--blue-900);
+    font-weight: 600;
+}
+
+/* Micro-interaction scalability constraint animation */
+@keyframes checkboxCheckScale {
+    from {
+        opacity: 0;
+        transform: rotate(45deg) scale(0.4) translate(-0.5px, -1px);
+    }
+    to {
+        opacity: 1;
+        transform: rotate(45deg) scale(1) translate(-0.5px, -1px);
+    }
+}
+
+/* ---------- BUTTON DISABLED STATE OVERRIDES ---------- */
+
+.btn:disabled,
+.btn[disabled] {
+    background-color: var(--blue-300) !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Deactivate interactive shimmer animation layers for the disabled state */
+.btn:disabled::after,
+.btn[disabled]::after {
+    display: none !important;
+    content: none !important;
+    animation: none !important;
+}
+
+/* Prevent scale or focus translation on hover when invalid */
+.btn:disabled:hover,
+.btn[disabled]:hover {
+    background-color: var(--blue-300) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}

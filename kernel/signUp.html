@@ -4,7 +4,7 @@
 <head>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-        <script>
+    <script>
         (function () {
             const currentUserId = localStorage.getItem('currentUserId');
             const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -14,7 +14,7 @@
                 window.location.href = 'dashboard.html';
             }
         })();
-        </script>
+    </script>
     <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <meta charset="UTF-8">
@@ -26,8 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
         rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
-        <style>
-
+    <style>
         body {
             overflow-x: hidden;
             background-color: var(--surface);
@@ -50,6 +49,7 @@
                 transform: rotateX(-20deg) rotateY(15deg) scale(0.9) translateY(60px);
                 filter: blur(10px);
             }
+
             100% {
                 opacity: 1;
                 transform: rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
@@ -163,19 +163,25 @@
     </style>
 </head>
 
-<body class = "login-redesign">
+<body class="login-redesign">
 
-<div id="statusModalOverlay" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 27, 42, 0.6); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: center;">
-    <div class="card feature-card entrance-container swirl-in" style="max-width: 400px; width: 90%; text-align: center; padding: 30px; border-top: 4px solid var(--blue-primary); position: relative;">
-        
-        <div id="modalIconContainer" style="font-size: 2.5rem; margin-bottom: 15px;"></div>
-        
-        <h3 id="modalTitle" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.4rem; margin-bottom: 10px; color: var(--border-hard);">Status Update</h3>
-        <p id="modalMessage" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; color: var(--blue-500); margin-bottom: 24px; line-height: 1.5;"></p>
-        
-        <button id="modalActionButton" class="btn" style="width: 100%;">ACKNOWLEDGE</button>
+    <div id="statusModalOverlay" class="modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 27, 42, 0.6); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: center;">
+        <div class="card feature-card entrance-container swirl-in"
+            style="max-width: 400px; width: 90%; text-align: center; padding: 30px; border-top: 4px solid var(--blue-primary); position: relative;">
+
+            <div id="modalIconContainer" style="font-size: 2.5rem; margin-bottom: 15px;"></div>
+
+            <h3 id="modalTitle"
+                style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.4rem; margin-bottom: 10px; color: var(--border-hard);">
+                Status Update</h3>
+            <p id="modalMessage"
+                style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; color: var(--blue-500); margin-bottom: 24px; line-height: 1.5;">
+            </p>
+
+            <button id="modalActionButton" class="btn" style="width: 100%;">ACKNOWLEDGE</button>
+        </div>
     </div>
-</div>
 
 
     <header class="fancy-header">
@@ -186,7 +192,7 @@
                 <div class="header-subtitle">Reaching the Epitome of wellness</div>
             </div>
         </div>
-                        <div class="header-actions">
+        <div class="header-actions">
 
             <button class="secondary-btn logout-pill" onclick="window.open('login.html', '_blank')">
                 <span class="material-symbols-rounded">person</span>Login
@@ -194,57 +200,93 @@
             </button>
     </header>
 
-    <main class="dashboard-main-pro" style="justify-content: center; align-items: center; min-height: calc(100vh - 72px);">
+    <main class="dashboard-main-pro"
+        style="justify-content: center; align-items: center; min-height: calc(100vh - 72px);">
 
-    <form class="card feature-card" id="signUpForm" style="max-width: 420px; width: 100%;" onsubmit="attemptSignUp(event)">
-        <h2>Sign Up</h2>
-        
-<div class="input-group">
-    <div class="input-suffix-wrapper" style="position: relative; width: 100%;">
-        <input id="usernameSignUp" type="text" placeholder=" " required pattern="^[a-zA-Z.]{3,15}$" style="padding-right: 95px; width: 100%;">
-        <label for="usernameSignUp">Set a Username</label>
-        <span class="input-inline-suffix">@summitra</span>
-    </div>
-    <span class="field-desc">Accepts letters and '.' characters exclusively.</span>
-</div>
-        
-        <div class="input-group">
-            <div class="input-suffix-wrapper" style="position: relative; width: 100%;"></div>
-            <input id="displayNameSignUp" type="text" placeholder=" " required>
-            <label for="displayNameSignUp">Set a Display Name</label>
+        <form class="card feature-card" id="signUpForm" style="max-width: 420px; width: 100%;"
+            onsubmit="attemptSignUp(event)">
+            <h2>Sign Up</h2>
+
+            <div class="input-group">
+                <div class="input-suffix-wrapper" style="position: relative; width: 100%;">
+                    <input id="usernameSignUp" type="text" placeholder=" " required pattern="^[a-zA-Z.]{3,15}$"
+                        style="padding-right: 95px; width: 100%;">
+                    <label for="usernameSignUp">Set a Username</label>
+                    <span class="input-inline-suffix">@summitra</span>
+                </div>
+                <span class="field-desc">Accepts letters and '.' characters exclusively.</span>
             </div>
-        </div>
-        
-        <div class="input-group">
-            <input id="userEmailSignUp" type="email" placeholder=" " required>
-            <label for="userEmailSignUp"> Enter your e-mail for us to contact you. </label>
-        </div>
-        
-<div class="input-group">
-    <input id="passwordSignUp" type="password" placeholder=" " required minlength="4" maxlength="4">
-    <label for="passwordSignUp">Enter a 4-character password</label>
-</div>
 
-<div class="input-group">
-    <input id="passwordConfirmSignUp" type="password" placeholder=" " required minlength="4" maxlength="4">
-    <label for="passwordConfirmSignUp">Confirm your password</label>
-</div>
-        
-        <div class="input-group">
-            <input id="ageSignUp" type="number" placeholder=" " required min="1" max="120">
-            <label for="ageSignUp">Age</label>
-        </div>
-        
-        <div class="input-group">
-            <input id="analyticsPreferenceSignUp" type="text" placeholder=" " required>
-            <label for="analyticsPreferenceSignUp">Your analytics Preference</label>
-        </div>
-        
-        <button type="submit" class="btn">SUBMIT</button>
-    </form>
+            <div class="input-group">
+                <div class="input-suffix-wrapper" style="position: relative; width: 100%;"></div>
+                <input id="displayNameSignUp" type="text" placeholder=" " required>
+                <label for="displayNameSignUp">Set a Display Name</label>
+            </div>
+            </div>
 
-</main>
+            <div class="input-group">
+                <input id="userEmailSignUp" type="email" placeholder=" " required>
+                <label for="userEmailSignUp"> Enter your e-mail for us to contact you. </label>
+            </div>
+
+            <div class="input-group">
+                <input id="passwordSignUp" type="password" placeholder=" " required minlength="4" maxlength="4">
+                <label for="passwordSignUp">Enter a 4-character password</label>
+            </div>
+
+            <div class="input-group">
+                <input id="passwordConfirmSignUp" type="password" placeholder=" " required minlength="4" maxlength="4">
+                <label for="passwordConfirmSignUp">Confirm your password</label>
+            </div>
+
+            <div class="input-group">
+                <input id="ageSignUp" type="number" placeholder=" " required min="1" max="120">
+                <label for="ageSignUp">Age</label>
+            </div>
+
+            <div class="input-group">
+                <input id="analyticsPreferenceSignUp" type="text" placeholder=" " required>
+                <label for="analyticsPreferenceSignUp">Your analytics Preference</label>
+            </div>
+            <div class="checkbox-group">
+                <label class="custom-checkbox-label">
+                    <input id="privacyAboutRead" type="checkbox" required>
+                    <span class="checkbox-box"></span>
+                    <span class="checkbox-text">I have read the privacy and about pages</span>
+                </label>
+            </div>
+
+            <div class="checkbox-group">
+                <label class="custom-checkbox-label">
+                    <input id="privacyPolicyAgree" type="checkbox" required>
+                    <span class="checkbox-box"></span>
+                    <span class="checkbox-text">I agree to the privacy policy</span>
+                </label>
+            </div>
+            <button id="signUpSubmitBtn" type="submit" class="btn" disabled>SUBMIT</button>
+        </form>
+
+    </main>
     <script src="auth.js"></script>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    const targetForm = document.querySelector("form");
+    const submitButton = document.getElementById("signUpSubmitBtn");
+
+    if (!targetForm || !submitButton) return;
+    const evaluateFormValidity = () => {
+        if (targetForm.checkValidity()) {
+            submitButton.removeAttribute("disabled");
+        } else {
+            submitButton.setAttribute("disabled", "true");
+        }
+    };
+
+    targetForm.addEventListener("input", evaluateFormValidity);
+    targetForm.addEventListener("change", evaluateFormValidity);
+    evaluateFormValidity();
+});
+</script>
 </body>
 
 </html>
