@@ -196,6 +196,13 @@
 
             <button class="secondary-btn logout-pill" onclick="window.open('login.html', '_blank')">
                 <span class="material-symbols-rounded">person</span>Login
+            </button>
+            <button class="secondary-btn logout-pill" onclick="window.open('about.html', '_blank')">
+                <span class="material-symbols-rounded">info</span>
+
+            </button>
+            <button class="secondary-btn logout-pill" onclick="window.open('privacyPolicy.html', '_blank')">
+                <span class="material-symbols-rounded">shield</span>
 
             </button>
     </header>
@@ -269,24 +276,24 @@
     </main>
     <script src="auth.js"></script>
     <script>
-document.addEventListener("DOMContentLoaded", () => {
-    const targetForm = document.querySelector("form");
-    const submitButton = document.getElementById("signUpSubmitBtn");
+        document.addEventListener("DOMContentLoaded", () => {
+            const targetForm = document.querySelector("form");
+            const submitButton = document.getElementById("signUpSubmitBtn");
 
-    if (!targetForm || !submitButton) return;
-    const evaluateFormValidity = () => {
-        if (targetForm.checkValidity()) {
-            submitButton.removeAttribute("disabled");
-        } else {
-            submitButton.setAttribute("disabled", "true");
-        }
-    };
+            if (!targetForm || !submitButton) return;
+            const evaluateFormValidity = () => {
+                if (targetForm.checkValidity()) {
+                    submitButton.removeAttribute("disabled");
+                } else {
+                    submitButton.setAttribute("disabled", "true");
+                }
+            };
 
-    targetForm.addEventListener("input", evaluateFormValidity);
-    targetForm.addEventListener("change", evaluateFormValidity);
-    evaluateFormValidity();
-});
-</script>
+            targetForm.addEventListener("input", evaluateFormValidity);
+            targetForm.addEventListener("change", evaluateFormValidity);
+            evaluateFormValidity();
+        });
+    </script>
 </body>
 
 </html>

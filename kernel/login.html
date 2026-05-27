@@ -29,8 +29,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
         rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
-        <style>
-
+    <style>
         body {
             overflow-x: hidden;
             background-color: var(--surface);
@@ -53,6 +52,7 @@
                 transform: rotateX(-20deg) rotateY(15deg) scale(0.9) translateY(60px);
                 filter: blur(10px);
             }
+
             100% {
                 opacity: 1;
                 transform: rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
@@ -166,7 +166,7 @@
     </style>
 </head>
 
-<body class = "login-redesign">
+<body class="login-redesign">
 
     <header class="fancy-header">
         <div class="header-content">
@@ -177,10 +177,18 @@
             </div>
         </div>
 
-                <div class="header-actions">
+        <div class="header-actions">
 
             <button class="secondary-btn logout-pill" onclick="window.open('signUp.html', '_blank')">
                 <span class="material-symbols-rounded">person</span>Sign Up
+
+            </button>
+            <button class="secondary-btn logout-pill" onclick="window.open('about.html', '_blank')">
+                <span class="material-symbols-rounded">info</span>
+
+            </button>
+            <button class="secondary-btn logout-pill" onclick="window.open('privacyPolicy.html', '_blank')">
+                <span class="material-symbols-rounded">shield</span>
 
             </button>
     </header>
@@ -201,7 +209,8 @@
             </div>
             <button class="btn" onclick="attemptLogin()">Login</button>
             <hr>
-            <button class="secondary-btn" onclick="window.open('signUp.html', '_blank')">Don't have an account or invite?</button>
+            <button class="secondary-btn" onclick="window.open('signUp.html', '_blank')">Don't have an account or
+                invite?</button>
         </div>
 
 
