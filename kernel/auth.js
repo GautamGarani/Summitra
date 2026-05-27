@@ -239,8 +239,8 @@ async function attemptSignUp(event) {
         console.error("Cloud Sync Failure:", dbError.message);
 
         showSystemModal(
-            "Username Taken",
-            `Registration failed: Choose another username`,
+            "Username Taken or email already registered",
+            `Registration failed: Choose another username, or register through another email`,
             "error"
         );
     }
