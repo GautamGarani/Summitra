@@ -1,6 +1,6 @@
 /* =========================================
-   SUMMITRA UNIFIED MASTER STYLESHEET
-   Version: 2026.04.26 (Enhanced Viewport)
+   SUMMITRA MASTER STYLESHEET
+   Version: 2026.04.26 
 ========================================= */
 
 :root {
@@ -70,8 +70,7 @@
 }
 
 
-
-/* ---------- ANALYTICS INSIGHT REFINEMENTS ---------- */
+/* ---------- ANALYTICS INSIGHTS ---------- */
 
 .insight-grid {
     margin-top: 16px;
@@ -80,7 +79,6 @@
 
 .insight-card {
     padding: 32px !important;
-    /* Slightly more compact than dashboard cards */
     border: 1px solid var(--blue-accent);
     transition: transform 0.3s ease;
 }
@@ -1507,34 +1505,38 @@ header {
 
 /* ---------- PURGE BUTTON OVERRIDE ---------- */
 
-/* Targeting the specific purge button ID */
-#stop-session-purge-btn, 
+
+#stop-session-purge-btn,
 #confirm-exit-purge-btn {
-    background: #FFF1F2; /* Very light red background */
-    border: 2px dashed var(--danger); /* Dashed border to imply 'destructive' */
+    background: #FFF1F2;
+    /* Very light red background */
+    border: 2px dashed var(--danger);
+    /* Dashed border to imply 'destructive' */
     color: var(--danger);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: none; /* Flatter look to distinguish from primary actions */
+    box-shadow: none;
+    /* Flatter look to distinguish from primary actions */
 }
 
 #stop-session-purge-btn:hover,
 #confirm-exit-purge-btn:hover {
     background: var(--danger);
     color: #FFFFFF;
-    border-style: solid; /* Becomes solid on hover for confidence */
+    border-style: solid;
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(211, 47, 47, 0.2);
 }
 
-/* Ensure the material icon inside stays aligned */
+
 #stop-session-purge-btn .material-symbols-rounded {
     font-size: 20px;
 }
 
-/* SYSTEM STATUS BOX STYLES */
+
 .system-status-card {
     background: linear-gradient(145deg, #ffffff, #f1f5f9);
-    border-top: 4px solid var(--blue-primary); /* Visual "Active" strip */
+    border-top: 4px solid var(--blue-primary);
+    /* Visual "Active" strip */
 }
 
 #status-indicator {
@@ -1580,7 +1582,8 @@ header {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #CBD5E1; /* Default grey */
+    background: #CBD5E1;
+    /* Default grey */
 }
 
 .active-pulse {
@@ -1590,35 +1593,45 @@ header {
 }
 
 @keyframes pulse-green {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+    }
 }
 
-/* Restored and Enhanced Manifest Container */
+
 .manifest-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin: 20px 0;
-    
-    /* --- RESTORED STYLES --- */
+
     background: var(--card-bg);
     border: 1px solid var(--border-soft);
-    border-radius: 24px;       /* Consistent with .card-segment */
-    padding: 24px;             /* Provides internal breathing room */
-    
-    /* --- SCROLLABLE LOGIC --- */
+    border-radius: 24px;
+    padding: 24px;
+
+
     max-height: 320px;
     overflow-y: auto;
-    padding-right: 12px;       /* Adjusted for scrollbar clearance */
+    padding-right: 12px;
     scrollbar-width: thin;
     scrollbar-color: var(--blue-300) transparent;
 }
 
-/* Scrollbar refinement to match --blue-primary palette */
+
 .manifest-list::-webkit-scrollbar-thumb {
-    background-color: var(--blue-300); 
+    background-color: var(--blue-300);
     border-radius: 20px;
 }
 
@@ -1636,7 +1649,8 @@ header {
 }
 
 .manifest-item .material-symbols-rounded {
-    font-size: 20px; /* Precise technical scale */
+    font-size: 20px;
+    /* Precise technical scale */
     color: var(--blue-primary);
     background: var(--blue-accent);
     padding: 8px;
@@ -1663,7 +1677,7 @@ header {
     width: 60px;
     height: 60px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1677,17 +1691,20 @@ header {
     width: 320px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    display: none; /* Hidden by default */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: none;
+    /* Hidden by default */
     flex-direction: column;
     overflow: hidden;
     z-index: 9999;
     font-family: sans-serif;
 }
 
-.modal-active { display: flex !important; }
+.modal-active {
+    display: flex !important;
+}
 
-/* --- Help Box Specific Refinements --- */
+
 #help-box {
     width: 350px;
     bottom: 100px;
@@ -1753,10 +1770,10 @@ header {
     background: white;
 }
 
-/* Apply Login Page floating logic to Textarea */
+
 #help-box .input-group textarea {
     width: 100%;
-    min-height: 120px; /* Larger area for detailed feedback */
+    min-height: 120px;
     padding: 18px 14px;
     border-radius: 14px;
     border: 1.5px solid var(--border-soft);
@@ -1765,13 +1782,14 @@ header {
     font-family: inherit;
     outline: none;
     transition: all 0.25s ease;
-    resize: none; /* Keeps the UI clean */
+    resize: none;
+    /* Keeps the UI clean */
 }
 
-/* Floating Label positioning for Textarea */
+
 #help-box .input-group label {
     position: absolute;
-    top: 24px; /* Adjusted for the taller textarea box */
+    top: 24px;
     left: 14px;
     transform: translateY(-50%);
     background: white;
@@ -1781,40 +1799,39 @@ header {
     transition: all 0.2s ease;
 }
 
-/* Float trigger for Textarea focus/content */
-#help-box .input-group textarea:focus + label,
-#help-box .input-group textarea:not(:placeholder-shown) + label {
+
+#help-box .input-group textarea:focus+label,
+#help-box .input-group textarea:not(:placeholder-shown)+label {
     top: -8px;
     font-size: 11px;
     color: var(--blue-primary);
     font-weight: 700;
 }
 
-/* Match the focus glow from the login page */
+
 #help-box .input-group textarea:focus {
     border-color: var(--blue-primary);
     box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.08);
     transform: scale(1.01);
 }
 
-/* ----------  HERO OVERRIDE ---------- */
 
 .dashboard-hero {
-    /* Using the darkest theme color for maximum contrast */
-    background: var(--blue-900) !important; 
+    background: var(--blue-900) !important;
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.5) !important;
 }
 
 .dashboard-hero h1 {
-    /* Multi-color gradient implementation */
-    background: linear-gradient(
-        to right, 
-        #4285F4 0%, /* Blue */
-        #9B72CB 30%, /* Purple */
-        #D96570 70%, /* Red/Pink */
-        #4285F4 100%
-    );
+
+    background: linear-gradient(to right,
+            #4285F4 0%,
+            /* Blue */
+            #9B72CB 30%,
+            /* Purple */
+            #D96570 70%,
+            /* Red*/
+            #4285F4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1824,10 +1841,12 @@ header {
 }
 
 @keyframes geminiShimmer {
-    to { background-position: 200% center; }
+    to {
+        background-position: 200% center;
+    }
 }
 
-/* Glassmorphism for pills to suit the dark background */
+
 .dashboard-hero .metric-pill {
     background: rgba(255, 255, 255, 0.08) !important;
     color: #FFFFFF !important;
@@ -1837,13 +1856,12 @@ header {
 }
 
 .dashboard-hero .metric-pill .material-symbols-rounded {
-    color: var(--blue-300) !important; /* Lighter blue for iconography[cite: 1] */
+    color: var(--blue-300) !important;
 }
 
 /* ---------- GLOBAL CONNECTIVITY GUARD ---------- */
 
-/* Hide main content when offline */
-body.is-offline > *:not(#offline-overlay) {
+body.is-offline>*:not(#offline-overlay) {
     display: none !important;
 }
 
@@ -1909,13 +1927,11 @@ body.is-offline > *:not(#offline-overlay) {
 
 /*ADD ONS*/
 
-/* --- ATOMIC ANIMATIONS & STYLING --- */
-
 .about-redesign {
     scroll-behavior: smooth;
 }
 
-/* Cinematic Hero Expansion */
+
 .creative-hero {
     overflow: hidden;
     position: relative;
@@ -1934,7 +1950,7 @@ body.is-offline > *:not(#offline-overlay) {
     max-width: 450px;
     border-radius: 24px;
     transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
-    box-shadow: -20px 20px 50px rgba(0,0,0,0.5);
+    box-shadow: -20px 20px 50px rgba(0, 0, 0, 0.5);
     transition: transform 0.5s ease;
 }
 
@@ -1942,9 +1958,9 @@ body.is-offline > *:not(#offline-overlay) {
     transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.05);
 }
 
-/* Feature Grid Interaction */
+
 .interactive-grid {
-    margin-top: -40px; /* Slight overlap for depth */
+    margin-top: -40px;
     position: relative;
     z-index: 10;
 }
@@ -2016,12 +2032,20 @@ body.is-offline > *:not(#offline-overlay) {
 }
 
 @keyframes ctaPulse {
-    0% { box-shadow: 0 0 0 0 rgba(0, 82, 204, 0.4); }
-    70% { box-shadow: 0 0 0 20px rgba(0, 82, 204, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(0, 82, 204, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 82, 204, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 20px rgba(0, 82, 204, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 82, 204, 0);
+    }
 }
 
-/* Tech Tag Styling */
+
 .tech-tag {
     margin-top: 15px;
     font-family: 'JetBrains Mono', monospace;
@@ -2034,10 +2058,10 @@ body.is-offline > *:not(#offline-overlay) {
 }
 
 
-/* --- KINETIC ENTRANCE ANIMATIONS --- */
+/* --- ENTRANCE ANIMATIONS --- */
 
 .entrance-container {
-    perspective: 1200px; /* Establishes the 3D space for the swirl */
+    perspective: 1200px;
 }
 
 .swirl-in {
@@ -2059,6 +2083,7 @@ body.is-offline > *:not(#offline-overlay) {
         transform: rotateX(-15deg) rotateY(20deg) scale(0.8) translateY(50px);
         filter: blur(10px);
     }
+
     100% {
         opacity: 1;
         transform: rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
@@ -2073,10 +2098,73 @@ body.is-offline > *:not(#offline-overlay) {
 }
 
 @keyframes imageFloat {
-    0%, 100% { transform: perspective(1000px) rotateY(-15deg) rotateX(5deg) translateY(0); }
-    50% { transform: perspective(1000px) rotateY(-10deg) rotateX(2deg) translateY(-15px); }
+
+    0%,
+    100% {
+        transform: perspective(1000px) rotateY(-15deg) rotateX(5deg) translateY(0);
+    }
+
+    50% {
+        transform: perspective(1000px) rotateY(-10deg) rotateX(2deg) translateY(-15px);
+    }
 }
 
 * {
     box-sizing: border-box;
+}
+
+/* --- FIELD DESCRIPTIONS & METADATA --- */
+.field-desc {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--blue-500);
+    /* Muted slate/steel blue for secondary typography */
+    margin-top: 4px;
+    padding-left: 2px;
+    display: block;
+    line-height: 1.4;
+}
+
+/* Technical validation hints (e.g., Domain appends, system counters) */
+.tech-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--blue-300);
+}
+
+/* Contextual States matching your system variables */
+.field-desc.error {
+    color: var(--danger);
+}
+
+.field-desc.success {
+    color: var(--success);
+}
+
+/* Container adjustment */
+.input-suffix-wrapper {
+    display: inline-block;
+}
+
+/* Suffix positioning constraints */
+.input-inline-suffix {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--blue-300);
+    /* Muted slate token */
+    pointer-events: none;
+    /* Prevents text-selection blocking on click click events */
+    transition: color 0.2s ease;
+}
+
+/* Enhancing visibility state when the parent field goes into focus */
+.input-suffix-wrapper input:focus~.input-inline-suffix {
+    color: var(--blue-primary);
+    /* Shifting accent to primary brand marker */
+    font-weight: 600;
 }

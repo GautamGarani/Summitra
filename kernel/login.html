@@ -25,6 +25,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
         rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
         <style>
 
@@ -173,6 +176,13 @@
                 <div class="header-subtitle">Reaching the Epitome of wellness</div>
             </div>
         </div>
+
+                <div class="header-actions">
+
+            <button class="secondary-btn logout-pill" onclick="window.open('signUp.html', '_blank')">
+                <span class="material-symbols-rounded">person</span>Sign Up
+
+            </button>
     </header>
 
     <main class="dashboard-main-pro"
@@ -181,7 +191,6 @@
 
         <div class="card feature-card" style="max-width: 420px; width: 100%;">
             <h2>Login</h2>
-            <p>If you don't have your credentials, check your mail for the beta invite.</p><br>
             <div class="input-group">
                 <input id="username" type="text" placeholder=" " required>
                 <label for="username">Username</label>
@@ -191,6 +200,8 @@
                 <label for="password">Password</label>
             </div>
             <button class="btn" onclick="attemptLogin()">Login</button>
+            <hr>
+            <button class="secondary-btn" onclick="window.open('signUp.html', '_blank')">Don't have an account or invite?</button>
         </div>
 
 

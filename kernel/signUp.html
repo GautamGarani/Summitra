@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script>
+        (function () {
+            const currentUserId = localStorage.getItem('currentUserId');
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const currentUser = localStorage.getItem('currentUser');
+
+            if (isLoggedIn == 'true' && currentUserId) {
+                window.location.href = 'dashboard.html';
+            }
+        })();
+        </script>
+    <script src="connectivity.js"></script>
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summitra | Sign Up</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+        <style>
+
+        body {
+            overflow-x: hidden;
+            background-color: var(--surface);
+        }
+
+        .entrance-container {
+            perspective: 2000px;
+            padding-bottom: 100px;
+        }
+
+        .swirl-in {
+            opacity: 0;
+            transform-origin: center center;
+            animation: entranceSwirl 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        @keyframes entranceSwirl {
+            0% {
+                opacity: 0;
+                transform: rotateX(-20deg) rotateY(15deg) scale(0.9) translateY(60px);
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        .fancy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 4rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .header-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--blue-900);
+            letter-spacing: -0.5px;
+        }
+
+        /* Hero Section */
+        .policy-hero {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 80px 4rem !important;
+        }
+
+        .hero-stock-img {
+            width: 100%;
+            border-radius: 32px;
+            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+            box-shadow: -30px 30px 60px rgba(13, 27, 42, 0.15);
+            transition: transform 0.6s ease;
+        }
+
+        .hero-stock-img:hover {
+            transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02);
+        }
+
+        .feature-grid {
+            padding: 0 4rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .zoom-hover-card {
+            display: flex;
+            flex-direction: column;
+            padding: 3rem;
+            border-radius: 32px;
+            background: white;
+            border: 1px solid var(--border-soft);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+        }
+
+        .zoom-hover-card:hover {
+            transform: scale(1.02) translateY(-10px);
+            box-shadow: 0 40px 80px rgba(13, 27, 42, 0.08);
+            border-color: var(--blue-primary);
+        }
+
+        .feature-badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            background: var(--blue-accent);
+            color: var(--blue-primary);
+        }
+
+        .feature-points {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-points div {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--blue-700);
+        }
+
+        .feature-points div::before {
+            content: "check_circle";
+            font-family: 'Material Symbols Rounded';
+            color: var(--success);
+            font-size: 20px;
+        }
+
+        .btn-container {
+            margin-top: 4rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class = "login-redesign">
+
+<div id="statusModalOverlay" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 27, 42, 0.6); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: center;">
+    <div class="card feature-card entrance-container swirl-in" style="max-width: 400px; width: 90%; text-align: center; padding: 30px; border-top: 4px solid var(--blue-primary); position: relative;">
+        
+        <div id="modalIconContainer" style="font-size: 2.5rem; margin-bottom: 15px;"></div>
+        
+        <h3 id="modalTitle" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.4rem; margin-bottom: 10px; color: var(--border-hard);">Status Update</h3>
+        <p id="modalMessage" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; color: var(--blue-500); margin-bottom: 24px; line-height: 1.5;"></p>
+        
+        <button id="modalActionButton" class="btn" style="width: 100%;">ACKNOWLEDGE</button>
+    </div>
+</div>
+
+
+    <header class="fancy-header">
+        <div class="header-content">
+            <img src="logo.jpg" class="logo-watermark" alt="Summitra Logo">
+            <div class="header-text-group">
+                <div class="header-title">Summitra</div>
+                <div class="header-subtitle">Reaching the Epitome of wellness</div>
+            </div>
+        </div>
+                        <div class="header-actions">
+
+            <button class="secondary-btn logout-pill" onclick="window.open('login.html', '_blank')">
+                <span class="material-symbols-rounded">person</span>Login
+
+            </button>
+    </header>
+
+    <main class="dashboard-main-pro" style="justify-content: center; align-items: center; min-height: calc(100vh - 72px);">
+
+    <form class="card feature-card" id="signUpForm" style="max-width: 420px; width: 100%;" onsubmit="attemptSignUp(event)">
+        <h2>Sign Up</h2>
+        
+<div class="input-group">
+    <div class="input-suffix-wrapper" style="position: relative; width: 100%;">
+        <input id="usernameSignUp" type="text" placeholder=" " required pattern="^[a-zA-Z.]{3,15}$" style="padding-right: 95px; width: 100%;">
+        <label for="usernameSignUp">Set a Username</label>
+        <span class="input-inline-suffix">@summitra</span>
+    </div>
+    <span class="field-desc">Accepts letters and '.' characters exclusively.</span>
+</div>
+        
+        <div class="input-group">
+            <div class="input-suffix-wrapper" style="position: relative; width: 100%;"></div>
+            <input id="displayNameSignUp" type="text" placeholder=" " required>
+            <label for="displayNameSignUp">Set a Display Name</label>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <input id="userEmailSignUp" type="email" placeholder=" " required>
+            <label for="userEmailSignUp"> Enter your e-mail for us to contact you. </label>
+        </div>
+        
+<div class="input-group">
+    <input id="passwordSignUp" type="password" placeholder=" " required minlength="4" maxlength="4">
+    <label for="passwordSignUp">Enter a 4-character password</label>
+</div>
+
+<div class="input-group">
+    <input id="passwordConfirmSignUp" type="password" placeholder=" " required minlength="4" maxlength="4">
+    <label for="passwordConfirmSignUp">Confirm your password</label>
+</div>
+        
+        <div class="input-group">
+            <input id="ageSignUp" type="number" placeholder=" " required min="1" max="120">
+            <label for="ageSignUp">Age</label>
+        </div>
+        
+        <div class="input-group">
+            <input id="analyticsPreferenceSignUp" type="text" placeholder=" " required>
+            <label for="analyticsPreferenceSignUp">Your analytics Preference</label>
+        </div>
+        
+        <button type="submit" class="btn">SUBMIT</button>
+    </form>
+
+</main>
+    <script src="auth.js"></script>
+</body>
+
+</html>

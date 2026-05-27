@@ -59,7 +59,7 @@ async function syncProfileData() {
             .single();
 
         if (data && !error) {
-            
+
             const fieldMap = {
                 'prof-display-name': data.display_name,
                 'prof-display-email': data.email,
@@ -73,7 +73,7 @@ async function syncProfileData() {
                 const el = document.getElementById(id);
                 if (el) el.textContent = value;
             }
-            
+
             // Sync header and cache immediately
             const headerDisplay = document.getElementById('display-user');
             if (headerDisplay) headerDisplay.textContent = data.display_name;
@@ -89,9 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const userEmail = localStorage.getItem('currentUser') || 'Guest';
     const displayName = localStorage.getItem('currentDisplayName') || userEmail.split('@')[0];
-    const displayUser = document.getElementById('display-user'); 
-    const userDetail = document.getElementById('user-detail');   
-    
+    const displayUser = document.getElementById('display-user');
+    const userDetail = document.getElementById('user-detail');
+
     if (displayUser) displayUser.textContent = displayName;
     if (userDetail) userDetail.textContent = userEmail;
 
@@ -106,3 +106,142 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncProfileData();
 });
+
+
+async function getLastId() {
+    try {
+        console.log("Attempting to validate ID");
+        const { data, error } = await _supabase
+            .from('profiles')
+            .select('id')
+            .order('id', { ascending: false })
+            .limit(1);
+
+        if (error || !data || data.length === 0) {
+            console.log("No existing records found or error reading database. Defaulting max ID to 0.");
+            return 0;
+        }
+
+        console.log(`The maximum id is: ${data[0].id}`);
+        return data[0].id;
+    } catch (dbError) {
+        console.error("Cloud error during ID evaluation:", dbError.message);
+        return 0;
+    }
+}
+
+
+function showSystemModal(title, message, mode, callback = null) {
+    const overlay = document.getElementById("statusModalOverlay");
+    const titleEl = document.getElementById("modalTitle");
+    const msgEl = document.getElementById("modalMessage");
+    const iconEl = document.getElementById("modalIconContainer");
+    const actionBtn = document.getElementById("modalActionButton");
+    const modalContent = overlay ? overlay.querySelector('.card') : null;
+
+    if (!overlay || !titleEl || !msgEl || !iconEl || !actionBtn) {
+        alert(`${title}: ${message}`);
+        if (callback) callback();
+        return;
+    }
+
+    if (mode === "success") {
+        modalContent.style.borderTopColor = "var(--success)";
+        iconEl.textContent = "✓";
+        iconEl.style.color = "var(--success)";
+    } else {
+        modalContent.style.borderTopColor = "var(--danger)";
+        iconEl.textContent = "✕";
+        iconEl.style.color = "var(--danger)";
+    }
+
+    titleEl.textContent = title;
+    msgEl.textContent = message;
+
+    overlay.style.display = "flex";
+
+    actionBtn.onclick = function () {
+        overlay.style.display = "none";
+        if (callback && typeof callback === "function") {
+            callback();
+        }
+    };
+}
+
+
+async function attemptSignUp(event) {
+    if (event) event.preventDefault();
+
+    // DOM Value Extractions
+    const emailField = document.getElementById("userEmailSignUp").value;
+    const username = document.getElementById("usernameSignUp").value + "@summitra";
+    const password = document.getElementById("passwordSignUp").value;
+    const passwordConfirm = document.getElementById("passwordConfirmSignUp").value;
+    const displayName = document.getElementById("displayNameSignUp").value;
+    const age = parseInt(document.getElementById("ageSignUp").value, 10) || 0;
+    const analyticsPreference = document.getElementById("analyticsPreferenceSignUp").value;
+
+    const confirmDesc = document.getElementById("confirmPasswordDesc");
+
+    if (password !== passwordConfirm) {
+        console.warn("Authentication Intercepted: Password string disparity discovered.");
+
+        if (confirmDesc) {
+            confirmDesc.textContent = "CRITICAL ERROR: Passwords do not match.";
+            confirmDesc.style.color = "var(--danger)";
+        }
+
+        showSystemModal(
+            "Password Mismatch",
+            "The passwords entered do not match. Please verify your credentials.",
+            "error"
+        );
+        return;
+    } else {
+        if (confirmDesc) {
+            confirmDesc.textContent = "Passwords match successfully.";
+            confirmDesc.style.color = "var(--success)";
+        }
+    }
+
+    try {
+        const maxId = await getLastId();
+        console.log("Attempting to connect to Supabase profiles");
+        console.log(`Received the maximum id: ${maxId}`);
+
+        const { error } = await _supabase
+            .from('profiles')
+            .insert([{
+                id: maxId + 1,
+                email: emailField,
+                username: username,
+                password: password,
+                display_name: displayName,
+                created_at: new Date().toISOString(),
+                age: age,
+                analytics_preference: analyticsPreference,
+            }]);
+
+        if (error) throw error;
+
+        console.log("Cloud log successful; user structural row provisioned.");
+
+        showSystemModal(
+            "Account Created!",
+            "Your profile setup is complete. Click 'acknowledge' to enter Summitra!.",
+            "success",
+            () => {
+                window.location.href = "login.html";
+            }
+        );
+
+    } catch (dbError) {
+        console.error("Cloud Sync Failure:", dbError.message);
+
+        showSystemModal(
+            "Username Taken",
+            `Registration failed: Choose another username`,
+            "error"
+        );
+    }
+}
