@@ -70,7 +70,7 @@ function populateFixes() {
             <span class="manifest-label">${fix}</span>
         `;
         item.onclick = () => {
-            document.getElementById('help-msg').value = `Technical Issue: ${fix}`;
+            
             document.getElementById('help-msg').focus();
         };
         list.appendChild(item);
