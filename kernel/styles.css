@@ -2307,7 +2307,7 @@ body.is-offline>*:not(#offline-overlay) {
     border: 3.5px solid var(--blue-accent);
     border-radius: 50%;
     border-top-color: var(--blue-primary);
-    animation: spinRotate 0.2s linear infinite, colorChangeTheme 2s ease-in-out infinite;
+    animation: spinRotate 0.2s linear infinite, colorChangeTheme 4s ease-in-out infinite;
 }
 
 .loader-text-pulse {
@@ -2320,27 +2320,31 @@ body.is-offline>*:not(#offline-overlay) {
     animation: textPulse 1.5s ease-in-out infinite;
 }
 
-/* Spin Acceleration */
+
 @keyframes spinRotate {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-/* Chromatic Theme Morphing */
+
 @keyframes colorChangeTheme {
     0%, 100% {
         border-top-color: var(--blue-primary);
     }
-    33% {
-        border-top-color: #16A34A; /* var(--success) */
+    23% {
+        border-top-color: #16A34A; 
     }
-    66% {
+    46% {
         border-top-color: var(--blue-900);
+    }
+    78%{
+        border-top-color: var(--danger);
     }
 }
 
-/* Text Opacity Pulse */
 @keyframes textPulse {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
 }
+
+

@@ -485,7 +485,6 @@
         function getSessionPct(session) {
             if (!session) return 0;
 
-            // Prefer precomputed compliance if valid
             if (
                 session.compliance !== undefined &&
                 session.compliance !== null &&
@@ -502,7 +501,7 @@
                 ? session.bad_frames
                 : (session.badFrames || 0);
 
-            // Only evaluated frames count
+
             const validFrames = good + bad;
 
             if (validFrames <= 0) {
@@ -511,7 +510,6 @@
 
             const score = (good / validFrames) * 100;
 
-            // Hard clamp
             return Math.min(100, Math.max(0, Number(score.toFixed(2))));
         }
         function formatDuration(seconds) {
@@ -578,7 +576,6 @@
         });
     </script>
     <div id="summitra-help-root"></div>
-
     <script src="help-system.js" defer></script>
     <script src="auth.js"></script>
 </body>
