@@ -904,7 +904,7 @@ async function refreshAIAnalysis() {
 
     try {
 
-        const userId =
+        const currentUser =
             localStorage.getItem("currentUser");
 
         const response =
@@ -919,7 +919,7 @@ async function refreshAIAnalysis() {
                     },
 
                     body: JSON.stringify({
-                        userId: userId
+                        userId: currentUser
                     })
                 }
             );
