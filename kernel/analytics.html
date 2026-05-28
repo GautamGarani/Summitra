@@ -905,7 +905,7 @@ async function refreshAIAnalysis() {
     try {
 
         const userId =
-            localStorage.getItem("userId");
+            localStorage.getItem("currentUser");
 
         const response =
             await fetch(
