@@ -2307,7 +2307,7 @@ body.is-offline>*:not(#offline-overlay) {
     border: 3.5px solid var(--blue-accent);
     border-radius: 50%;
     border-top-color: var(--blue-primary);
-    animation: spinRotate 0.2s linear infinite, colorChangeTheme 6s ease-in-out infinite;
+    animation: spinRotate 0.2s linear infinite, colorChangeTheme 2s ease-in-out infinite;
 }
 
 .loader-text-pulse {
