@@ -2596,3 +2596,206 @@ body.is-offline>*:not(#offline-overlay) {
         padding: 20px;
     }
 }
+
+/* ====================================================== */
+/* ADVANCED AI ENGINE THEME - PROFESSIONAL LIGHT OVERRIDES */
+/* ====================================================== */
+
+/* Outer structural safety wrapper matching layout criteria */
+.ai-full-width-wrapper {
+    width: 100%;
+    max-width: 1440px; 
+    margin: 32px auto;
+    padding: 0;
+    display: block;
+    box-sizing: border-box;
+}
+
+/* Professional Clean Dashboard Workspace Panel */
+.ai-engine-panel {
+    width: 100%;
+    padding: 36px;
+    border-radius: 32px;
+    position: relative;
+    background: var(--card-bg) !important; /* Reverted dark canvas to soft background */
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 20px 40px -12px rgba(0, 82, 204, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* Subtle diagnostic elevation on container hover */
+.ai-engine-panel:hover {
+    border-color: var(--blue-300);
+    box-shadow: 0 30px 60px -12px rgba(0, 82, 204, 0.09);
+}
+
+/* Flexbox Workspace Header Integration */
+.ai-engine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.ai-engine-title-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Identity Title Text Adjustments */
+.ai-engine-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--blue-900) !important; /* Bold high-contrast light text profiling */
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.ai-engine-subtitle {
+    margin-top: 2px;
+    font-size: 0.85rem;
+    color: var(--blue-500) !important;
+    font-weight: 600;
+}
+
+/* Micro-Action Refresh Button Override */
+.ai-refresh-btn {
+    width: auto;
+    padding: 12px 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: inherit;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-soft) !important;
+    color: var(--blue-700) !important;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-refresh-btn:hover {
+    background: var(--blue-accent) !important;
+    color: var(--blue-primary) !important;
+    border-color: var(--blue-primary) !important;
+}
+
+/* Clean Workspace Output Canvas Area */
+.ai-engine-output {
+    width: 100%;
+    min-height: 180px;
+    padding: 28px 32px;
+    border-radius: 20px;
+    background: var(--surface) !important; /* Replaced glowing borders with solid light ink surfaces */
+    border: 1px solid var(--border-soft) !important;
+    color: var(--blue-900) !important;
+    line-height: 1.75;
+    font-size: 0.98rem;
+    box-sizing: border-box;
+}
+
+/* Markdown Rendering Structural Adjustments */
+.ai-engine-output strong {
+    color: var(--blue-primary) !important;
+    font-weight: 700;
+}
+
+.ai-engine-output p {
+    margin: 0 0 16px 0;
+}
+
+.ai-engine-output p:last-child {
+    margin-bottom: 0;
+}
+
+.ai-engine-output ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 12px 0;
+}
+
+.ai-engine-output li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: var(--blue-700);
+}
+
+/* Clean vector chevrons replacing manual indicators */
+.ai-engine-output li::before {
+    content: "chevron_right";
+    font-family: 'Material Symbols Rounded';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: var(--blue-primary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Clean Loader Workspace Refinements */
+.ai-engine-panel .themed-loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 140px;
+}
+
+.ai-engine-panel .themed-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--blue-accent) !important;
+    border-radius: 50%;
+    border-top-color: var(--blue-primary) !important;
+    animation: spinRotate 0.8s linear infinite;
+}
+
+.ai-engine-panel .loader-text-pulse {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--blue-500) !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+@keyframes spinRotate {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Adaptive Layout Viewports */
+@media (max-width: 768px) {
+    .ai-engine-panel {
+        padding: 24px;
+        border-radius: 24px;
+        gap: 20px;
+    }
+    
+    .ai-engine-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .ai-refresh-btn {
+        width: 100% !important;
+        justify-content: center;
+    }
+    
+    .ai-engine-output {
+        padding: 20px;
+        font-size: 0.92rem;
+    }
+}
