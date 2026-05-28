@@ -224,7 +224,7 @@ async function attemptSignUp(event) {
 
         if (error) throw error;
 
-        console.log("Cloud log successful; user structural row provisioned.");
+        console.log("Cloud log successful; user row provisioned.");
 
         showSystemModal(
             "Account Created!",

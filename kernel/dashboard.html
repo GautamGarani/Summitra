@@ -39,7 +39,7 @@
         rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <style>
-            body {
+        body {
             overflow-x: hidden;
             background-color: var(--surface);
         }
@@ -61,6 +61,7 @@
                 transform: rotateX(-20deg) rotateY(15deg) scale(0.9) translateY(60px);
                 filter: blur(10px);
             }
+
             100% {
                 opacity: 1;
                 transform: rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
@@ -174,136 +175,136 @@
 
 
 
-@media (max-width: 768px) {
+        @media (max-width: 768px) {
 
 
-    body {
-        font-size: 14px;
-    }
+            body {
+                font-size: 14px;
+            }
 
 
-    .fancy-header {
-        padding: 1rem 1.2rem;
-        flex-direction: row;
-        gap: 0.5rem;
-    }
+            .fancy-header {
+                padding: 1rem 1.2rem;
+                flex-direction: row;
+                gap: 0.5rem;
+            }
 
-    .header-title {
-        font-size: 1.1rem;
-    }
+            .header-title {
+                font-size: 1.1rem;
+            }
 
-    .header-subtitle {
-        display: none;
-    }
-
-
-    .profile-trigger span:nth-child(2) {
-        display: none;
-    }
-
-    /* Hero Section */
-    .dashboard-hero {
-        padding: 40px 1.2rem !important;
-        text-align: left;
-    }
-
-    .gemini-greet {
-        font-size: 1.8rem;
-    }
-
-    .hero-pills {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .metric-pill {
-        font-size: 0.75rem;
-        padding: 0.4rem 0.8rem;
-    }
+            .header-subtitle {
+                display: none;
+            }
 
 
-    .feature-grid {
-        grid-template-columns: 1fr;
-        padding: 0 1rem; 
-        width: 100%;
-        box-sizing: border-box;
-    }
+            .profile-trigger span:nth-child(2) {
+                display: none;
+            }
+
+            /* Hero Section */
+            .dashboard-hero {
+                padding: 40px 1.2rem !important;
+                text-align: left;
+            }
+
+            .gemini-greet {
+                font-size: 1.8rem;
+            }
+
+            .hero-pills {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .metric-pill {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.8rem;
+            }
 
 
-    .card,
-    .feature-card,
-    .zoom-hover-card {
-        width: 100%;
-        box-sizing: border-box; 
-        padding: 1.5rem !important;
-        margin: 0 0 1rem 0; 
-        border-radius: 20px;
-        overflow: hidden; 
-    }
-
-    .feature-badge {
-        width: 52px;
-        height: 52px;
-        margin-bottom: 1rem;
-    }
-
-    .entrance-container {
-        overflow-x: hidden;
-        width: 100%;
-    }
-
-    .feature-card h2 {
-        font-size: 1.2rem;
-    }
-
-    .feature-card p {
-        font-size: 0.9rem;
-    }
+            .feature-grid {
+                grid-template-columns: 1fr;
+                padding: 0 1rem;
+                width: 100%;
+                box-sizing: border-box;
+            }
 
 
-    .btn {
-        width: 100%;
-        justify-content: center;
-    }
+            .card,
+            .feature-card,
+            .zoom-hover-card {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 1.5rem !important;
+                margin: 0 0 1rem 0;
+                border-radius: 20px;
+                overflow: hidden;
+            }
 
-    /* TABLE FIX (CRITICAL) */
-    .manifest-table-container {
-        overflow-x: auto;
-    }
+            .feature-badge {
+                width: 52px;
+                height: 52px;
+                margin-bottom: 1rem;
+            }
 
-    .manifest-light-table {
-        min-width: 600px; 
-        font-size: 0.8rem;
-    }
+            .entrance-container {
+                overflow-x: hidden;
+                width: 100%;
+            }
+
+            .feature-card h2 {
+                font-size: 1.2rem;
+            }
+
+            .feature-card p {
+                font-size: 0.9rem;
+            }
 
 
-    .btn-container {
-        margin-top: 2rem;
-    }
-}
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* TABLE FIX (CRITICAL) */
+            .manifest-table-container {
+                overflow-x: auto;
+            }
+
+            .manifest-light-table {
+                min-width: 600px;
+                font-size: 0.8rem;
+            }
 
 
-/* Extra small devices */
-@media (max-width: 480px) {
+            .btn-container {
+                margin-top: 2rem;
+            }
+        }
 
-    .gemini-greet {
-        font-size: 1.5rem;
-    }
 
-    .metric-pill {
-        font-size: 0.7rem;
-    }
+        /* Extra small devices */
+        @media (max-width: 480px) {
 
-    .feature-card h2 {
-        font-size: 1.05rem;
-    }
-}
+            .gemini-greet {
+                font-size: 1.5rem;
+            }
+
+            .metric-pill {
+                font-size: 0.7rem;
+            }
+
+            .feature-card h2 {
+                font-size: 1.05rem;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <header class = "fancy-header">
+    <header class="fancy-header">
         <div class="header-content">
             <img src="logo.jpg" class="logo-watermark" alt="Summitra">
             <div class="header-text-group">
@@ -481,40 +482,79 @@
     </main>
 
     <script>
+        function getSessionPct(session) {
+            if (!session) return 0;
+
+            // Prefer precomputed compliance if valid
+            if (
+                session.compliance !== undefined &&
+                session.compliance !== null &&
+                isFinite(session.compliance)
+            ) {
+                return Math.min(100, Math.max(0, session.compliance));
+            }
+
+            const good = session.good_frames !== undefined
+                ? session.good_frames
+                : (session.goodFrames || 0);
+
+            const bad = session.bad_frames !== undefined
+                ? session.bad_frames
+                : (session.badFrames || 0);
+
+            // Only evaluated frames count
+            const validFrames = good + bad;
+
+            if (validFrames <= 0) {
+                return 0;
+            }
+
+            const score = (good / validFrames) * 100;
+
+            // Hard clamp
+            return Math.min(100, Math.max(0, Number(score.toFixed(2))));
+        }
+        function formatDuration(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hrs > 0 ? hrs + 'h ' : ''}${mins}m ${secs}s`;
+        }
+
         function renderLedger() {
-            const allSessions = JSON.parse(localStorage.getItem("sessions")) || [];
             const currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) return;
+
+            const allSessions = JSON.parse(localStorage.getItem("sessions")) || [];
+            const userSessions = allSessions.filter(session => session.owner === currentUser);
+
             const tbody = document.getElementById("ledger-body");
-            const currentName = localStorage.getItem("currentDisplayName");
-
-            const userSessions = allSessions.filter(s => s.owner === currentUser);
-
+            if (!tbody) return;
             tbody.innerHTML = "";
 
             if (userSessions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;">No private data available for you, ${currentName}.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--blue-secondary);">No sessions recorded yet.</td></tr>`;
                 return;
             }
 
             userSessions.slice().reverse().forEach((session, index) => {
-                const compliance = ((session.goodFrames / (session.totalFrames - 110)) * 100).toFixed(1);
-                const mins = Math.floor(session.durationSeconds / 60);
-                const secs = session.durationSeconds % 60;
-                const timeStr = `${mins}m ${secs}s`;
+                const durationSec = session.durationSeconds || session.duration || 0;
+                const timeStr = formatDuration(durationSec);
+
+                const compliance = getSessionPct(session).toFixed(1);
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
             <td>#${userSessions.length - index}</td>
-            <td>${timeStr}</td> <!-- Calculated Duration -->
-            <td>${session.lateralAlerts}</td>
-            <td>${session.forwardAlerts}</td>
-            <td>${session.slouchAlerts}</td>
+            <td>${timeStr}</td> 
+            <td>${session.lateralAlerts !== undefined ? session.lateralAlerts : (session.lateral_alerts || 0)}</td>
+            <td>${session.forwardAlerts !== undefined ? session.forwardAlerts : (session.forward_alerts || 0)}</td>
+            <td>${session.slouchAlerts !== undefined ? session.slouchAlerts : (session.slouch_alerts || 0)}</td>
             <td style="font-weight: 800; color: var(--blue-primary)">${compliance}%</td>
         `;
                 tbody.appendChild(row);
             });
         }
-
 
         function clearHistory() {
             if (confirm("Are you sure you want to permanently delete all session data from this browser?")) {
@@ -524,12 +564,10 @@
         }
 
         function updateWelcomeMessage() {
-            // Retrieve the display name from localStorage
             const currentName = localStorage.getItem("currentDisplayName");
             const nameElement = document.getElementById("welcome-name");
 
             if (currentName && nameElement) {
-                // Update the span with the user's display name
                 nameElement.textContent = currentName;
             }
         }

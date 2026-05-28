@@ -292,6 +292,25 @@ cancelExitBtn.addEventListener('click', () => {
 //-------------------------------------
 
 
+function getSessionPct(session) {
+    if (!session) return 0;
+
+    const good = session.goodFrames || 0;
+    const bad = session.badFrames || 0;
+
+    // Only count evaluated frames
+    const validFrames = good + bad;
+
+    if (validFrames <= 0) {
+        return 0;
+    }
+
+    const score = (good / validFrames) * 100;
+
+    return Math.min(100, Math.max(0, Number(score.toFixed(2))));
+}
+
+
 confirmExitBtn.addEventListener('click', async () => {
     running = false;
 
@@ -305,9 +324,43 @@ confirmExitBtn.addEventListener('click', async () => {
         video.srcObject.getTracks().forEach(t => t.stop());
     }
 
-    // ATTEMPT THE CLOUD LOG
+
+    const complianceScore = getSessionPct(sessionData);
+
+
+    const sumBad = sessionData.badFrames || 0;
+    const debtMinutes = Math.ceil((sumBad * 0.181) / 60);
+
+
+    let totalRecoveryTime = 0;
+    let recoveryCount = 0;
+    const logsRes = sessionData.logs || [];
+
+    for (let i = 0; i < logsRes.length; i++) {
+        if (logsRes[i].status === "ALERT") {
+            const alertTime = new Date(logsRes[i].timestamp);
+
+            for (let j = i + 1; j < logsRes.length; j++) {
+                if (logsRes[j].status === "GOOD") {
+                    const recoverTime = new Date(logsRes[j].timestamp);
+                    const delta = (recoverTime - alertTime) / 1000;
+
+                    if (delta > 0 && delta < 600) {
+                        totalRecoveryTime += delta;
+                        recoveryCount++;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    const resilienceScore = recoveryCount > 0 ? parseFloat((totalRecoveryTime / recoveryCount).toFixed(1)) : null;
+    const baseDebtScore = Math.max(0, 100 - (debtMinutes * 3.3));
+    const calculatedProprioScore = parseFloat((0.6 * complianceScore + 0.4 * baseDebtScore).toFixed(1));
+
+    // ATTEMPT CLOUD STORAGE 
     try {
-        console.log("Syncing to cloud...");
+        console.log("Syncing comprehensive session telemetry to cloud...");
         const { error } = await _supabase
             .from('sessions')
             .insert([{
@@ -322,22 +375,30 @@ confirmExitBtn.addEventListener('click', async () => {
                 total_frames: sessionData.totalFrames,
                 multiple_alerts: sessionData.multipleAlerts,
                 session_end: sessionData.sessionEnd,
-                browser_data: `${sessionData.environment.browser.name}-${sessionData.environment.browser.version}`
+                browser_data: `${sessionData.environment.browser.name}-${sessionData.environment.browser.version}`,
+                compliance: complianceScore,
+                ergonomic_debt: debtMinutes,
+                resilience: resilienceScore,
+                proprio_score: calculatedProprioScore
             }]);
 
         if (error) throw error;
-        console.log("Cloud log successful.");
+        console.log("Cloud normalization sync successful.");
 
     } catch (dbError) {
-        console.error("Cloud Sync Failed:", dbError.message);
+        console.error("Cloud Sync Failure, payload preserved locally:", dbError.message);
     }
+
+    sessionData.compliance = complianceScore;
+    sessionData.ergonomicDebt = debtMinutes;
+    sessionData.resilience = resilienceScore;
+    sessionData.proprioScore = calculatedProprioScore; 
 
     let sessions = JSON.parse(localStorage.getItem('sessions')) || [];
     sessions.push(sessionData);
     if (sessions.length > 20) sessions = sessions.slice(-20);
     localStorage.setItem('sessions', JSON.stringify(sessions));
     window.location.href = 'analytics.html';
-    console.log("Redirecting to analytics.html...");
 });
 
 confirmExitPurgeBtn.addEventListener('click', () => {
