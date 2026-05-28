@@ -2348,3 +2348,251 @@ body.is-offline>*:not(#offline-overlay) {
 }
 
 
+
+
+
+
+/* ====================================================== */
+/* ADVANCED AI ENGINE THEME & ANIMATIONS (ONLY UI CHANGES)*/
+/* ====================================================== */
+
+/* Container wrapper to isolate, center, and provide optimal width */
+.ai-full-width-wrapper {
+    width: 100%;
+    max-width: 1200px; /* Constrains width for high readability */
+    margin: 40px auto; /* Centers the container block and isolates it below the grid systems */
+    padding: 0 16px;
+    display: block;
+    box-sizing: border-box;
+}
+
+/* Premium AI Panel with Ambient Cyber-Mesh Glow */
+.ai-engine-panel {
+    width: 100%;
+    min-height: auto;
+    padding: 40px;
+    border-radius: 28px;
+    position: relative;
+    background: linear-gradient(160deg, #090d16 0%, #111827 100%);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    box-shadow: 
+        0 25px 70px rgba(2, 6, 23, 0.7),
+        0 0 40px rgba(37, 99, 235, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    overflow: hidden;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.ai-engine-panel:hover {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 
+        0 30px 80px rgba(2, 6, 23, 0.8),
+        0 0 50px rgba(99, 102, 241, 0.25);
+}
+
+/* Background Neural Aura Particle Effect (Pseudo-element) */
+.ai-engine-panel::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 70%);
+    filter: blur(40px);
+    z-index: 1;
+    pointer-events: none;
+    animation: pulseAura 8s infinite alternate ease-in-out;
+}
+
+/* Header Adjustments for Deep Space Aesthetic */
+.ai-engine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    z-index: 2;
+}
+
+/* Dynamic Neural Core Icon Upgrade */
+.ai-engine-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+    color: #ffffff;
+    box-shadow: 
+        0 0 20px rgba(79, 70, 229, 0.4),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    position: relative;
+}
+
+.ai-engine-icon::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 21px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    z-index: -1;
+    opacity: 0.6;
+    filter: blur(6px);
+    animation: coreGlow 3s infinite alternate ease-in-out;
+}
+
+.ai-engine-icon .material-symbols-rounded {
+    font-size: 34px;
+    animation: floatIcon 4s infinite ease-in-out;
+}
+
+/* Typography Refinements */
+.ai-engine-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #f8fafc;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.ai-engine-subtitle {
+    margin-top: 4px;
+    font-size: 0.92rem;
+    color: #94a3b8;
+    opacity: 1;
+    font-weight: 500;
+}
+
+/* Refresh Action Button Styling Extension */
+.ai-refresh-btn {
+    width: auto !important;
+    padding: 12px 24px !important;
+    font-size: 0.88rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ai-refresh-btn:hover {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* AI Monospace/Sleek Output Box Terminal Theme */
+.ai-engine-output {
+    width: 100%;
+    min-height: 280px;
+    padding: 28px 32px;
+    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    color: #cbd5e1;
+    line-height: 1.8;
+    font-size: 0.98rem;
+    z-index: 2;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Advanced Markdown Rendering Inside Terminal Output */
+.ai-engine-output strong {
+    color: #60a5fa; /* Electric cyan-blue highlights instead of standard dark-blue */
+    font-weight: 600;
+    text-shadow: 0 0 8px rgba(96, 165, 250, 0.2);
+}
+
+.ai-engine-output ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.ai-engine-output li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 16px;
+    font-size: 0.96rem;
+}
+
+.ai-engine-output li::before {
+    content: "➔";
+    position: absolute;
+    left: 0;
+    color: #818cf8;
+    font-size: 0.85rem;
+}
+
+/* High-Tech Pulse Loader Overrides */
+.themed-loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    min-height: 180px;
+}
+
+.themed-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(99, 102, 241, 0.1);
+    border-radius: 50%;
+    border-top-color: #6366f1;
+    border-right-color: #2563eb;
+    animation: spinCore 1s infinite linear;
+}
+
+.loader-text-pulse {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: #64748b;
+    letter-spacing: 0.05em;
+    animation: textPulse 1.8s infinite ease-in-out;
+}
+
+/* ====================================================== */
+/* MICRO-INTERACTION KEYFRAMES FOR THE AI ENGINE          */
+/* ====================================================== */
+@keyframes spinCore {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes textPulse {
+    0%, 100% { opacity: 0.5; color: #64748b; }
+    50% { opacity: 1; color: #60a5fa; text-shadow: 0 0 10px rgba(96, 165, 250, 0.3); }
+}
+
+@keyframes pulseAura {
+    0% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+    100% { transform: translate(-30px, 20px) scale(1.2); opacity: 0.3; }
+}
+
+@keyframes coreGlow {
+    0% { filter: blur(4px); opacity: 0.5; }
+    100% { filter: blur(10px); opacity: 0.8; }
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* Layout Adaptation Override for Mobile Devices */
+@media (max-width: 768px) {
+    .ai-full-width-wrapper {
+        margin: 20px auto;
+    }
+    .ai-engine-panel {
+        padding: 24px;
+        gap: 20px;
+    }
+    .ai-engine-output {
+        padding: 20px;
+    }
+}

@@ -34,6 +34,9 @@
         rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
         body {
             overflow-x: hidden;
@@ -486,13 +489,34 @@
                 <div class="kpi-mini">The percentage variance between your current compliance and the rolling average of
                     all previous sessions.</div>
             </div>
-            
-            <div class="card analytics-kpi">
-                <div class="kpi-icon"><span class="material-symbols-rounded">timer</span></div>
-                <div class="kpi-label">Summitra AI (Coming Up!)</div>
-                <button class = "btn">Open Summitra AI</button>
-            </div>
+
         </section>
+
+        <div class="ai-full-width-wrapper">
+            <div class="ai-engine-panel">
+                <div class="ai-engine-header">
+                    <div class="ai-engine-title-group">
+                        <div class="ai-engine-icon">
+                            <span class="material-symbols-rounded">neurology</span>
+                        </div>
+                        <div>
+                            <div class="ai-engine-title">Mitraa</div>
+                            <div class="ai-engine-subtitle">Your AI companion</div>
+                        </div>
+                    </div>
+                    <button class="btn ai-refresh-btn" onclick="refreshAIAnalysis()">
+                        Refresh Analysis
+                    </button>
+                </div>
+
+                <div id="ai-analysis-content" class="ai-engine-output">
+                    <div class="themed-loader-container">
+                        <div class="themed-spinner"></div>
+                        <span class="loader-text-pulse">Mitraa is generating diagnostics...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="charts-matrix">
             <section class="card chart-pro-card" style="position: relative;">
@@ -868,10 +892,16 @@
             });
         }
 
+
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("Initializing isolated session intelligence elements...");
+
+            console.log(
+                "Initializing..."
+            );
+
             await loadAnalytics();
         });
+
     </script>
 
     <div id="summitra-help-root"></div>
