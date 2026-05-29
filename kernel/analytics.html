@@ -512,7 +512,7 @@
                 <div id="ai-analysis-content" class="ai-engine-output">
                     <div class="themed-loader-container">
                         <div class="themed-spinner"></div>
-                        <span class="loader-text-pulse">Mitraa is generating diagnostics...</span>
+                        <span class="loader-text-pulse">Click the button to generate the diagnostics.</span>
                     </div>
                 </div>
             </div>
@@ -891,61 +891,82 @@
                 }
             });
         }
-async function refreshAIAnalysis() {
-    const output =
-        document.getElementById(
-            "ai-analysis-content"
-        );
 
-    if (!output) return;
+        async function refreshAIAnalysis() {
+            const output =
+                document.getElementById(
+                    "ai-analysis-content"
+                );
 
-    output.innerHTML =
-        "Generating analysis...";
+            if (!output) return;
 
-    try {
+            output.innerHTML =
+                "Generating analysis...";
 
-        const currentUser =
-            localStorage.getItem("currentUser");
+            try {
 
-        const response =
-            await fetch(
-                "https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service",
-                {
-                    method: "POST",
+                const currentUser =
+                    localStorage.getItem("currentUser");
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                const response =
+                    await fetch(
+                        "https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service",
+                        {
+                            method: "POST",
 
-                    body: JSON.stringify({
-                        userId: currentUser
-                    })
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                userId: currentUser
+                            })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (response.status === 403) {
+
+                    output.innerHTML = `
+                <div style="
+                    padding:20px;
+                    border-radius:16px;
+                    background:#fee2e2;
+                    color:#991b1b;
+                    font-weight:600;
+                    text-align:center;
+                ">
+                    You are not eligible to access Mitraa diagnostics.
+                </div>
+            `;
+
+                    return;
                 }
-            );
 
-        const data =
-            await response.json();
+                output.innerHTML =
+                    marked.parse(
+                        data.responseText ||
+                        "No analysis generated."
+                    );
 
-        output.innerHTML =
-            marked.parse(
-                data.responseText ||
-                "No analysis generated."
-            );
+            } catch (error) {
 
-    } catch (error) {
+                console.error(error);
 
-        console.error(error);
+                output.innerHTML =
+                    "Failed to load analysis.";
+            }
+        }
+        document.addEventListener("DOMContentLoaded", async () => {
+            console.log("Initializing...");
 
-        output.innerHTML =
-            "Failed to load analysis.";
-    }
-}
-       document.addEventListener("DOMContentLoaded", async () => {
-    console.log("Initializing...");
+            await loadAnalytics();
 
-    await loadAnalytics();
-    await refreshAIAnalysis();
+            //WE WANT ANALYTICS ONLY WHEN THE USER CLICKS THE BUTTON, ELSE NO
+            /*await refreshAIAnalysis();*/
         });
 
     </script>
