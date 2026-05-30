@@ -36,7 +36,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             overflow-x: hidden;
@@ -504,6 +504,9 @@
                             <div class="ai-engine-subtitle">Your AI companion</div>
                         </div>
                     </div>
+                    <button class="btn ai-refresh-btn" onclick="exportAnalyticsPDF()">
+                        Export PDF
+                    </button>
                     <button class="btn ai-refresh-btn" onclick="refreshAIAnalysis()">
                         Refresh Analysis
                     </button>
@@ -550,6 +553,7 @@
     </main>
 
     <script>
+        let latestAIAnalysis = "";
         const currentUser = localStorage.getItem('currentUser');
         function goBack() { window.location.href = "dashboard.html"; }
 
@@ -943,10 +947,9 @@
                 </div>
             `;
 
-            if(response.status === 500)
-            {
-                output.innerHTML = 
-                `                <div style="
+                    if (response.status === 500) {
+                        output.innerHTML =
+                            `                <div style="
                     padding:20px;
                     border-radius:16px;
                     background:#fee2e2;
@@ -956,10 +959,14 @@
                 ">
                     The model is experiencing high demand, please try again shortly.
                 </div>`;
-            }
+                    }
 
                     return;
                 }
+
+                latestAIAnalysis =
+                    data.responseText ||
+                    "No analysis generated.";
 
                 output.innerHTML =
                     marked.parse(
@@ -975,6 +982,106 @@
                     "Failed to load analysis.";
             }
         }
+
+        async function exportAnalyticsPDF() {
+
+            if (!latestAIAnalysis) {
+
+                alert(
+                    "Generate AI diagnostics first."
+                );
+
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+
+            const pdf = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
+
+            // Header Bar
+            pdf.setFillColor(0, 82, 204);
+            pdf.rect(0, 0, 210, 25, "F");
+
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(22);
+            pdf.text("Summitra Analytics", 15, 16);
+
+            pdf.setTextColor(0, 0, 0);
+
+            pdf.setFontSize(10);
+            pdf.text(
+                `Generated: ${new Date().toLocaleString()}`,
+                15,
+                35
+            );
+
+            pdf.setFontSize(14);
+            pdf.text("Performance Summary", 15, 50);
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            pdf.setFontSize(11);
+            pdf.text(
+                `User: ${localStorage.getItem('currentUser')}`,
+                15,
+                pageHeight - 10
+            );
+
+            pdf.text(
+                `Compliance: ${document.getElementById("curr-score").innerText}`,
+                15,
+                60
+            );
+
+            pdf.text(
+                `Resilience: ${document.getElementById("resilience-ratio").innerText}`,
+                15,
+                68
+            );
+
+            pdf.text(
+                `Ergonomic Debt: ${document.getElementById("ergo-debt").innerText}`,
+                15,
+                76
+            );
+
+            pdf.text(
+                `Proprioception: ${document.getElementById("proprio-score").innerText}`,
+                15,
+                84
+            );
+
+            pdf.setFontSize(14);
+            pdf.text("Mitraa's Diagnostics", 15, 100);
+
+            const cleanText =
+                latestAIAnalysis
+                    .replace(/\*\*/g, "")
+                    .replace(/#/g, "");
+
+            const wrapped =
+                pdf.splitTextToSize(
+                    cleanText,
+                    180
+                );
+
+            pdf.setFontSize(11);
+
+            pdf.text(
+                wrapped,
+                15,
+                110
+            );
+
+
+            pdf.save(
+                `Summitra_Report-${Date.now()}.pdf`
+            );
+        }
+
+
         document.addEventListener("DOMContentLoaded", async () => {
             console.log("Initializing...");
 
