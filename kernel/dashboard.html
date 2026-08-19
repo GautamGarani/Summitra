@@ -4,26 +4,10 @@
 <head>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    <script src="auth.js"></script>
     <script>
-        //AUTH GUARD GATEKEEPING
-        (function () {
-            const currentUserId = localStorage.getItem('currentUserId');
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const currentUser = localStorage.getItem('currentUser');
-
-            if (isLoggedIn !== 'true' || !currentUser) {
-                // Optional: Clean any corrupted state
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('currentUser');
-                localStorage.getItem('currentUserId');
-
-                window.location.href = 'login.html';
-            }
-        })();
-        const landingTime = new Date().toISOString;
+        requireAuth();
         console.log("Successful landed on dashboard.html");
-
     </script>
     <script src="connectivity.js"></script>
 
@@ -513,11 +497,10 @@
         }
 
         function renderLedger() {
-            const currentUser = localStorage.getItem("currentUser");
-            if (!currentUser) return;
-
             const allSessions = JSON.parse(localStorage.getItem("sessions")) || [];
-            const userSessions = allSessions.filter(session => session.owner === currentUser);
+            const userSessions = typeof filterSessionsForCurrentUser === "function"
+                ? filterSessionsForCurrentUser(allSessions)
+                : allSessions;
 
             const tbody = document.getElementById("ledger-body");
             if (!tbody) return;
@@ -563,14 +546,14 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
+            if (window.summitraAuthReady) await window.summitraAuthReady;
             renderLedger();
             updateWelcomeMessage();
         });
     </script>
     <div id="summitra-help-root"></div>
     <script src="help-system.js" defer></script>
-    <script src="auth.js"></script>
 </body>
 
 </html>

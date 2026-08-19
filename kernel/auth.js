@@ -1,65 +1,158 @@
-// --- CONFIGURATION & INITIALIZATION ---
 const supabaseUrl = 'https://gigpodszdjckhvpzmuuh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpZ3BvZHN6ZGpja2h2cHptdXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTU2NzcsImV4cCI6MjA5MzI5MTY3N30.UjO4Fyw5nq9zpZim_9UFNEpHi-oceTWsQSLHGrkH6_c';
-window._supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// --- AUTHENTICATION 
-async function attemptLogin() {
-    const userField = document.getElementById("username").value;
-    const passField = document.getElementById("password").value;
+window._supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+    }
+});
+
+const AUTH_CACHE_KEYS = [
+    'currentUser',
+    'currentUserId',
+    'isLoggedIn',
+    'currentDisplayName',
+    'currentUserAge',
+    'currentUserEmail',
+    'currentUserAnalyticsPreference'
+];
+
+window.summitraAuthReady = Promise.resolve(null);
+
+function clearAuthCache() {
+    AUTH_CACHE_KEYS.forEach((key) => localStorage.removeItem(key));
+}
+
+async function hydrateAuthCache(session) {
+    const user = session.user;
+    localStorage.setItem('currentUserId', user.id);
+    localStorage.setItem('currentUserEmail', user.email || '');
+    localStorage.setItem('isLoggedIn', 'true');
 
     const { data, error } = await _supabase
         .from('profiles')
-        .select('id, username, password, display_name, email, analytics_preference, age')
-        .eq('username', userField)
-        .eq('password', passField)
+        .select('id, username, display_name, age, analytics_preference, email')
+        .eq('id', user.id)
         .single();
 
     if (data && !error) {
-        localStorage.setItem('currentUserId', data.id);
         localStorage.setItem('currentUser', data.username);
         localStorage.setItem('currentDisplayName', data.display_name);
         localStorage.setItem('currentUserAge', data.age);
-        localStorage.setItem('currentUserEmail', data.email);
+        localStorage.setItem('currentUserEmail', data.email || user.email || '');
         localStorage.setItem('currentUserAnalyticsPreference', data.analytics_preference);
-        localStorage.setItem('isLoggedIn', 'true');
-        window.location.href = 'dashboard.html';
-    } else {
-        alert("INVALID CREDENTIALS");
+        return data;
     }
+
+    const fallbackName = user.user_metadata?.username || user.email || 'Guest';
+    localStorage.setItem('currentUser', fallbackName);
+    localStorage.setItem('currentDisplayName', user.user_metadata?.display_name || fallbackName);
+    return null;
 }
 
-function logout() {
-    //localStorage.clear(); //WE CAN CLEAN EVERYTHING ON LOGOUT, not doing it in this version
-    //We will only clear out the currentUser, currentUserId, isLoggedIn, currentDisplayName, errorLogs
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('currentUserId');
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('currentDisplayName');
+async function bootstrapSession({ require = false, redirectIfPresent = false } = {}) {
+    const { data: { session } } = await _supabase.auth.getSession();
+
+    if (redirectIfPresent && session) {
+        window.location.replace('dashboard.html');
+        return session;
+    }
+
+    if (require && !session) {
+        clearAuthCache();
+        window.location.replace('login.html');
+        return null;
+    }
+
+    if (session) {
+        await hydrateAuthCache(session);
+    } else {
+        clearAuthCache();
+    }
+
+    return session;
+}
+
+function requireAuth() {
+    window.summitraAuthReady = bootstrapSession({ require: true });
+    return window.summitraAuthReady;
+}
+
+function redirectIfAuthenticated() {
+    window.summitraAuthReady = bootstrapSession({ redirectIfPresent: true });
+    return window.summitraAuthReady;
+}
+
+function filterSessionsForCurrentUser(allSessions) {
+    const userId = localStorage.getItem('currentUserId');
+    const owner = localStorage.getItem('currentUser');
+    return (allSessions || []).filter((session) => {
+        if (userId && session.user_id === userId) return true;
+        if (owner && session.owner === owner) return true;
+        return false;
+    });
+}
+
+async function attemptLogin() {
+    const emailEl = document.getElementById('email') || document.getElementById('username');
+    const passEl = document.getElementById('password');
+    const email = (emailEl?.value || '').trim();
+    const password = passEl?.value || '';
+
+    if (!email || !password) {
+        alert('Enter your email and password.');
+        return;
+    }
+
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+    if (error || !data.session) {
+        alert(error?.message || 'INVALID CREDENTIALS');
+        return;
+    }
+
+    await hydrateAuthCache(data.session);
+    window.location.href = 'dashboard.html';
+}
+
+async function logout() {
+    await _supabase.auth.signOut();
+    clearAuthCache();
     localStorage.removeItem('errorLogs');
-    window.location.href = "login.html";
+    window.location.href = 'login.html';
 }
 
-// --- UI CONTROLLERS ---
 function toggleDropdown() {
     const menu = document.getElementById('profile-dropdown');
     if (menu) menu.classList.toggle('active');
 }
 
-// --- PAGE-SPECIFIC DATA 
+function applyHeaderFromCache() {
+    const userEmail = localStorage.getItem('currentUserEmail') || localStorage.getItem('currentUser') || 'Guest';
+    const displayName = localStorage.getItem('currentDisplayName') || (userEmail.includes('@') ? userEmail.split('@')[0] : userEmail);
+    const displayUser = document.getElementById('display-user');
+    const userDetail = document.getElementById('user-detail');
+
+    if (displayUser) displayUser.textContent = displayName;
+    if (userDetail) userDetail.textContent = userEmail;
+}
+
 async function syncProfileData() {
-    const userId = localStorage.getItem('currentUserId');
-    if (!userId || !window.location.pathname.includes('profile.html')) return;
+    if (!window.location.pathname.includes('profile.html')) return;
+
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (!session) return;
 
     try {
         const { data, error } = await _supabase
             .from('profiles')
             .select('id, username, display_name, age, analytics_preference, email')
-            .eq('id', userId)
+            .eq('id', session.user.id)
             .single();
 
         if (data && !error) {
-
             const fieldMap = {
                 'prof-display-name': data.display_name,
                 'prof-display-email': data.email,
@@ -74,27 +167,21 @@ async function syncProfileData() {
                 if (el) el.textContent = value;
             }
 
-            // Sync header and cache immediately
             const headerDisplay = document.getElementById('display-user');
             if (headerDisplay) headerDisplay.textContent = data.display_name;
             localStorage.setItem('currentDisplayName', data.display_name);
+            localStorage.setItem('currentUser', data.username);
+            localStorage.setItem('currentUserEmail', data.email || session.user.email || '');
         }
     } catch (err) {
-        console.error("Critical Sync Failure:", err.message);
+        console.error('Critical Sync Failure:', err.message);
     }
 }
 
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    const userEmail = localStorage.getItem('currentUser') || 'Guest';
-    const displayName = localStorage.getItem('currentDisplayName') || userEmail.split('@')[0];
-    const displayUser = document.getElementById('display-user');
-    const userDetail = document.getElementById('user-detail');
-
-    if (displayUser) displayUser.textContent = displayName;
-    if (userDetail) userDetail.textContent = userEmail;
-
+document.addEventListener('DOMContentLoaded', async () => {
+    await window.summitraAuthReady;
+    applyHeaderFromCache();
+    syncProfileData();
 
     window.addEventListener('click', (e) => {
         const container = document.querySelector('.profile-container');
@@ -103,40 +190,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!container.contains(e.target)) menu.classList.remove('active');
         }
     });
-
-    syncProfileData();
 });
 
-
-async function getLastId() {
-    try {
-        console.log("Attempting to validate ID");
-        const { data, error } = await _supabase
-            .from('profiles')
-            .select('id')
-            .order('id', { ascending: false })
-            .limit(1);
-
-        if (error || !data || data.length === 0) {
-            console.log("No existing records found or error reading database. Defaulting max ID to 0.");
-            return 0;
-        }
-
-        console.log(`The maximum id is: ${data[0].id}`);
-        return data[0].id;
-    } catch (dbError) {
-        console.error("Cloud error during ID evaluation:", dbError.message);
-        return 0;
-    }
-}
-
-
 function showSystemModal(title, message, mode, callback = null) {
-    const overlay = document.getElementById("statusModalOverlay");
-    const titleEl = document.getElementById("modalTitle");
-    const msgEl = document.getElementById("modalMessage");
-    const iconEl = document.getElementById("modalIconContainer");
-    const actionBtn = document.getElementById("modalActionButton");
+    const overlay = document.getElementById('statusModalOverlay');
+    const titleEl = document.getElementById('modalTitle');
+    const msgEl = document.getElementById('modalMessage');
+    const iconEl = document.getElementById('modalIconContainer');
+    const actionBtn = document.getElementById('modalActionButton');
     const modalContent = overlay ? overlay.querySelector('.card') : null;
 
     if (!overlay || !titleEl || !msgEl || !iconEl || !actionBtn) {
@@ -145,103 +206,110 @@ function showSystemModal(title, message, mode, callback = null) {
         return;
     }
 
-    if (mode === "success") {
-        modalContent.style.borderTopColor = "var(--success)";
-        iconEl.textContent = "✓";
-        iconEl.style.color = "var(--success)";
+    if (mode === 'success') {
+        modalContent.style.borderTopColor = 'var(--success)';
+        iconEl.textContent = '✓';
+        iconEl.style.color = 'var(--success)';
     } else {
-        modalContent.style.borderTopColor = "var(--danger)";
-        iconEl.textContent = "✕";
-        iconEl.style.color = "var(--danger)";
+        modalContent.style.borderTopColor = 'var(--danger)';
+        iconEl.textContent = '✕';
+        iconEl.style.color = 'var(--danger)';
     }
 
     titleEl.textContent = title;
     msgEl.textContent = message;
-
-    overlay.style.display = "flex";
+    overlay.style.display = 'flex';
 
     actionBtn.onclick = function () {
-        overlay.style.display = "none";
-        if (callback && typeof callback === "function") {
+        overlay.style.display = 'none';
+        if (callback && typeof callback === 'function') {
             callback();
         }
     };
 }
 
-
 async function attemptSignUp(event) {
     if (event) event.preventDefault();
 
-    // DOM Value Extractions
-    const emailField = document.getElementById("userEmailSignUp").value;
-    const username = document.getElementById("usernameSignUp").value + "@summitra";
-    const password = document.getElementById("passwordSignUp").value;
-    const passwordConfirm = document.getElementById("passwordConfirmSignUp").value;
-    const displayName = document.getElementById("displayNameSignUp").value;
-    const age = parseInt(document.getElementById("ageSignUp").value, 10) || 0;
-    const analyticsPreference = document.getElementById("analyticsPreferenceSignUp").value;
+    const emailField = (document.getElementById('userEmailSignUp').value || '').trim();
+    const username = document.getElementById('usernameSignUp').value + '@summitra';
+    const password = document.getElementById('passwordSignUp').value;
+    const passwordConfirm = document.getElementById('passwordConfirmSignUp').value;
+    const displayName = document.getElementById('displayNameSignUp').value;
+    const age = parseInt(document.getElementById('ageSignUp').value, 10) || 0;
+    const analyticsPreference = document.getElementById('analyticsPreferenceSignUp').value;
+    const confirmDesc = document.getElementById('confirmPasswordDesc');
 
-    const confirmDesc = document.getElementById("confirmPasswordDesc");
-
-    if (password !== passwordConfirm) {
-        console.warn("Authentication Intercepted: Password string disparity discovered.");
-
-        if (confirmDesc) {
-            confirmDesc.textContent = "CRITICAL ERROR: Passwords do not match.";
-            confirmDesc.style.color = "var(--danger)";
-        }
-
+    if (password.length < 8) {
         showSystemModal(
-            "Password Mismatch",
-            "The passwords entered do not match. Please verify your credentials.",
-            "error"
+            'Password Too Short',
+            'Use at least 8 characters.',
+            'error'
         );
         return;
-    } else {
+    }
+
+    if (password !== passwordConfirm) {
         if (confirmDesc) {
-            confirmDesc.textContent = "Passwords match successfully.";
-            confirmDesc.style.color = "var(--success)";
+            confirmDesc.textContent = 'CRITICAL ERROR: Passwords do not match.';
+            confirmDesc.style.color = 'var(--danger)';
         }
+        showSystemModal(
+            'Password Mismatch',
+            'The passwords entered do not match. Please verify your credentials.',
+            'error'
+        );
+        return;
+    }
+
+    if (confirmDesc) {
+        confirmDesc.textContent = 'Passwords match successfully.';
+        confirmDesc.style.color = 'var(--success)';
     }
 
     try {
-        const maxId = await getLastId();
-        console.log("Attempting to connect to Supabase profiles");
-        console.log(`Received the maximum id: ${maxId}`);
-
-        const { error } = await _supabase
-            .from('profiles')
-            .insert([{
-                id: maxId + 1,
-                email: emailField,
-                username: username,
-                password: password,
-                display_name: displayName,
-                created_at: new Date().toISOString(),
-                age: age,
-                analytics_preference: analyticsPreference,
-            }]);
+        const { data, error } = await _supabase.auth.signUp({
+            email: emailField,
+            password,
+            options: {
+                data: {
+                    username,
+                    display_name: displayName,
+                    age: String(age),
+                    analytics_preference: analyticsPreference
+                }
+            }
+        });
 
         if (error) throw error;
 
-        console.log("Cloud log successful; user row provisioned.");
+        if (data.session) {
+            await hydrateAuthCache(data.session);
+            showSystemModal(
+                'Account Created!',
+                'Your profile setup is complete. Click acknowledge to enter Summitra.',
+                'success',
+                () => {
+                    window.location.href = 'dashboard.html';
+                }
+            );
+            return;
+        }
 
         showSystemModal(
-            "Account Created!",
-            "Your profile setup is complete. Click 'acknowledge' to enter Summitra!.",
-            "success",
+            'Account Created!',
+            'Check your email to confirm the account, then log in.',
+            'success',
             () => {
-                window.location.href = "login.html";
+                window.location.href = 'login.html';
             }
         );
-
     } catch (dbError) {
-        console.error("Cloud Sync Failure:", dbError.message);
-
+        console.error('Cloud Sync Failure:', dbError.message);
         showSystemModal(
-            "Username Taken or email already registered",
-            `Registration failed: Choose another username, or register through another email`,
-            "error"
+            'Registration failed',
+            dbError.message || 'Choose another username, or register with another email.',
+            'error'
         );
     }
 }

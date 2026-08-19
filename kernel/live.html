@@ -3,22 +3,9 @@
 
 <head>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
   <script>
-    //AUTH GUARD GATEKEEPING
-    (function () {
-      const currentUserId = localStorage.getItem('currentUserId');
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      const currentUser = localStorage.getItem('currentUser');
-
-      if (isLoggedIn !== 'true' || !currentUser) {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('currentUser');
-        localStorage.getItem('currentUserId');
-
-        window.location.href = 'login.html';
-      }
-    })();
-
+    requireAuth();
     //We will NOT include connectivity.js on this page.
   </script>
 
@@ -369,9 +356,7 @@
     </div>
   </div>
 
-  <script type="module" src="live.js">
-  </script>
-  <script src="auth.js"></script>
+  <script type="module" src="live.js"></script>
   <div id="summitra-help-root"></div>
   <script src="help-system.js" defer></script>
 </body>

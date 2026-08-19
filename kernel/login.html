@@ -4,19 +4,8 @@
 <head>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        (function () {
-            const currentUserId = localStorage.getItem('currentUserId');
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const currentUser = localStorage.getItem('currentUser');
-
-            if (isLoggedIn == 'true' && currentUserId) {
-                window.location.href = 'dashboard.html';
-            }
-        })();
-
-
-    </script>
+    <script src="auth.js"></script>
+    <script>redirectIfAuthenticated();</script>
     <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <meta charset="UTF-8">
@@ -200,11 +189,11 @@
         <div class="card feature-card" style="max-width: 420px; width: 100%;">
             <h2>Login</h2>
             <div class="input-group">
-                <input id="username" type="text" placeholder=" " required>
-                <label for="username">Username</label>
+                <input id="email" type="email" placeholder=" " required autocomplete="username">
+                <label for="email">Email</label>
             </div>
             <div class="input-group">
-                <input id="password" type="password" placeholder=" " required>
+                <input id="password" type="password" placeholder=" " required autocomplete="current-password">
                 <label for="password">Password</label>
             </div>
             <button class="btn" onclick="attemptLogin()">Login</button>
@@ -215,7 +204,6 @@
 
 
     </main>
-    <script src="auth.js"></script>
 </body>
 
 </html>

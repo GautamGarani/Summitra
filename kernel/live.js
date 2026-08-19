@@ -1,6 +1,4 @@
-const supabaseUrl = 'https://gigpodszdjckhvpzmuuh.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpZ3BvZHN6ZGpja2h2cHptdXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTU2NzcsImV4cCI6MjA5MzI5MTY3N30.UjO4Fyw5nq9zpZim_9UFNEpHi-oceTWsQSLHGrkH6_c';
-const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const _supabase = window._supabase;
 
 let latestFeedback = null;
 let starting = false;
@@ -15,6 +13,7 @@ const CALIBRATION_FRAMES = 112;
 // ----------------------------
 const sessionData = {
     owner: localStorage.getItem('currentUser'),
+    user_id: localStorage.getItem('currentUserId'),
     sessionStart: new Date().toISOString(),
     sessionEnd: null,
     durationSeconds: 0,
@@ -238,6 +237,10 @@ const {
     FilesetResolver
 } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3");
 
+if (window.summitraAuthReady) await window.summitraAuthReady;
+sessionData.owner = localStorage.getItem('currentUser');
+sessionData.user_id = localStorage.getItem('currentUserId');
+
 const welcomeModal = document.getElementById('welcome-modal');
 const exitModal = document.getElementById('exit-modal');
 const startBtn = document.getElementById('modal-start-btn');
@@ -361,11 +364,20 @@ confirmExitBtn.addEventListener('click', async () => {
     // ATTEMPT CLOUD STORAGE 
     try {
         console.log("Syncing comprehensive session telemetry to cloud...");
+        const { data: authData, error: authError } = await _supabase.auth.getSession();
+        if (authError || !authData.session) {
+            throw new Error(authError?.message || 'Not signed in');
+        }
+
+        sessionData.user_id = authData.session.user.id;
+        sessionData.owner = localStorage.getItem('currentUser') || sessionData.owner;
+
         const { error } = await _supabase
             .from('sessions')
             .insert([{
+                user_id: sessionData.user_id,
                 owner: sessionData.owner,
-                session_id: `${sessionData.owner}-${Date.now()}`,
+                session_id: `${sessionData.user_id}-${Date.now()}`,
                 duration: sessionData.durationSeconds,
                 lateral_alerts: sessionData.lateralAlerts,
                 slouch_alerts: sessionData.slouchAlerts,

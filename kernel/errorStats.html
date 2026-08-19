@@ -3,23 +3,8 @@
 
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        //AUTH GUARD GATEKEEPING
-        (function () {
-            const currentUserId = localStorage.getItem('currentUserId');
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const currentUser = localStorage.getItem('currentUser');
-
-            if (isLoggedIn !== 'true' || !currentUser) {
-                // Optional: Clean any corrupted state
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('currentUser');
-                localStorage.getItem('currentUserId');
-
-                window.location.href = 'login.html';
-            }
-        })();
-    </script>
+    <script src="auth.js"></script>
+    <script>requireAuth();</script>
     <script src="connectivity.js"></script>
 
     <link rel="icon" type="image/png" href="logo.jpg">
@@ -442,7 +427,9 @@
             const errors = JSON.parse(localStorage.getItem("errorLogs")) || [];
 
             // Filter sessions exclusively for THIS user
-            const userSessions = allSessions.filter(s => s.owner === currentUser);
+            const userSessions = typeof filterSessionsForCurrentUser === "function"
+                ? filterSessionsForCurrentUser(allSessions)
+                : allSessions.filter(s => s.owner === currentUser);
 
             document.getElementById("sessions").textContent = pretty(userSessions);
             document.getElementById("errors").textContent = pretty(errors);
@@ -459,10 +446,12 @@
             document.getElementById("all").textContent = pretty(allData);
         }
 
-        loadStorage();
+        document.addEventListener("DOMContentLoaded", async () => {
+            if (window.summitraAuthReady) await window.summitraAuthReady;
+            loadStorage();
+        });
     </script>
 
-    <script src="auth.js"></script>
     <div id="summitra-help-root"></div>
     <script src="help-system.js" defer></script>
 </body>

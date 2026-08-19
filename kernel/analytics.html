@@ -5,24 +5,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="auth.js"></script>
     <script src="connectivity.js"></script>
-    <script>
-        //AUTH GUARD GATEKEEPING
-        (function () {
-            const currentUserId = localStorage.getItem('currentUserId');
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const currentUser = localStorage.getItem('currentUser');
-
-            if (isLoggedIn !== 'true' || !currentUser) {
-
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('currentUser');
-                localStorage.getItem('currentUserId');
-
-                window.location.href = 'login.html';
-            }
-        })();
-
-    </script>
+    <script>requireAuth();</script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <title>Analytics</title>
     <meta charset="UTF-8">
@@ -581,10 +564,11 @@
             let sessions = [];
 
             try {
+                const userId = localStorage.getItem('currentUserId');
                 const { data, error } = await _supabase
                     .from('sessions')
                     .select('*')
-                    .eq('owner', currentUser)
+                    .eq('user_id', userId)
                     .order('session_id', { ascending: true });
 
                 if (error) throw error;
@@ -622,7 +606,9 @@
             if (!currentUser) return [];
             console.log("Retrieving local sessions for:", currentUser);
             const allStoredSessions = JSON.parse(localStorage.getItem("sessions")) || [];
-            localSessions = allStoredSessions.filter(session => session.owner === currentUser);
+            localSessions = typeof filterSessionsForCurrentUser === "function"
+                ? filterSessionsForCurrentUser(allStoredSessions)
+                : allStoredSessions.filter(session => session.owner === currentUser);
 
             console.log(`Found ${localSessions.length} local sessions for user.`);
             return localSessions || [];
@@ -897,92 +883,122 @@
         }
 
         async function refreshAIAnalysis() {
-            const output =
-                document.getElementById(
-                    "ai-analysis-content"
-                );
 
-            if (!output) return;
+    const output =
+        document.getElementById("ai-analysis-content");
 
-            output.innerHTML =
-                "Generating analysis...";
+    if (!output) return;
 
-            try {
+    output.innerHTML = `
+        <div class="themed-loader-container">
+            <div class="themed-spinner"></div>
+            <span class="loader-text-pulse">
+                Mitraa is analyzing your posture telemetry...
+            </span>
+        </div>
+    `;
 
-                const currentUser =
-                    localStorage.getItem("currentUser");
+    try {
 
-                const response =
-                    await fetch(
-                        "https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service",
-                        {
-                            method: "POST",
+        const {
+            data: { session },
+            error: sessionError
+        } = await _supabase.auth.getSession();
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
+        console.log("Supabase session:", session);
+        console.log("Session error:", sessionError);
 
-                            body: JSON.stringify({
-                                userId: currentUser
-                            })
-                        }
-                    );
-
-                const data =
-                    await response.json();
-
-                if (response.status === 403) {
-
-                    output.innerHTML = `
-                <div style="
-                    padding:20px;
-                    border-radius:16px;
-                    background:#fee2e2;
-                    color:#991b1b;
-                    font-weight:600;
-                    text-align:center;
-                ">
-                    You are not eligible to access Mitraa diagnostics.
-                </div>
-            `;
-
-                    if (response.status === 500) {
-                        output.innerHTML =
-                            `                <div style="
-                    padding:20px;
-                    border-radius:16px;
-                    background:#fee2e2;
-                    color:#991b1b;
-                    font-weight:600;
-                    text-align:center;
-                ">
-                    The model is experiencing high demand, please try again shortly.
-                </div>`;
-                    }
-
-                    return;
-                }
-
-                latestAIAnalysis =
-                    data.responseText ||
-                    "No analysis generated.";
-
-                output.innerHTML =
-                    marked.parse(
-                        data.responseText ||
-                        "No analysis generated."
-                    );
-
-            } catch (error) {
-
-                console.error(error);
-
-                output.innerHTML =
-                    "Failed to load analysis.";
-            }
+        if (sessionError || !session) {
+            throw new Error(
+                "No authenticated Supabase session exists."
+            );
         }
 
+        const response = await fetch(
+            "https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization":
+                        `Bearer ${session.access_token}`
+                },
+
+                body: JSON.stringify({
+                    action: "analysis"
+                })
+            }
+        );
+
+        const rawResponse =
+            await response.text();
+
+        console.log(
+            "chat-service HTTP status:",
+            response.status
+        );
+
+        console.log(
+            "chat-service raw response:",
+            rawResponse
+        );
+
+        let data;
+
+        try {
+            data = JSON.parse(rawResponse);
+        } catch {
+            throw new Error(
+                `Edge Function returned non-JSON response: ${rawResponse}`
+            );
+        }
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.error ||
+                `Edge Function failed with HTTP ${response.status}`
+            );
+        }
+
+        if (!data?.responseText) {
+
+            throw new Error(
+                "Edge Function succeeded but returned no responseText."
+            );
+        }
+
+        latestAIAnalysis =
+            data.responseText;
+
+        output.innerHTML =
+            marked.parse(
+                latestAIAnalysis
+            );
+
+    } catch (error) {
+
+        console.error(
+            "Mitraa analysis failure:",
+            error
+        );
+
+        output.innerHTML = `
+            <div style="
+                padding:20px;
+                border-radius:16px;
+                background:#fee2e2;
+                color:#991b1b;
+                line-height:1.5;
+            ">
+                <strong>Failed to load analysis.</strong>
+                <br><br>
+                ${error.message}
+            </div>
+        `;
+    }
+}
         async function exportAnalyticsPDF() {
 
             if (!latestAIAnalysis) {
@@ -1084,7 +1100,7 @@
 
         document.addEventListener("DOMContentLoaded", async () => {
             console.log("Initializing...");
-
+            if (window.summitraAuthReady) await window.summitraAuthReady;
             await loadAnalytics();
 
             //WE WANT ANALYTICS ONLY WHEN THE USER CLICKS THE BUTTON, ELSE NO

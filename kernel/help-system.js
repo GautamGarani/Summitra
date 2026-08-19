@@ -96,7 +96,7 @@ function setupListeners() {
         const storedOS = localStorage.getItem('os_data') || "Unknown OS";
         const browserString = `${storedBrowser.name} ${storedBrowser.version}`;
         const osString = storedOS;
-        const userEmail = localStorage.getItem('currentUser') || "guest_user";
+        const userEmail = localStorage.getItem('currentUserEmail') || localStorage.getItem('currentUser') || "guest_user";
         sendBtn.innerHTML = `<span class="material-symbols-rounded pulse">sync</span> Sending...`;
         await submitToGoogle(userEmail, msg, browserString, osString);
         alert("Your feedback has been transmitted! We are grateful for your feedback and time.");

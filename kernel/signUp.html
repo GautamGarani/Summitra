@@ -4,17 +4,8 @@
 <head>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        (function () {
-            const currentUserId = localStorage.getItem('currentUserId');
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const currentUser = localStorage.getItem('currentUser');
-
-            if (isLoggedIn == 'true' && currentUserId) {
-                window.location.href = 'dashboard.html';
-            }
-        })();
-    </script>
+    <script src="auth.js"></script>
+    <script>redirectIfAuthenticated();</script>
     <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <meta charset="UTF-8">
@@ -232,17 +223,17 @@
             </div>
 
             <div class="input-group">
-                <input id="userEmailSignUp" type="email" placeholder=" " required>
-                <label for="userEmailSignUp"> Enter your e-mail for us to contact you. </label>
+                <input id="userEmailSignUp" type="email" placeholder=" " required autocomplete="email">
+                <label for="userEmailSignUp">Email (this is how you log in)</label>
             </div>
 
             <div class="input-group">
-                <input id="passwordSignUp" type="password" placeholder=" " required minlength="4" maxlength="4">
-                <label for="passwordSignUp">Enter a 4-character password</label>
+                <input id="passwordSignUp" type="password" placeholder=" " required minlength="8" autocomplete="new-password">
+                <label for="passwordSignUp">Password (at least 8 characters)</label>
             </div>
 
             <div class="input-group">
-                <input id="passwordConfirmSignUp" type="password" placeholder=" " required minlength="4" maxlength="4">
+                <input id="passwordConfirmSignUp" type="password" placeholder=" " required minlength="8" autocomplete="new-password">
                 <label for="passwordConfirmSignUp">Confirm your password</label>
             </div>
 
@@ -274,7 +265,6 @@
         </form>
 
     </main>
-    <script src="auth.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const targetForm = document.querySelector("form");

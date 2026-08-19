@@ -3,16 +3,8 @@
 
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // AUTH GUARD GATEKEEPING
-        (function () {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const currentUser = localStorage.getItem('currentUser');
-            if (isLoggedIn !== 'true' || !currentUser) {
-                window.location.href = 'login.html';
-            }
-        })();
-    </script>
+    <script src="auth.js"></script>
+    <script>requireAuth();</script>
     <script src="connectivity.js"></script>
     <link rel="icon" type="image/png" href="logo.jpg">
     <meta charset="UTF-8">
@@ -177,7 +169,6 @@
     </main>
     <div id="summitra-help-root"></div>
     <script src="help-system.js" defer></script>
-    <script src="auth.js"></script>
 
 </body>
 
