@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="logo.jpg">
     <title>Mitraa AI Chat | Summitra</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
@@ -17,9 +17,10 @@
     <style>
         html, body {
             height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile browser toolbars */
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Lock viewport scrolling */
+            overflow: hidden;
         }
 
         body {
@@ -36,11 +37,11 @@
             max-width: 1100px;
             width: 95%;
             margin: 0 auto;
-            padding: 16px 0;
+            padding: 12px 0;
             display: flex;
             flex-direction: column;
             flex: 1;
-            min-height: 0; /* Prevents flex items from expanding parent */
+            min-height: 0;
             box-sizing: border-box;
         }
 
@@ -91,7 +92,7 @@
             color: var(--blue-500);
         }
 
-        /* Isolated Internal Scroll Container */
+        /* Scrollable Message Area */
         .chat-messages {
             flex: 1;
             padding: 20px 24px;
@@ -159,9 +160,10 @@
             padding-left: 20px;
         }
 
-        /* Sticky Bottom Input Bar */
+        /* Sticky Mobile-Safe Input Area */
         .chat-input-area {
             padding: 14px 20px;
+            padding-bottom: calc(14px + env(safe-area-inset-bottom));
             border-top: 1px solid var(--border-soft);
             background: #FAFBFC;
             display: flex;
@@ -248,7 +250,7 @@
             40% { transform: scale(1.0); }
         }
 
-        /* Responsive Mobile Layout */
+        /* Mobile Layout */
         @media (max-width: 768px) {
             .chat-layout {
                 width: 100%;
@@ -258,14 +260,22 @@
                 border-radius: 0;
                 border: none;
             }
+            .chat-header-section {
+                padding: 10px 14px;
+            }
+            .chat-header-icon {
+                width: 36px;
+                height: 36px;
+            }
             .chat-messages {
-                padding: 16px;
+                padding: 12px;
             }
             .message {
                 max-width: 88%;
             }
             .chat-input-area {
                 padding: 10px 12px;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom));
             }
         }
 
@@ -427,10 +437,10 @@
                 </div>
             </div>
 
-            <!-- Scrollable Messages Body -->
+            <!-- Internal Scroll Messages Container -->
             <div id="chat-messages" class="chat-messages"></div>
 
-            <!-- Bottom Sticky Input Area -->
+            <!-- Sticky Bottom Input Container -->
             <div class="chat-input-area">
                 <div class="chat-input-wrapper">
                     <input type="text" id="chat-input" class="chat-input" placeholder="Type a message..." autocomplete="off">
@@ -471,7 +481,6 @@
             }, 4400);
         });
 
-        // Word-by-word streaming typewriter for AI responses
         async function appendMessage(sender, text) {
             const messagesContainer = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
