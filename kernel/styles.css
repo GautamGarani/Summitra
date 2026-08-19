@@ -19,6 +19,107 @@
     --success: #16A34A;
 }
 
+
+/* Clean Responsive Header - No Overlaps */
+header,
+.fancy-header,
+.app-header {
+    height: auto !important;
+    min-height: 64px;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+    padding: 1rem 1.5rem !important;
+    box-sizing: border-box !important;
+    position: relative;
+}
+
+/* Reset absolute/float positions that force element overlaps */
+.header-content,
+.header-actions,
+.header-text-group,
+.logo-watermark {
+    position: static !important;
+    float: none !important;
+    transform: none !important;
+}
+
+/* Logo + Text Container */
+.header-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    flex-shrink: 0 !important;
+}
+
+.header-text-group {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.header-title {
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--blue-900, #0F172A);
+    white-space: nowrap !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+}
+
+.header-subtitle {
+    font-size: 0.8rem;
+    white-space: nowrap !important;
+    margin: 0 !important;
+}
+
+/* Button Group Container */
+.header-actions {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    flex-shrink: 0 !important;
+}
+
+.header-actions button,
+.header-actions .secondary-btn,
+.profile-container {
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Mobile & Small Screen Stacking Layout */
+/* Mobile & Small Screen Centered Stacking Layout */
+@media (max-width: 850px) {
+    header,
+    .fancy-header,
+    .app-header {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 0.75rem !important;
+    }
+
+    .header-content {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
+    .header-text-group {
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    .header-actions {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
 /* ---------- BUTTON SHIMMER EFFECT ---------- */
 
 .btn,

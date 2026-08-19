@@ -73,49 +73,11 @@
             letter-spacing: -0.5px;
         }
 
-        .policy-hero {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 4rem;
-            align-items: center;
-            padding: 80px 4rem !important;
-        }
-
-        .hero-stock-img {
-            width: 100%;
-            border-radius: 32px;
-            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
-            box-shadow: -30px 30px 60px rgba(13, 27, 42, 0.15);
-            transition: transform 0.6s ease;
-        }
-
-        .hero-stock-img:hover {
-            transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02);
-        }
-
-
         .feature-grid {
             padding: 0 4rem;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 2rem;
-        }
-
-        .zoom-hover-card {
-            display: flex;
-            flex-direction: column;
-            padding: 3rem;
-            border-radius: 32px;
-            background: white;
-            border: 1px solid var(--border-soft);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            height: 100%;
-        }
-
-        .zoom-hover-card:hover {
-            transform: scale(1.02) translateY(-10px);
-            box-shadow: 0 40px 80px rgba(13, 27, 42, 0.08);
-            border-color: var(--blue-primary);
         }
 
         .feature-badge {
@@ -130,42 +92,130 @@
             color: var(--blue-primary);
         }
 
-        .feature-points {
-            margin-top: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .feature-points div {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.95rem;
-            color: var(--blue-700);
-        }
-
-        .feature-points div::before {
-            content: "check_circle";
-            font-family: 'Material Symbols Rounded';
-            color: var(--success);
-            font-size: 20px;
-        }
-
         .btn-container {
             margin-top: 4rem;
             text-align: center;
         }
 
+        /* Splash Screen Modular Styles */
+        .splash-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(-45deg, #030712, #0F172A, #1E3A8A, #1E40AF, #0284C7, #030712);
+            background-size: 400% 400%;
+            animation: gradientSwirl 12s ease infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            overflow: hidden;
+        }
 
+        @keyframes gradientSwirl {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .splash-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .splash-content {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .splash-slide {
+            position: absolute;
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+            width: 100%;
+        }
+
+        .splash-slide.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .splash-slide.exit {
+            opacity: 0;
+            transform: translateY(-40px) scale(1.05);
+        }
+
+        .splash-slide h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            line-height: 1.1;
+        }
+
+        .splash-slide p {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            font-weight: 300;
+            line-height: 1.6;
+            opacity: 0.9;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .splash-slide .icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: #FFFFFF;
+            text-shadow: 0 0 20px rgba(255,255,255,0.4);
+        }
+
+        .enter-btn-container {
+            position: absolute;
+            bottom: 60px;
+            z-index: 10;
+        }
+
+        .enter-btn {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 18px 48px;
+            border-radius: 99px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .enter-btn:hover {
+            background: #FFFFFF;
+            color: #0F172A;
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
 
         @media (max-width: 768px) {
-
-
             body {
                 font-size: 14px;
             }
-
 
             .fancy-header {
                 padding: 1rem 1.2rem;
@@ -181,12 +231,10 @@
                 display: none;
             }
 
-
             .profile-trigger span:nth-child(2) {
                 display: none;
             }
 
-            /* Hero Section */
             .dashboard-hero {
                 padding: 40px 1.2rem !important;
                 text-align: left;
@@ -206,7 +254,6 @@
                 padding: 0.4rem 0.8rem;
             }
 
-
             .feature-grid {
                 grid-template-columns: 1fr;
                 padding: 0 1rem;
@@ -214,10 +261,8 @@
                 box-sizing: border-box;
             }
 
-
             .card,
-            .feature-card,
-            .zoom-hover-card {
+            .feature-card {
                 width: 100%;
                 box-sizing: border-box;
                 padding: 1.5rem !important;
@@ -245,13 +290,11 @@
                 font-size: 0.9rem;
             }
 
-
             .btn {
                 width: 100%;
                 justify-content: center;
             }
 
-            /* TABLE FIX (CRITICAL) */
             .manifest-table-container {
                 overflow-x: auto;
             }
@@ -261,16 +304,12 @@
                 font-size: 0.8rem;
             }
 
-
             .btn-container {
                 margin-top: 2rem;
             }
         }
 
-
-        /* Extra small devices */
         @media (max-width: 480px) {
-
             .gemini-greet {
                 font-size: 1.5rem;
             }
@@ -285,106 +324,98 @@
         }
 
         #bot-welcome-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(13, 27, 42, 0.4);
-    backdrop-filter: blur(8px);
-    pointer-events: auto;
-    animation: fadeOutOverlay 0.6s ease forwards 3.8s;
-}
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(13, 27, 42, 0.4);
+            backdrop-filter: blur(8px);
+            pointer-events: auto;
+            animation: fadeOutOverlay 0.6s ease forwards 3.8s;
+        }
 
-/* Background Color Splash */
-.splash-burst {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--blue-primary) 0%, var(--blue-500) 40%, var(--blue-accent) 70%, transparent 100%);
-    animation: splashExpand 1s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
-}
+        .splash-burst {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--blue-primary) 0%, var(--blue-500) 40%, var(--blue-accent) 70%, transparent 100%);
+            animation: splashExpand 1s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
+        }
 
-/* Bot Container & Zoom Animation */
-.bot-container {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    transform: scale(0);
-    animation: botZoomIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.4s;
-}
+        .bot-container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            transform: scale(0);
+            animation: botZoomIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.4s;
+        }
 
-.bot-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--blue-primary);
-    color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 25px rgba(0, 82, 204, 0.4);
-    border: 3px solid var(--blue-accent);
-}
+        .bot-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--blue-primary);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0, 82, 204, 0.4);
+            border: 3px solid var(--blue-accent);
+        }
 
-.bot-avatar .material-symbols-rounded {
-    font-size: 3rem;
-}
+        .speech-bubble {
+            background: var(--card-bg);
+            color: var(--blue-900);
+            padding: 14px 24px;
+            border-radius: 18px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-soft);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: bubblePop 0.5s ease forwards 1.1s;
+        }
 
-/* Speech Bubble Animation */
-.speech-bubble {
-    background: var(--card-bg);
-    color: var(--blue-900);
-    padding: 14px 24px;
-    border-radius: 18px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--border-soft);
-    opacity: 0;
-    transform: translateY(10px);
-    animation: bubblePop 0.5s ease forwards 1.1s;
-}
+        @keyframes splashExpand {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(250); opacity: 0; }
+        }
 
-/* Keyframes */
-@keyframes splashExpand {
-    0% { transform: scale(1); opacity: 0.8; }
-    100% { transform: scale(250); opacity: 0; }
-}
+        @keyframes botZoomIn {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
 
-@keyframes botZoomIn {
-    0% { transform: scale(0) rotate(-15deg); opacity: 0; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
-}
+        @keyframes bubblePop {
+            0% { transform: translateY(10px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
 
-@keyframes bubblePop {
-    0% { transform: translateY(10px) scale(0.9); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-@keyframes fadeOutOverlay {
-    to { opacity: 0; visibility: hidden; pointer-events: none; }
-}
+        @keyframes fadeOutOverlay {
+            to { opacity: 0; visibility: hidden; pointer-events: none; }
+        }
     </style>
 </head>
 
 <body>
-        <div id="bot-welcome-overlay">
-    <div class="splash-burst"></div>
-    <div class="bot-container">
-        <div class="bot-avatar">
-            <img src="logo.jpg" class="logo-watermark" alt="Summitra">
-        </div>
-        <div class="speech-bubble">
-            Welcome! Ready to track your posture?
+    <div id="bot-welcome-overlay">
+        <div class="splash-burst"></div>
+        <div class="bot-container">
+            <div class="bot-avatar">
+                <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+            </div>
+            <div class="speech-bubble">
+                Welcome! Ready to track your posture?
+            </div>
         </div>
     </div>
-</div>
 
     <header class="fancy-header">
         <div class="header-content">
@@ -396,27 +427,26 @@
         </div>
 
         <div class="header-actions">
+            <!-- Retained Usage Guide Splash Button -->
+            <button class="secondary-btn logout-pill" onclick="openUsageSplash()" title="Usage Guide">
+                <span class="material-symbols-rounded">help</span>
+            </button>
             <button class="secondary-btn logout-pill" onclick="window.open('chat.html', '_blank')">
                 <span class="material-symbols-rounded">auto_awesome</span>
-
             </button>
             <button class="secondary-btn logout-pill" onclick="window.open('about.html', '_blank')">
                 <span class="material-symbols-rounded">info</span>
-
             </button>
             <button class="secondary-btn logout-pill" onclick="window.open('privacyPolicy.html', '_blank')">
                 <span class="material-symbols-rounded">shield</span>
-
             </button>
             <button class="secondary-btn logout-pill" onclick="window.open('new.html', '_blank')">
                 <span class="material-symbols-rounded">fiber_new</span>
-
             </button>
 
             <div class="profile-container">
                 <button class="profile-trigger" onclick="toggleDropdown()">
                     <span class="material-symbols-rounded">account_circle</span>
-                    <!-- display-user will now show the human-readable Display Name -->
                     <span id="display-user">User</span>
                     <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
                 </button>
@@ -429,7 +459,6 @@
                     </div>
 
                     <hr class="dropdown-divider">
-
 
                     <div class="dropdown-header">
                         <span class="label">Summitra</span>
@@ -464,11 +493,11 @@
             </div>
         </div>
     </header>
+
     <main class="dashboard-main-pro">
 
         <section class="dashboard-hero animate-fade-in-up">
             <div class="hero-copy">
-
                 <h1 class="gemini-greet">Hello, <span id="welcome-name">Guest</span>!</h1>
             </div>
 
@@ -496,11 +525,6 @@
                 </div>
                 <h2>Start Monitoring</h2>
                 <p>Launch the Vision Engine to begin real-time posture tracking and live feedback.</p>
-                <!--<div class="feature-points">
-                    <div>• Personalized calibration</div>
-                    <div>• Drift-aware feedback</div>
-                    <div>• Alert suppression logic (so you don't get annoyed!)</div>
-                </div>-->
                 <button class="btn" onclick="location.href='live.html'">
                     Launch Live Monitor
                     <span class="material-symbols-rounded">sensors</span>
@@ -513,11 +537,6 @@
                 </div>
                 <h2>View Analytics</h2>
                 <p>Compare sessions, examine alert distributions, and track your compliance trend.</p>
-                <!--<div class="feature-points">
-                    <div>• Session comparison</div>
-                    <div>• Alert distribution review</div>
-                    <div>• Trends</div>
-                </div>-->
                 <button class="btn" onclick="location.href='analytics.html'">
                     View Analytics
                     <span class="material-symbols-rounded">insights</span>
@@ -589,6 +608,7 @@
 
             return isFinite(score) ? score : 0;
         }
+
         function formatDuration(seconds) {
             const hrs = Math.floor(seconds / 3600);
             const mins = Math.floor((seconds % 3600) / 60);
@@ -650,18 +670,14 @@
             if (window.summitraAuthReady) await window.summitraAuthReady;
             renderLedger();
             updateWelcomeMessage();
-        });
 
-                document.addEventListener('DOMContentLoaded', () => {
-    // Auto-remove overlay after animation completes (4.4 seconds)
-    setTimeout(() => {
-        const overlay = document.getElementById('bot-welcome-overlay');
-        if (overlay) overlay.remove();
-    }, 4400);
-});
+            setTimeout(() => {
+                const overlay = document.getElementById('bot-welcome-overlay');
+                if (overlay) overlay.remove();
+            }, 4400);
+        });
     </script>
-    <div id="summitra-help-root"></div>
-    <script src="help-system.js" defer></script>
+    <script src="splash.js" defer></script>
 </body>
 
 </html>
