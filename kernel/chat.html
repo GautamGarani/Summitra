@@ -38,7 +38,7 @@
             background: var(--card-bg);
             border: 1px solid var(--border-soft);
             border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -58,8 +58,8 @@
             width: 48px;
             height: 48px;
             border-radius: 16px;
-            background: #E8F5E9;
-            color: #2E7D32;
+            background: var(--primary-light);
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -88,7 +88,7 @@
         }
 
         .message {
-            max-width: 80%;
+            max-width: 85%;
             padding: 14px 20px;
             border-radius: 18px;
             line-height: 1.5;
@@ -183,7 +183,7 @@
 
         .chat-send-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 82, 204, 0.25);
+            box-shadow: 0 5px 15px rgba(30, 110, 67, 0.25);
         }
 
         .chat-send-btn:disabled {
@@ -219,10 +219,109 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1.0); }
         }
+
+        /* Bot Splash Overlay Styles */
+#bot-welcome-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 27, 42, 0.4);
+    backdrop-filter: blur(8px);
+    pointer-events: auto;
+    animation: fadeOutOverlay 0.6s ease forwards 3.8s;
+}
+
+/* Background Color Splash */
+.splash-burst {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--blue-primary) 0%, var(--blue-500) 40%, var(--blue-accent) 70%, transparent 100%);
+    animation: splashExpand 1s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
+}
+
+/* Bot Container & Zoom Animation */
+.bot-container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    transform: scale(0);
+    animation: botZoomIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.4s;
+}
+
+.bot-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--blue-primary);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(0, 82, 204, 0.4);
+    border: 3px solid var(--blue-accent);
+}
+
+.bot-avatar .material-symbols-rounded {
+    font-size: 3rem;
+}
+
+/* Speech Bubble Animation */
+.speech-bubble {
+    background: var(--card-bg);
+    color: var(--blue-900);
+    padding: 14px 24px;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-soft);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: bubblePop 0.5s ease forwards 1.1s;
+}
+
+/* Keyframes */
+@keyframes splashExpand {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(250); opacity: 0; }
+}
+
+@keyframes botZoomIn {
+    0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes bubblePop {
+    0% { transform: translateY(10px) scale(0.9); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes fadeOutOverlay {
+    to { opacity: 0; visibility: hidden; pointer-events: none; }
+}
     </style>
 </head>
 
 <body>
+    <div id="bot-welcome-overlay">
+    <div class="splash-burst"></div>
+    <div class="bot-container">
+        <div class="bot-avatar">
+            <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+        </div>
+        <div class="speech-bubble">
+            Welcome! Ready to analyse your posture?
+        </div>
+    </div>
+</div>
     <header class="fancy-header">
         <div class="header-content">
             <img src="logo.jpg" class="logo-watermark" alt="Summitra">
@@ -288,10 +387,10 @@
         </div>
     </header>
 
-    <main class="chat-layout">
+    <main class="chat-layout animate-fade-in-up">
         <div class="chat-container">
             <div class="chat-header-section">
-                <div class="chat-header-icon">
+                <div class="chat-header-icon animate-scale-in">
                     <span class="material-symbols-rounded">chat</span>
                 </div>
                 <div class="chat-header-info">
@@ -317,6 +416,7 @@
 
     <script>
         let supabaseSession = null;
+        let conversationHistory = [];
 
         document.addEventListener('DOMContentLoaded', async () => {
             if (window.summitraAuthReady) {
@@ -341,7 +441,7 @@
         function appendMessage(sender, text) {
             const messagesContainer = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
+            msgDiv.className = `message ${sender} animate-scale-in`;
 
             if (sender === 'bot') {
                 msgDiv.innerHTML = marked.parse(text);
@@ -357,7 +457,7 @@
             const messagesContainer = document.getElementById('chat-messages');
             const indicator = document.createElement('div');
             indicator.id = 'typing-indicator';
-            indicator.className = 'typing-indicator';
+            indicator.className = 'typing-indicator animate-scale-in';
             indicator.innerHTML = `
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
@@ -383,6 +483,9 @@
             input.value = '';
             input.disabled = true;
             sendBtn.disabled = true;
+
+            // Push to local conversation history
+            conversationHistory.push({ role: "user", content: text });
             appendMessage('user', text);
             showTypingIndicator();
 
@@ -397,7 +500,7 @@
                 }
 
                 const response = await fetch(
-                    "https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service",
+                    "https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/conversation-service",
                     {
                         method: "POST",
                         headers: {
@@ -405,8 +508,7 @@
                             "Authorization": `Bearer ${supabaseSession.access_token}`
                         },
                         body: JSON.stringify({
-                            action: "chat",
-                            message: text
+                            messages: conversationHistory
                         })
                     }
                 );
@@ -424,16 +526,30 @@
                 }
 
                 removeTypingIndicator();
-                appendMessage('bot', data.responseText || "No response received.");
+                const replyText = data.responseText || "No response received.";
+                
+                // Push response to history
+                conversationHistory.push({ role: "assistant", content: replyText });
+                appendMessage('bot', replyText);
             } catch (error) {
                 removeTypingIndicator();
                 appendMessage('bot', `**Error:** ${error.message}`);
+                // Remove the failed user query from history to keep it clean
+                conversationHistory.pop();
             } finally {
                 input.disabled = false;
                 sendBtn.disabled = false;
                 input.focus();
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+    // Auto-remove overlay after animation completes (4.4 seconds)
+    setTimeout(() => {
+        const overlay = document.getElementById('bot-welcome-overlay');
+        if (overlay) overlay.remove();
+    }, 4400);
+});
     </script>
     <div id="summitra-help-root"></div>
     <script src="help-system.js" defer></script>
