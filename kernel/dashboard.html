@@ -287,6 +287,17 @@
 </head>
 
 <body>
+        <div id="bot-welcome-overlay">
+    <div class="splash-burst"></div>
+    <div class="bot-container">
+        <div class="bot-avatar">
+            <img src="logo.jpg" class="logo-watermark" alt="Summitra">
+        </div>
+        <div class="speech-bubble">
+            Welcome! Ready to analyse your posture?
+        </div>
+    </div>
+</div>
 
     <header class="fancy-header">
         <div class="header-content">
@@ -553,6 +564,14 @@
             renderLedger();
             updateWelcomeMessage();
         });
+
+                document.addEventListener('DOMContentLoaded', () => {
+    // Auto-remove overlay after animation completes (4.4 seconds)
+    setTimeout(() => {
+        const overlay = document.getElementById('bot-welcome-overlay');
+        if (overlay) overlay.remove();
+    }, 4400);
+});
     </script>
     <div id="summitra-help-root"></div>
     <script src="help-system.js" defer></script>
