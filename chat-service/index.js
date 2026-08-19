@@ -37,7 +37,7 @@ const MODEL =
 // ============================================================================
 
 const allowedOrigins = [
-    "https://summitra-smartopia.vercel.app",
+    "https://summitracoach.vercel.app",
     "http://localhost:8000",
     "http://127.0.0.1:8000"
 ];
