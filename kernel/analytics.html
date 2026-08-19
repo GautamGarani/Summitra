@@ -10,337 +10,108 @@
     <title>Analytics</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body {
-            overflow-x: hidden;
-            background-color: var(--surface);
-        }
+        body { overflow-x: hidden; background-color: var(--surface); }
+        .fancy-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-soft); }
+        .header-title { font-weight: 800; font-size: 1.5rem; color: var(--blue-900); letter-spacing: -0.5px; }
+        .charts-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; width: 100%; }
+        .chart-pro-card { min-height: 400px; display: flex; flex-direction: column; }
+        .chart-container-pro { flex: 1; position: relative; min-height: 250px; }
+        .chart-error-fallback { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(248, 250, 252, 0.9); border-radius: 16px; border: 2px dashed #CBD5E1; padding: 24px; text-align: center; box-sizing: border-box; z-index: 10; }
+        .chart-error-fallback span.material-symbols-rounded { font-size: 40px; color: #64748b; margin-bottom: 8px; }
+        .chart-error-fallback h3 { font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0 0 4px 0; }
+        .chart-error-fallback p { font-size: 0.8rem; color: #64748b; margin: 0 0 12px 0; }
 
-        .entrance-container {
-            perspective: 2000px;
-            padding-bottom: 100px;
-        }
-
-        .swirl-in {
-            opacity: 0;
-            transform-origin: center center;
-            animation: entranceSwirl 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-        }
-
-        @keyframes entranceSwirl {
-            0% {
-                opacity: 0;
-                transform: rotateX(-20deg) rotateY(15deg) scale(0.9) translateY(60px);
-                filter: blur(10px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: rotateX(0deg) rotateY(0deg) scale(1) translateY(0);
-                filter: blur(0);
-            }
-        }
-
-        .fancy-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 4rem;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid var(--border-soft);
-        }
-
-        .header-title {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--blue-900);
-            letter-spacing: -0.5px;
-        }
-
-        /* Hero Section */
-        .policy-hero {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 4rem;
-            align-items: center;
-            padding: 80px 4rem !important;
-        }
-
-        .hero-stock-img {
-            width: 100%;
-            border-radius: 32px;
-            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
-            box-shadow: -30px 30px 60px rgba(13, 27, 42, 0.15);
-            transition: transform 0.6s ease;
-        }
-
-        .hero-stock-img:hover {
-            transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02);
-        }
-
-        /* Feature Grid Adjustments */
-        .feature-grid {
-            padding: 0 4rem;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
-        }
-
-        .zoom-hover-card {
-            display: flex;
-            flex-direction: column;
-            padding: 3rem;
-            border-radius: 32px;
-            background: white;
-            border: 1px solid var(--border-soft);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            height: 100%;
-        }
-
-        .zoom-hover-card:hover {
-            transform: scale(1.02) translateY(-10px);
-            box-shadow: 0 40px 80px rgba(13, 27, 42, 0.08);
-            border-color: var(--blue-primary);
-        }
-
-        .feature-badge {
-            width: 64px;
-            height: 64px;
+        /* Centered & Compact Dynamic Banner */
+        .about-banner {
+            width: fit-content;
+            max-width: 520px;
+            margin: 0 auto 24px auto;
+            background: linear-gradient(-45deg, #030712, #0F172A, #1E3A8A, #1E40AF, #0284C7, #030712);
+            background-size: 400% 400%;
+            animation: gradientSwirl 12s ease infinite;
             border-radius: 20px;
+            padding: 16px 20px;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 2rem;
-            background: var(--blue-accent);
-            color: var(--blue-primary);
-        }
-
-        .feature-points {
-            margin-top: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .feature-points div {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.95rem;
-            color: var(--blue-700);
-        }
-
-        .feature-points div::before {
-            content: "check_circle";
-            font-family: 'Material Symbols Rounded';
-            color: var(--success);
-            font-size: 20px;
-        }
-
-        .btn-container {
-            margin-top: 4rem;
-            text-align: center;
-        }
-
-        /* 2x2 Grid Logic for Charts */
-        .charts-matrix {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 24px;
-            width: 100%;
-        }
-
-        .chart-pro-card {
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chart-container-pro {
-            flex: 1;
-            position: relative;
-            min-height: 250px;
-        }
-
-        /* Chart Intercept Error State Overlay Styles */
-        .chart-error-fallback {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(248, 250, 252, 0.85);
-            border-radius: 16px;
-            border: 2px dashed #CBD5E1;
-            padding: 24px;
-            text-align: center;
+            align-items: flex-start;
+            gap: 16px;
+            box-shadow: 0 10px 30px rgba(3, 7, 18, 0.2);
+            text-align: left;
+            min-height: 90px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             box-sizing: border-box;
-            z-index: 10;
         }
 
-        .chart-error-fallback span.material-symbols-rounded {
-            font-size: 48px;
-            color: #ef4444;
-            margin-bottom: 12px;
+        @keyframes gradientSwirl {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .chart-error-fallback h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0 0 6px 0;
+        .about-banner .banner-icon {
+            font-size: 2.2rem;
+            color: white;
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
-        .chart-error-fallback p {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin: 0 0 16px 0;
+        .about-banner .banner-content {
+            flex: 1;
         }
 
-        /* Adjusted Grid Layout configuration for 6 elements */
-        .analytics-kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
+        .banner-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 800;
+            margin-bottom: 6px;
         }
 
-        @media (max-width: 900px) {
-            .charts-matrix {
-                grid-template-columns: 1fr;
-            }
-
-            header {
-                padding: 20px;
-            }
+        .banner-typewriter {
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: white;
+            line-height: 1.5;
+            display: inline;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        }
+        
+        .banner-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.1rem;
+            background-color: white;
+            animation: blinkCursor 0.8s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
         }
 
+        @keyframes blinkCursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @media (max-width: 900px) { .charts-matrix { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
-
-            body {
-                font-size: 14px;
-            }
-
-            .fancy-header {
-                padding: 1rem 1.2rem;
-                flex-direction: row;
-                gap: 0.5rem;
-            }
-
-            .header-title {
-                font-size: 1.1rem;
-            }
-
-            .header-subtitle {
-                display: none;
-            }
-
-            .profile-trigger span:nth-child(2) {
-                display: none;
-            }
-
-            .dashboard-hero {
-                padding: 40px 1.2rem !important;
-                text-align: left;
-            }
-
-            .gemini-greet {
-                font-size: 1.8rem;
-            }
-
-            .hero-pills {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-
-            .metric-pill {
-                font-size: 0.75rem;
-                padding: 0.4rem 0.8rem;
-            }
-
-            .feature-grid {
-                grid-template-columns: 1fr;
-                padding: 0 1.2rem;
-            }
-
-            .card,
-            .feature-card,
-            .zoom-hover-card {
-                padding: 1.5rem !important;
-                border-radius: 20px;
-            }
-
-            .feature-badge {
-                width: 52px;
-                height: 52px;
-                margin-bottom: 1rem;
-            }
-
-            .feature-card h2 {
-                font-size: 1.2rem;
-            }
-
-            .feature-card p {
-                font-size: 0.9rem;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .manifest-table-container {
-                overflow-x: auto;
-            }
-
-            .manifest-light-table {
-                min-width: 600px;
-                font-size: 0.8rem;
-            }
-
-            .btn-container {
-                margin-top: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-
-            .gemini-greet {
-                font-size: 1.5rem;
-            }
-
-            .metric-pill {
-                font-size: 0.7rem;
-            }
-
-            .feature-card h2 {
-                font-size: 1.05rem;
-            }
+            .fancy-header { padding: 1rem 1.2rem; }
+            .header-title { font-size: 1.1rem; }
+            .header-subtitle { display: none; }
+            .analytics-main-pro { padding: 1.5rem !important; }
+            .about-banner { width: 100%; max-width: 100%; }
         }
     </style>
-
 </head>
 
 <body>
-
     <header class="fancy-header">
         <div class="header-content">
             <img src="logo.jpg" class="logo-watermark" alt="Summitra">
@@ -369,134 +140,140 @@
                         <span class="label">Authenticated As</span>
                         <div class="user-email" id="user-detail">user@summitra</div>
                     </div>
-
                     <hr class="dropdown-divider">
-
-                    <div class="dropdown-header">
-                        <span class="label">Summitra</span>
-                    </div>
-                    <button class="dropdown-item secondary-item" onclick="window.open('privacyPolicy.html', '_blank')">
-                        <span class="material-symbols-rounded">shield</span>
-                        Our Policy
-                    </button>
-                    <button class="dropdown-item secondary-item" onclick="window.open('about.html', '_blank')">
-                        <span class="material-symbols-rounded">info</span>
-                        About Summitra
-                    </button>
-
+                    <button class="dropdown-item secondary-item" onclick="window.open('privacyPolicy.html', '_blank')"><span class="material-symbols-rounded">shield</span> Our Policy</button>
+                    <button class="dropdown-item secondary-item" onclick="window.open('about.html', '_blank')"><span class="material-symbols-rounded">info</span> About Summitra</button>
                     <hr class="dropdown-divider">
-
-                    <div class="dropdown-header">
-                        <span class="label">System</span>
-                    </div>
-                    <button class="dropdown-item" onclick="location.href='chat.html'">
-                        <span class="material-symbols-rounded">chat</span>
-                        Mitraa AI Chat
-                    </button>
-                    <button class="dropdown-item" onclick="location.href='profile.html'">
-                        <span class="material-symbols-rounded">person</span>
-                        Your Profile
-                    </button>
-                    <button class="dropdown-item" onclick="logout()">
-                        <span class="material-symbols-rounded">logout</span>
-                        Logout
-                    </button>
+                    <button class="dropdown-item" onclick="location.href='chat.html'"><span class="material-symbols-rounded">chat</span> Mitraa AI Chat</button>
+                    <button class="dropdown-item" onclick="location.href='profile.html'"><span class="material-symbols-rounded">person</span> Your Profile</button>
+                    <button class="dropdown-item" onclick="logout()"><span class="material-symbols-rounded">logout</span> Logout</button>
                 </div>
             </div>
         </div>
     </header>
 
     <main class="analytics-main-pro animate-fade-in-up">
-
-        <section class="analytics-hero">
-            <div>
-                <div class="hero-eyebrow">SESSION INTELLIGENCE</div>
-                <h1>Posture performance analytics</h1>
-                <p class="hero-text">Unified behavioral matrix of your kinetic health.</p>
+        <!-- Centered Dynamic Typewriter Banner -->
+        <div class="about-banner">
+            <div class="material-symbols-rounded banner-icon" id="banner-icon">neurology</div>
+            <div class="banner-content">
+                <div class="banner-title" id="banner-title">About Summitra</div>
+                <div class="banner-typewriter" id="banner-text-container"></div>
+                <span class="banner-cursor"></span>
             </div>
-        </section>
+        </div>
 
-        <section class="analytics-kpi-grid">
-            <div class="card analytics-kpi">
-                <div class="kpi-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
-                <div class="kpi-label">Compliance</div>
-                <div class="kpi-value" id="curr-score">
-                    <div class="themed-loader-container">
-                        <div class="themed-spinner"></div>
-                        <span class="loader-text-pulse">Calculating</span>
+        <!-- Sessional Metrics Section -->
+        <section class="sessional-metrics-section">
+            <h2 class="sessional-metrics-heading">Sessional Metrics</h2>
+            
+            <div class="analytics-kpi-grid">
+                <div class="card analytics-kpi" tabindex="0" role="button" aria-expanded="false" onclick="toggleKpiCard(this)" onkeydown="handleKpiKeydown(event, this)">
+                    <div class="kpi-main-row">
+                        <div class="kpi-left">
+                            <div class="kpi-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
+                            <div class="kpi-meta">
+                                <span class="kpi-label">Compliance</span>
+                                <span class="kpi-value" id="curr-score">--</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-rounded kpi-toggle-icon">expand_more</span>
+                    </div>
+                    <div class="kpi-details">
+                        <div class="kpi-details-inner">
+                            <div class="kpi-mini">Total session health ratio of optimal frames to total captured frames.</div>
+                        </div>
                     </div>
                 </div>
-                <div class="kpi-mini">Total session health calculated as the ratio of optimal frames to total captured
-                    frames.</div>
-            </div>
 
-            <div class="card analytics-kpi">
-                <div class="kpi-icon"><span class="material-symbols-rounded">timer</span></div>
-                <div class="kpi-label">Resilience</div>
-                <div class="kpi-value" id="resilience-ratio">
-                    <div class="themed-loader-container">
-                        <div class="themed-spinner"></div>
-                        <span class="loader-text-pulse" id="unavailable">Calculating</span>
+                <div class="card analytics-kpi" tabindex="0" role="button" aria-expanded="false" onclick="toggleKpiCard(this)" onkeydown="handleKpiKeydown(event, this)">
+                    <div class="kpi-main-row">
+                        <div class="kpi-left">
+                            <div class="kpi-icon"><span class="material-symbols-rounded">timer</span></div>
+                            <div class="kpi-meta">
+                                <span class="kpi-label">Resilience</span>
+                                <span class="kpi-value" id="resilience-ratio">--</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-rounded kpi-toggle-icon">expand_more</span>
+                    </div>
+                    <div class="kpi-details">
+                        <div class="kpi-details-inner">
+                            <div class="kpi-mini">Average time elapsed between alert trigger and posture correction.</div>
+                        </div>
                     </div>
                 </div>
-                <div class="kpi-mini">Measures your agility by averaging the time difference between an alert trigger
-                    and a corrected state.</div>
-            </div>
 
-            <div class="card analytics-kpi">
-                <div class="kpi-icon"><span class="material-symbols-rounded">receipt_long</span></div>
-                <div class="kpi-label">Ergonomic Debt</div>
-                <div class="kpi-value" id="ergo-debt">
-                    <div class="themed-loader-container">
-                        <div class="themed-spinner"></div>
-                        <span class="loader-text-pulse">Calculating</span>
+                <div class="card analytics-kpi" tabindex="0" role="button" aria-expanded="false" onclick="toggleKpiCard(this)" onkeydown="handleKpiKeydown(event, this)">
+                    <div class="kpi-main-row">
+                        <div class="kpi-left">
+                            <div class="kpi-icon"><span class="material-symbols-rounded">receipt_long</span></div>
+                            <div class="kpi-meta">
+                                <span class="kpi-label">Ergonomic Debt</span>
+                                <span class="kpi-value" id="ergo-debt">--</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-rounded kpi-toggle-icon">expand_more</span>
+                    </div>
+                    <div class="kpi-details">
+                        <div class="kpi-details-inner">
+                            <div class="kpi-mini">Estimated recovery time needed to compensate for bad posture.</div>
+                        </div>
                     </div>
                 </div>
-                <div class="kpi-mini">Estimated recovery time (the time you need to spend in good posture to compensate,
-                    ROUNDED UP to next minute).</div>
-            </div>
 
-            <div class="card analytics-kpi">
-                <div class="kpi-icon"><span class="material-symbols-rounded">center_focus_strong</span></div>
-                <div class="kpi-label">Proprioception</div>
-                <div class="kpi-value" id="proprio-score">
-                    <div class="themed-loader-container">
-                        <div class="themed-spinner"></div>
-                        <span class="loader-text-pulse">Calculating</span>
+                <div class="card analytics-kpi" tabindex="0" role="button" aria-expanded="false" onclick="toggleKpiCard(this)" onkeydown="handleKpiKeydown(event, this)">
+                    <div class="kpi-main-row">
+                        <div class="kpi-left">
+                            <div class="kpi-icon"><span class="material-symbols-rounded">center_focus_strong</span></div>
+                            <div class="kpi-meta">
+                                <span class="kpi-label">Proprioception</span>
+                                <span class="kpi-value" id="proprio-score">--</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-rounded kpi-toggle-icon">expand_more</span>
+                    </div>
+                    <div class="kpi-details">
+                        <div class="kpi-details-inner">
+                            <div class="kpi-mini">Weighted postural awareness metric.</div>
+                            <div style="font-size:11px; opacity:0.8; font-style:italic;" id="proprio-feedback">--</div>
+                        </div>
                     </div>
                 </div>
-                <div class="kpi-mini" style="margin-bottom: 4px;">Weighted awareness score.</div>
-                <div style="font-size:11px; opacity:0.8; font-style:italic;" id="proprio-feedback">--</div>
-            </div>
 
-            <div class="card analytics-kpi">
-                <div class="kpi-icon"><span class="material-symbols-rounded">trending_up</span></div>
-                <div class="kpi-label">Improvement</div>
-                <div class="kpi-value" id="improvement-score">0%</div>
-                <div class="kpi-mini">The percentage variance between your current compliance and the rolling average of
-                    all previous sessions.</div>
+                <div class="card analytics-kpi" tabindex="0" role="button" aria-expanded="false" onclick="toggleKpiCard(this)" onkeydown="handleKpiKeydown(event, this)">
+                    <div class="kpi-main-row">
+                        <div class="kpi-left">
+                            <div class="kpi-icon"><span class="material-symbols-rounded">trending_up</span></div>
+                            <div class="kpi-meta">
+                                <span class="kpi-label">Improvement</span>
+                                <span class="kpi-value" id="improvement-score">0%</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-rounded kpi-toggle-icon">expand_more</span>
+                    </div>
+                    <div class="kpi-details">
+                        <div class="kpi-details-inner">
+                            <div class="kpi-mini">Percentage variance against your historical baseline.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </section>
 
         <div class="ai-full-width-wrapper">
             <div class="ai-engine-panel">
                 <div class="ai-engine-header">
                     <div class="ai-engine-title-group">
-                        <div class="ai-engine-icon">
-                            <span class="material-symbols-rounded">neurology</span>
-                        </div>
+                        <div class="ai-engine-icon"><span class="material-symbols-rounded">neurology</span></div>
                         <div>
                             <div class="ai-engine-title">Mitraa</div>
                             <div class="ai-engine-subtitle">Your AI companion</div>
                         </div>
                     </div>
-                    <button class="btn ai-refresh-btn" onclick="exportAnalyticsPDF()">
-                        Export PDF
-                    </button>
-                    <button class="btn ai-refresh-btn" onclick="refreshAIAnalysis()">
-                        Refresh Analysis
-                    </button>
+                    <button class="btn ai-refresh-btn" onclick="exportAnalyticsPDF()">Export PDF</button>
+                    <button class="btn ai-refresh-btn" onclick="refreshAIAnalysis()">Refresh Analysis</button>
+                    <button class="btn ai-refresh-btn" onclick="window.open('chat.html', '_blank')"><span class="material-symbols-rounded">chat</span>Chat with Mitraa!</button>
                 </div>
 
                 <div id="ai-analysis-content" class="ai-engine-output">
@@ -514,8 +291,6 @@
                     <div>
                         <span class="label">Cognitive Load</span>
                         <h2>Your Compliance decay over last session</h2>
-                        <p class="kpi-mini">A timeline mapping focus decay to identify muscular strain over session
-                            duration.</p>
                     </div>
                 </div>
                 <div class="chart-container-pro" id="fatigue-container">
@@ -528,8 +303,6 @@
                     <div>
                         <span class="label">Distribution</span>
                         <h2>Alert Composition over last session</h2>
-                        <p class="kpi-mini">A categorical breakdown of posture failures to pinpoint whether your primary
-                            strain is lateral, forward, or vertical.</p>
                     </div>
                 </div>
                 <div class="chart-container-pro">
@@ -540,327 +313,186 @@
     </main>
 
     <script>
+        const splashSlides = [
+            { icon: 'neurology', title: 'Welcome to Summitra', text: 'Your kinetic health and posture intelligence companion.' },
+            { icon: 'sensors', title: 'Live Vision Engine', text: 'Sit back and let our AI monitor your posture in real-time, sending gentle alerts before ergonomic debt builds.' },
+            { icon: 'insights', title: 'Deep Analytics', text: 'Review your session compliance, analyze fatigue trends, and track your posture resilience.' },
+            { icon: 'chat', title: 'Mitraa AI', text: 'Consult with your personal kinetic health assistant for tailored ergonomic guidance and setup reviews.' },
+            { icon: 'task_alt', title: 'Ready to Align?', text: 'Enter the app, calibrate your posture, and reach the epitome of wellness.' }
+        ];
+
+        let bannerMsgIndex = 0;
+        let bannerCharIndex = 0;
+        let isDeleting = false;
+
+        function runTypewriter() {
+            const currentItem = splashSlides[bannerMsgIndex];
+            const textContainer = document.getElementById('banner-text-container');
+            const iconContainer = document.getElementById('banner-icon');
+            const titleContainer = document.getElementById('banner-title');
+
+            if (iconContainer) iconContainer.textContent = currentItem.icon;
+            if (titleContainer) titleContainer.textContent = currentItem.title;
+
+            const fullText = currentItem.text;
+
+            if (isDeleting) {
+                textContainer.textContent = fullText.substring(0, bannerCharIndex - 1);
+                bannerCharIndex--;
+            } else {
+                textContainer.textContent = fullText.substring(0, bannerCharIndex + 1);
+                bannerCharIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 30 : 60;
+
+            if (!isDeleting && bannerCharIndex === fullText.length) {
+                typeSpeed = 2500;
+                isDeleting = true;
+            } else if (isDeleting && bannerCharIndex === 0) {
+                isDeleting = false;
+                bannerMsgIndex = (bannerMsgIndex + 1) % splashSlides.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(runTypewriter, typeSpeed);
+        }
+
+        let fatigueChartInstance = null;
+        let alertChartInstance = null;
         let latestAIAnalysis = "";
-        const currentUser = localStorage.getItem('currentUser');
-        function goBack() { window.location.href = "dashboard.html"; }
 
-        function getSessionPct(session) {
-            if (!session) return 0;
+        function toggleKpiCard(card) {
+            const isExpanded = card.classList.toggle('expanded');
+            card.setAttribute('aria-expanded', isExpanded);
+        }
 
-            if (session.compliance !== undefined && session.compliance !== null) {
-                return session.compliance;
+        function handleKpiKeydown(e, card) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleKpiCard(card);
             }
+        }
 
-            const total = session.total_frames !== undefined ? session.total_frames : (session.totalFrames || 0);
-            const good = session.good_frames !== undefined ? session.good_frames : (session.goodFrames || 0);
-
-            if (total <= 112) {
-                return 0;
-            }
-
-            const validFrames = total - 112;
-            const score = (good / validFrames) * 100;
-
-            return isFinite(score) ? score : 0;
+        function getSessionPct(s) {
+            if (!s) return 0;
+            if (s.compliance != null) return s.compliance;
+            const total = s.total_frames ?? s.totalFrames ?? 0;
+            const good = s.good_frames ?? s.goodFrames ?? 0;
+            return total > 112 ? Math.max(0, (good / (total - 112)) * 100) : 0;
         }
 
         async function getAllSessions() {
-            let sessions = [];
-
             try {
                 const userId = localStorage.getItem('currentUserId');
-                const { data, error } = await _supabase
-                    .from('sessions')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('session_id', { ascending: true });
-
-                if (error) throw error;
-
-                if (data && data.length > 0) {
-                    console.log("Successfully retrieved Cloud logs");
-                    sessions = data;
-                } else {
-                    throw new Error("NO DATA IN DATABASE");
-                }
-
-            } catch (e) {
-                console.warn("Failed to connect to DB, using local storage", e);
-
-                const localSessions = await getAllLocalSessions();
-                const alreadyHasBanner = document.getElementById('offline-status-banner');
-
-                if (localSessions.length > 0 && !alreadyHasBanner) {
-                    const statusMsg = document.createElement('div');
-                    statusMsg.id = 'offline-status-banner';
-                    statusMsg.style = "background:#fee2e2; color:#b91c1c; padding:12px; border-radius:12px; margin-bottom:20px; font-size:14px; font-weight:600; text-align:center;";
-                    statusMsg.innerHTML = `<span class="material-symbols-rounded"></span> No connection to Database. Displaying local data.`;
-                    document.querySelector('main').prepend(statusMsg);
-                }
-
-                return localSessions;
+                const { data, error } = await _supabase.from('sessions').select('*').eq('user_id', userId).order('session_id', { ascending: true });
+                if (error || !data?.length) throw new Error();
+                return data;
+            } catch {
+                return getAllLocalSessions();
             }
-
-            return sessions;
         }
 
         async function getAllLocalSessions() {
-            let localSessions = [];
-            const currentUser = localStorage.getItem('currentUser');
-            if (!currentUser) return [];
-            console.log("Retrieving local sessions for:", currentUser);
-            const allStoredSessions = JSON.parse(localStorage.getItem("sessions")) || [];
-            localSessions = typeof filterSessionsForCurrentUser === "function"
-                ? filterSessionsForCurrentUser(allStoredSessions)
-                : allStoredSessions.filter(session => session.owner === currentUser);
-
-            console.log(`Found ${localSessions.length} local sessions for user.`);
-            return localSessions || [];
-        }
-
-        async function getLatestSession() {
-            const sessions = await getAllSessions();
-            return sessions.length ? sessions.at(-1) : null;
-        }
-
-        function getAllErrors() {
-            try {
-                return JSON.parse(localStorage.getItem("errorLogs")) || [];
-            } catch (e) {
-                console.error("Failed to parse error logs", e);
-                return [];
-            }
+            const user = localStorage.getItem('currentUser');
+            const all = JSON.parse(localStorage.getItem("sessions")) || [];
+            return all.filter(s => s.owner === user) || [];
         }
 
         async function loadAnalytics() {
-            const currentName = localStorage.getItem("currentDisplayName");
             const sessions = await getAllSessions();
             const localSessions = await getAllLocalSessions();
-            console.log("LOCAL SESSIONS: ", localSessions);
+            if (!sessions.length) return;
 
-            if (!sessions.length) {
-                document.querySelector('.analytics-main-pro').innerHTML = `
-        <div style="padding:100px; text-align:center;">
-            <h2 style="color:var(--blue-900);">There is no session history in the database for you, ${currentName}</h2>
-            <p style="color:var(--blue-500); margin-bottom:24px;">Start a live session to generate reports.</p>
-            <button class="primary-btn" style="width:fit-content; margin:0 auto;" onclick="goBack()">
-                Return to Dashboard
-            </button>
-        </div>`;
-                return;
+            const curr = sessions.at(-1);
+            const currLocal = localSessions.length ? localSessions.at(-1) : null;
+            const prev = sessions.slice(0, -1);
+
+            const currVal = curr.compliance ?? getSessionPct(curr);
+            document.getElementById("curr-score").textContent = currVal.toFixed(1) + "%";
+
+            if (prev.length) {
+                const avg = prev.reduce((a, s) => a + getSessionPct(s), 0) / prev.length;
+                const delta = (currVal - avg).toFixed(1);
+                const impEl = document.getElementById("improvement-score");
+                impEl.textContent = (delta > 0 ? "+" : "") + delta + "%";
+                impEl.style.color = delta < 0 ? "var(--danger)" : "#16A34A";
             }
 
-            const currentSession = sessions.at(-1);
-            const currentLocalSession = (localSessions && localSessions.length) ? localSessions.at(-1) : null;
-            const previousSessions = sessions.slice(0, -1);
+            const debt = curr.ergonomic_debt ?? Math.ceil(((curr.bad_frames ?? curr.badFrames ?? 0) * 0.181) / 60);
+            document.getElementById("ergo-debt").textContent = debt + "m";
 
-            // 1. Render Compliance Score
-            let currentVal = currentSession.compliance;
-            if (currentVal === undefined || currentVal === null) {
-                currentVal = getSessionPct(currentSession);
-            }
-            document.getElementById("curr-score").textContent = currentVal.toFixed(1) + "%";
-
-            // Calculate Historical Average Improvement Variance
-            let historicalAvg = null;
-            if (previousSessions.length > 0) {
-                historicalAvg = previousSessions.reduce((acc, s) => acc + getSessionPct(s), 0) / previousSessions.length;
-            }
-
-            const improvementElement = document.getElementById("improvement-score");
-            if (historicalAvg !== null) {
-                const delta = (currentVal - historicalAvg).toFixed(1);
-                improvementElement.textContent = (delta > 0 ? "+" : "") + delta + "%";
-                improvementElement.style.color = delta < 0 ? "var(--danger)" : "#16A34A";
-            }
-
-            // 2. Render Ergonomic Debt
-            let debtMinutes = currentSession.ergonomic_debt;
-            if (debtMinutes === undefined || debtMinutes === null) {
-                const sumBad = currentSession.bad_frames !== undefined ? currentSession.bad_frames : (currentSession.badFrames || 0);
-                debtMinutes = Math.ceil((sumBad * 0.181) / 60);
-            }
-            document.getElementById("ergo-debt").textContent = debtMinutes + "m";
-
-            // Render Alert Breakdown Pie Chart
-            new Chart(document.getElementById("chart"), {
+            if (alertChartInstance) alertChartInstance.destroy();
+            alertChartInstance = new Chart(document.getElementById("chart"), {
                 type: "pie",
                 data: {
                     labels: ["Lateral", "Forward", "Slouch", "Multiple"],
                     datasets: [{
-                        data: [
-                            currentSession.lateral_alerts || currentSession.lateralAlerts || 0,
-                            currentSession.forward_alerts || currentSession.forwardAlerts || 0,
-                            currentSession.slouch_alerts || currentSession.slouchAlerts || 0,
-                            currentSession.multiple_alerts || currentSession.multipleAlerts || 0
-                        ],
-                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "green"]
+                        data: [curr.lateral_alerts || 0, curr.forward_alerts || 0, curr.slouch_alerts || 0, curr.multiple_alerts || 0],
+                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "#10b981"]
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // 3. Render Resilience Ratio
-            const resilienceEl = document.getElementById("resilience-ratio");
-            let rawResilienceValue = currentSession.resilience;
+            document.getElementById("resilience-ratio").textContent = (curr.resilience ?? "--") + "s";
 
-            if (rawResilienceValue !== undefined && rawResilienceValue !== null) {
-                resilienceEl.textContent = rawResilienceValue + "s";
-            } else {
-                let totalRecoveryTime = 0;
-                let recoveryCount = 0;
+            let proprio = curr.proprio_score ?? parseFloat((0.6 * currVal + 0.4 * Math.max(0, 100 - debt * 3.3)).toFixed(1));
+            document.getElementById("proprio-score").textContent = proprio;
 
-                const logsRes = currentLocalSession?.logs || currentSession.logs || [];
+            buildFatigueChart(curr, currLocal);
+        }
 
-                if (Array.isArray(logsRes) && logsRes.length > 0) {
-                    for (let i = 0; i < logsRes.length; i++) {
-                        if (logsRes[i].status === "ALERT") {
-                            const alertTime = new Date(logsRes[i].timestamp);
-                            for (let j = i + 1; j < logsRes.length; j++) {
-                                if (logsRes[j].status === "GOOD") {
-                                    const recoverTime = new Date(logsRes[j].timestamp);
-                                    const delta = (recoverTime - alertTime) / 1000;
-                                    if (delta > 0 && delta < 600) {
-                                        totalRecoveryTime += delta;
-                                        recoveryCount++;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (recoveryCount > 0) {
-                    rawResilienceValue = totalRecoveryTime / recoveryCount;
-                    resilienceEl.textContent = rawResilienceValue.toFixed(1) + "s";
-                }
-                else {
-                    document.getElementById("unavailable").textContent = "unavailable";
-                }
-            }
-
-            // 4. Parse & Render Proprioception Score Matrix
-            let proprioScore = currentSession.proprio_score || currentSession.proprioScore;
-
-            if (proprioScore === undefined || proprioScore === null) {
-                const complianceScore = currentVal || 0;
-                const debtScore = Math.max(0, 100 - (debtMinutes * 3.3));
-                proprioScore = parseFloat((0.6 * complianceScore + 0.4 * debtScore).toFixed(1));
-            } else {
-                proprioScore = parseFloat(Number(proprioScore).toFixed(1));
-            }
-
-            const proprioEl = document.getElementById("proprio-score");
-            proprioEl.textContent = proprioScore;
-
-            const proprioFeedback = document.getElementById("proprio-feedback");
-            if (proprioScore >= 80) {
-                proprioEl.style.color = "#16A34A";
-                proprioFeedback.innerText = `GOOD`;
-            } else if (proprioScore >= 50) {
-                proprioEl.style.color = "#F59E0B";
-                proprioFeedback.innerText = `Tweak your threshold next session!`;
-            } else {
-                proprioEl.style.color = "#EF4444";
-                proprioFeedback.innerText = `Improve your compliance`;
-            }
-
-
+        function buildFatigueChart(cloudSession, localSession) {
             const fatigueContainer = document.getElementById('fatigue-container');
+            const logs = localSession?.logs || cloudSession?.logs || [];
 
-            if (!localSessions || localSessions.length === 0) {
-                fatigueContainer.innerHTML = '';
-
-                const errorOverlay = document.createElement('div');
-                errorOverlay.className = 'chart-error-fallback';
-                errorOverlay.innerHTML = `
-                    <span class="material-symbols-rounded">error</span>
-                    <h3>No local data</h3>
-                    <p>Log a new session now</p>
-                    <button class="primary-btn" style="padding: 8px 16px; font-size: 12px; width: auto;" onclick="location.href='live.html'">
-                        Launch live monitor
-                    </button>
-                `;
-                fatigueContainer.appendChild(errorOverlay);
+            if (!logs || !logs.length) {
+                fatigueContainer.innerHTML = `
+                    <div class="chart-error-fallback">
+                        <span class="material-symbols-rounded">bar_chart_off</span>
+                        <h3>No Timeline Telemetry</h3>
+                        <p>Complete a longer active session to view decay telemetry.</p>
+                    </div>`;
                 return;
             }
 
-            const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
-            const totalFramesCheck = currentSession.total_frames || currentSession.totalFrames || currentLocalSession?.totalFrames || 0;
+            const binCount = 5;
+            const goodCounts = new Array(binCount).fill(0);
+            const totalCounts = new Array(binCount).fill(0);
 
-            if (totalFramesCheck < 100) {
-                const fallbackDataPoints = [currentVal, Math.max(0, currentVal - 5), Math.max(0, currentVal - 12), Math.max(0, currentVal - 18), Math.max(0, currentVal - 22)];
-                renderFatigueChart(fatigueCtx, fallbackDataPoints);
-            } else {
-
-                const logs = currentLocalSession.logs;
-
-
-                if (!logs || !logs.length) {
-                    const dynamicDataPoints = [currentVal, Math.max(0, currentVal - 4), Math.max(0, currentVal - 9), Math.max(0, currentVal - 15), Math.max(0, currentVal - 20)];
-                    renderFatigueChart(fatigueCtx, dynamicDataPoints);
-                    return;
+            logs.forEach((log, index) => {
+                const binIndex = Math.min(binCount - 1, Math.floor((index / logs.length) * binCount));
+                const status = String(log.status || "").trim().toUpperCase();
+                totalCounts[binIndex]++;
+                if (status === "GOOD" || status === "OPTIMAL POSTURE") {
+                    goodCounts[binIndex]++;
                 }
+            });
 
-                const binCount = 5;
+            const decayPoints = goodCounts.map((good, i) => {
+                const total = totalCounts[i];
+                return total > 0 ? parseFloat(((good / total) * 100).toFixed(1)) : 100;
+            });
 
-                const goodCounts = new Array(binCount).fill(0);
-                const badCounts = new Array(binCount).fill(0);
+            fatigueContainer.innerHTML = '<canvas id="fatigueChart"></canvas>';
+            const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
 
-                logs.forEach((log, index) => {
-
-                    const binIndex = Math.min(
-                        binCount - 1,
-                        Math.floor((index / logs.length) * binCount)
-                    );
-
-                    const status = String(log.status || "").trim().toUpperCase();
-
-                    if (
-                        status === "GOOD" ||
-                        status === "OPTIMAL POSTURE"
-                    ) {
-                        goodCounts[binIndex]++;
-                    }
-
-                    else if (
-                        status === "ALERT" ||
-                        status === "BAD"
-                    ) {
-                        badCounts[binIndex]++;
-                    }
-                });
-
-                const fatigueDataPoints = goodCounts.map((good, i) => {
-
-                    const bad = badCounts[i];
-                    const total = good + bad;
-
-                    return total > 0
-                        ? (good / total) * 100
-                        : 100;
-                });
-
-                renderFatigueChart(fatigueCtx, fatigueDataPoints.reverse());
-            }
-        }
-
-        function renderFatigueChart(ctx, dataPoints) {
-            new Chart(ctx, {
+            if (fatigueChartInstance) fatigueChartInstance.destroy();
+            fatigueChartInstance = new Chart(fatigueCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Start', '25%', '50%', '75%', 'End'],
+                    labels: ['0-20%', '20-40%', '40-60%', '60-80%', '80-100%'],
                     datasets: [{
-                        label: 'Postural Efficiency %',
-                        data: dataPoints,
-                        borderColor: '#0052CC',
-                        backgroundColor: 'rgba(0, 82, 204, 0.08)',
+                        label: 'Compliance %',
+                        data: decayPoints,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
                         fill: true,
-                        tension: 0.45,
+                        tension: 0.35,
                         pointRadius: 4,
                         pointBackgroundColor: '#FFFFFF',
-                        pointBorderColor: '#0052CC',
+                        pointBorderColor: '#2563eb',
                         pointBorderWidth: 2
                     }]
                 },
@@ -878,7 +510,7 @@
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: (context) => `Efficiency: ${context.parsed.y.toFixed(1)}%`
+                                label: (context) => `Interval Compliance: ${context.parsed.y}%`
                             }
                         }
                     }
@@ -886,231 +518,50 @@
             });
         }
 
+        // Streaming Typewriter animation for AI Markdown analysis
+        async function typewriteMarkdown(element, fullText, delay = 20) {
+            element.innerHTML = '';
+            const words = fullText.split(' ');
+            let accumulated = '';
+            for (let i = 0; i < words.length; i++) {
+                accumulated += (i === 0 ? '' : ' ') + words[i];
+                element.innerHTML = marked.parse(accumulated);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+
         async function refreshAIAnalysis() {
-
-    const output =
-        document.getElementById("ai-analysis-content");
-
-    if (!output) return;
-
-    output.innerHTML = `
-        <div class="themed-loader-container">
-            <div class="themed-spinner"></div>
-            <span class="loader-text-pulse">
-                Mitraa is analyzing your posture telemetry...
-            </span>
-        </div>
-    `;
-
-    try {
-
-        const {
-            data: { session },
-            error: sessionError
-        } = await _supabase.auth.getSession();
-
-        console.log("Supabase session:", session);
-        console.log("Session error:", sessionError);
-
-        if (sessionError || !session) {
-            throw new Error(
-                "No authenticated Supabase session exists."
-            );
-        }
-
-        const response = await fetch(
-            "https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization":
-                        `Bearer ${session.access_token}`
-                },
-
-                body: JSON.stringify({
-                    action: "analysis"
-                })
+            const output = document.getElementById("ai-analysis-content");
+            output.innerHTML = `<div class="themed-loader-container"><div class="themed-spinner"></div><span>Analyzing posture telemetry...</span></div>`;
+            try {
+                const { data: { session } } = await _supabase.auth.getSession();
+                const res = await fetch("https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
+                    body: JSON.stringify({ action: "analysis" })
+                });
+                const data = await res.json();
+                latestAIAnalysis = data.responseText;
+                await typewriteMarkdown(output, latestAIAnalysis, 20);
+            } catch (err) {
+                output.innerHTML = `<div style="padding:12px; background:#fee2e2; color:#991b1b;">Analysis service currently unavailable.</div>`;
             }
-        );
-
-        const rawResponse =
-            await response.text();
-
-        console.log(
-            "chat-service HTTP status:",
-            response.status
-        );
-
-        console.log(
-            "chat-service raw response:",
-            rawResponse
-        );
-
-        let data;
-
-        try {
-            data = JSON.parse(rawResponse);
-        } catch {
-            throw new Error(
-                `Edge Function returned non-JSON response: ${rawResponse}`
-            );
         }
 
-        if (!response.ok) {
-
-            throw new Error(
-                data?.error ||
-                `Edge Function failed with HTTP ${response.status}`
-            );
-        }
-
-        if (!data?.responseText) {
-
-            throw new Error(
-                "Edge Function succeeded but returned no responseText."
-            );
-        }
-
-        latestAIAnalysis =
-            data.responseText;
-
-        output.innerHTML =
-            marked.parse(
-                latestAIAnalysis
-            );
-
-    } catch (error) {
-
-        console.error(
-            "Mitraa analysis failure:",
-            error
-        );
-
-        output.innerHTML = `
-            <div style="
-                padding:20px;
-                border-radius:16px;
-                background:#fee2e2;
-                color:#991b1b;
-                line-height:1.5;
-            ">
-                <strong>Failed to load analysis.</strong>
-                <br><br>
-                ${error.message}
-            </div>
-        `;
-    }
-}
         async function exportAnalyticsPDF() {
-
-            if (!latestAIAnalysis) {
-
-                alert(
-                    "Generate AI diagnostics first."
-                );
-
-                return;
-            }
-
+            if (!latestAIAnalysis) return alert("Generate AI diagnostics first.");
             const { jsPDF } = window.jspdf;
-
-            const pdf = new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: "a4"
-            });
-
-            // Header Bar
-            pdf.setFillColor(0, 82, 204);
-            pdf.rect(0, 0, 210, 25, "F");
-
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(22);
-            pdf.text("Summitra Analytics", 15, 16);
-
-            pdf.setTextColor(0, 0, 0);
-
-            pdf.setFontSize(10);
-            pdf.text(
-                `Generated: ${new Date().toLocaleString()}`,
-                15,
-                35
-            );
-
-            pdf.setFontSize(14);
-            pdf.text("Performance Summary", 15, 50);
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            pdf.setFontSize(11);
-            pdf.text(
-                `User: ${localStorage.getItem('currentUser')}`,
-                15,
-                pageHeight - 10
-            );
-
-            pdf.text(
-                `Compliance: ${document.getElementById("curr-score").innerText}`,
-                15,
-                60
-            );
-
-            pdf.text(
-                `Resilience: ${document.getElementById("resilience-ratio").innerText}`,
-                15,
-                68
-            );
-
-            pdf.text(
-                `Ergonomic Debt: ${document.getElementById("ergo-debt").innerText}`,
-                15,
-                76
-            );
-
-            pdf.text(
-                `Proprioception: ${document.getElementById("proprio-score").innerText}`,
-                15,
-                84
-            );
-
-            pdf.setFontSize(14);
-            pdf.text("Mitraa's Diagnostics", 15, 100);
-
-            const cleanText =
-                latestAIAnalysis
-                    .replace(/\*\*/g, "")
-                    .replace(/#/g, "");
-
-            const wrapped =
-                pdf.splitTextToSize(
-                    cleanText,
-                    180
-                );
-
-            pdf.setFontSize(11);
-
-            pdf.text(
-                wrapped,
-                15,
-                110
-            );
-
-
-            pdf.save(
-                `Summitra_Report-${Date.now()}.pdf`
-            );
+            const pdf = new jsPDF();
+            pdf.text("Summitra Analytics Report", 15, 20);
+            pdf.text(latestAIAnalysis.replace(/\*\*/g, ""), 15, 30);
+            pdf.save("Summitra_Report.pdf");
         }
-
 
         document.addEventListener("DOMContentLoaded", async () => {
-            console.log("Initializing...");
+            runTypewriter();
             if (window.summitraAuthReady) await window.summitraAuthReady;
             await loadAnalytics();
-
-            //WE WANT ANALYTICS ONLY WHEN THE USER CLICKS THE BUTTON, ELSE NO
-            /*await refreshAIAnalysis();*/
         });
-
     </script>
 
     <div id="summitra-help-root"></div>
