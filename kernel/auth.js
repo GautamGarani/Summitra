@@ -313,3 +313,46 @@ async function attemptSignUp(event) {
         );
     }
 }
+
+// ============================================================================
+// VERSION CHECKING & AUTO-RELOAD LOGIC
+// ============================================================================
+const CLIENT_VERSION = "1.0.0";
+
+function checkVersion() {
+    fetch(`version.json?t=${Date.now()}`, {
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const serverVersion = data.version;
+        if (serverVersion && serverVersion !== CLIENT_VERSION) {
+            console.log(`[Version Check] New version available: ${serverVersion} (Current: ${CLIENT_VERSION})`);
+            
+            // Prevent reload loops in the same session
+            const lastReloadFor = sessionStorage.getItem('last_version_reload_attempt');
+            if (lastReloadFor === serverVersion) {
+                console.warn(`[Version Check] Already attempted reload to version ${serverVersion}. Skipping reload to prevent loop.`);
+                return;
+            }
+            
+            sessionStorage.setItem('last_version_reload_attempt', serverVersion);
+            window.location.reload();
+        }
+    })
+    .catch(err => {
+        console.error("[Version Check] Error checking version:", err);
+    });
+}
+
+// Check version 2 seconds after page load, and then every 30 seconds
+setTimeout(checkVersion, 2000);
+setInterval(checkVersion, 30000);
