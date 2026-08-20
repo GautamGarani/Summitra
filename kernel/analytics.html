@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="auth.js"></script>
@@ -17,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { overflow-x: hidden; background-color: var(--surface); }
+       body { overflow-x: hidden; background-color: var(--surface); }
         .fancy-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-soft); }
         .header-title { font-weight: 800; font-size: 1.5rem; color: var(--blue-900); letter-spacing: -0.5px; }
         .charts-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; width: 100%; }
@@ -28,7 +27,6 @@
         .chart-error-fallback h3 { font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0 0 4px 0; }
         .chart-error-fallback p { font-size: 0.8rem; color: #64748b; margin: 0 0 12px 0; }
 
-        /* Centered & Compact Dynamic Banner */
         .about-banner {
             width: fit-content;
             max-width: 520px;
@@ -84,7 +82,7 @@
             display: inline;
             text-shadow: 0 2px 10px rgba(0,0,0,0.4);
         }
-        
+
         .banner-cursor {
             display: inline-block;
             width: 2px;
@@ -100,17 +98,102 @@
             50% { opacity: 0; }
         }
 
-        @media (max-width: 900px) { .charts-matrix { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) {
-            .fancy-header { padding: 1rem 1.2rem; }
-            .header-title { font-size: 1.1rem; }
-            .header-subtitle { display: none; }
-            .analytics-main-pro { padding: 1.5rem !important; }
-            .about-banner { width: 100%; max-width: 100%; }
+        @media (max-width: 900px) {
+            .charts-matrix {
+                grid-template-columns: 1fr;
+            }
         }
+
+        @media (max-width: 768px) {
+            .fancy-header {
+                padding: 1rem 1.2rem;
+            }
+
+            .header-title {
+                font-size: 1.1rem;
+            }
+
+            .header-subtitle {
+                display: none;
+            }
+
+            .analytics-main-pro {
+                padding: 1.5rem !important;
+            }
+
+            .about-banner {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        .analytics-feedback {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .workspace-diagnostic {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 30px;
+        }
+
+        .diagnostic-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 18px;
+            background: #f8fafc;
+            border-radius: 14px;
+            font-size: 0.95rem;
+        }
+
+        .diagnostic-row span:first-child {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .diagnostic-row .material-symbols-rounded {
+            font-size: 20px;
+        }
+
+        .diagnostic-row strong {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+        }
+
+        .advanced-analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+            width: 100%;
+            margin-top: 24px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 480px) {
+            .gemini-greet {
+                font-size: 1.5rem;
+            }
+
+            .metric-pill {
+                font-size: 0.7rem;
+            }
+
+            .feature-card h2 {
+                font-size: 1.05rem;
+            }
+        }
+
     </style>
 </head>
-
 <body>
     <header class="fancy-header">
         <div class="header-content">
@@ -120,7 +203,6 @@
                 <div class="header-subtitle">Reaching the Epitome of Wellness</div>
             </div>
         </div>
-
         <div class="header-actions">
             <button class="secondary-btn logout-pill" onclick="window.open('dashboard.html', '_blank')">
                 <span class="material-symbols-rounded">dashboard</span>
@@ -134,26 +216,45 @@
                     <span id="display-user">User</span>
                     <span class="material-symbols-rounded" style="font-size: 1.2rem;">expand_more</span>
                 </button>
-
                 <div id="profile-dropdown" class="dropdown-menu">
                     <div class="dropdown-header">
                         <span class="label">Authenticated As</span>
                         <div class="user-email" id="user-detail">user@summitra</div>
                     </div>
                     <hr class="dropdown-divider">
-                    <button class="dropdown-item secondary-item" onclick="window.open('privacyPolicy.html', '_blank')"><span class="material-symbols-rounded">shield</span> Our Policy</button>
-                    <button class="dropdown-item secondary-item" onclick="window.open('about.html', '_blank')"><span class="material-symbols-rounded">info</span> About Summitra</button>
+                    <div class="dropdown-header">
+                        <span class="label">Summitra</span>
+                    </div>
+                    <button class="dropdown-item secondary-item" onclick="window.open('privacyPolicy.html', '_blank')">
+                        <span class="material-symbols-rounded">shield</span>
+                        Our Policy
+                    </button>
+                    <button class="dropdown-item secondary-item" onclick="window.open('about.html', '_blank')">
+                        <span class="material-symbols-rounded">info</span>
+                        About Summitra
+                    </button>
                     <hr class="dropdown-divider">
-                    <button class="dropdown-item" onclick="location.href='chat.html'"><span class="material-symbols-rounded">chat</span> Mitraa AI Chat</button>
-                    <button class="dropdown-item" onclick="location.href='profile.html'"><span class="material-symbols-rounded">person</span> Your Profile</button>
-                    <button class="dropdown-item" onclick="logout()"><span class="material-symbols-rounded">logout</span> Logout</button>
+                    <div class="dropdown-header">
+                        <span class="label">System</span>
+                    </div>
+                    <button class="dropdown-item" onclick="location.href='chat.html'">
+                        <span class="material-symbols-rounded">chat</span>
+                        Mitraa AI Chat
+                    </button>
+                    <button class="dropdown-item" onclick="location.href='profile.html'">
+                        <span class="material-symbols-rounded">person</span>
+                        Your Profile
+                    </button>
+                    <button class="dropdown-item" onclick="logout()">
+                        <span class="material-symbols-rounded">logout</span>
+                        Logout
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
     <main class="analytics-main-pro animate-fade-in-up">
-        <!-- Centered Dynamic Typewriter Banner -->
         <div class="about-banner">
             <div class="material-symbols-rounded banner-icon" id="banner-icon">neurology</div>
             <div class="banner-content">
@@ -163,10 +264,8 @@
             </div>
         </div>
 
-        <!-- Sessional Metrics Section -->
         <section class="sessional-metrics-section">
             <h2 class="sessional-metrics-heading">Sessional Metrics</h2>
-            
             <div class="analytics-kpi-grid">
                 <div class="card analytics-kpi" tabindex="0" role="button" aria-expanded="false" onclick="toggleKpiCard(this)" onkeydown="handleKpiKeydown(event, this)">
                     <div class="kpi-main-row">
@@ -265,15 +364,21 @@
             <div class="ai-engine-panel">
                 <div class="ai-engine-header">
                     <div class="ai-engine-title-group">
-                        <div class="ai-engine-icon"><span class="material-symbols-rounded">neurology</span></div>
+                        <div class="ai-engine-icon">
+                            <span class="material-symbols-rounded">neurology</span>
+                        </div>
                         <div>
                             <div class="ai-engine-title">Mitraa</div>
                             <div class="ai-engine-subtitle">Your AI companion</div>
                         </div>
                     </div>
+
                     <button class="btn ai-refresh-btn" onclick="exportAnalyticsPDF()">Export PDF</button>
                     <button class="btn ai-refresh-btn" onclick="refreshAIAnalysis()">Refresh Analysis</button>
-                    <button class="btn ai-refresh-btn" onclick="window.open('chat.html', '_blank')"><span class="material-symbols-rounded">chat</span>Chat with Mitraa!</button>
+                    <button class="btn ai-refresh-btn" onclick="window.open('chat.html', '_blank')">
+                        <span class="material-symbols-rounded">chat</span>
+                        Chat with Mitraa!
+                    </button>
                 </div>
 
                 <div id="ai-analysis-content" class="ai-engine-output">
@@ -310,56 +415,57 @@
                 </div>
             </section>
         </div>
+
+        <div class="advanced-analytics-grid">
+            <section class="card chart-pro-card advanced-analytics-card">
+                <div class="chart-heading-row">
+                    <div>
+                        <span class="label">Recovery Metrics</span>
+                        <h2>Muscle Memory Trend</h2>
+                    </div>
+                </div>
+                <div class="advanced-chart-container">
+                    <canvas id="muscleMemoryChart"></canvas>
+                </div>
+                <div id="muscle-memory-feedback" class="analytics-feedback">Calculating your resilience trend...</div>
+            </section>
+
+            <section class="card chart-pro-card advanced-analytics-card">
+                <div class="chart-heading-row">
+                    <div>
+                        <span class="label">Behavioral Diagnostics</span>
+                        <h2>Workspace Diagnostic</h2>
+                    </div>
+                </div>
+                <div class="workspace-diagnostic">
+                    <div class="diagnostic-row">
+                        <span>
+                            <span class="material-symbols-rounded">swap_horiz</span>
+                            Lateral
+                        </span>
+                        <strong id="workspace-lateral">0%</strong>
+                    </div>
+                    <div class="diagnostic-row">
+                        <span>
+                            <span class="material-symbols-rounded">airline_seat_recline_normal</span>
+                            Slouch
+                        </span>
+                        <strong id="workspace-slouch">0%</strong>
+                    </div>
+                    <div class="diagnostic-row">
+                        <span>
+                            <span class="material-symbols-rounded">north</span>
+                            Forward
+                        </span>
+                        <strong id="workspace-forward">0%</strong>
+                    </div>
+                </div>
+                <div id="workspace-diagnostic-feedback" class="analytics-feedback">Analyzing workspace patterns...</div>
+            </section>
+        </div>
     </main>
 
     <script>
-        const splashSlides = [
-            { icon: 'neurology', title: 'Welcome to Summitra', text: 'Your kinetic health and posture intelligence companion.' },
-            { icon: 'sensors', title: 'Live Vision Engine', text: 'Sit back and let our AI monitor your posture in real-time, sending gentle alerts before ergonomic debt builds.' },
-            { icon: 'insights', title: 'Deep Analytics', text: 'Review your session compliance, analyze fatigue trends, and track your posture resilience.' },
-            { icon: 'chat', title: 'Mitraa AI', text: 'Consult with your personal kinetic health assistant for tailored ergonomic guidance and setup reviews.' },
-            { icon: 'task_alt', title: 'Ready to Align?', text: 'Enter the app, calibrate your posture, and reach the epitome of wellness.' }
-        ];
-
-        let bannerMsgIndex = 0;
-        let bannerCharIndex = 0;
-        let isDeleting = false;
-
-        function runTypewriter() {
-            const currentItem = splashSlides[bannerMsgIndex];
-            const textContainer = document.getElementById('banner-text-container');
-            const iconContainer = document.getElementById('banner-icon');
-            const titleContainer = document.getElementById('banner-title');
-
-            if (iconContainer) iconContainer.textContent = currentItem.icon;
-            if (titleContainer) titleContainer.textContent = currentItem.title;
-
-            const fullText = currentItem.text;
-
-            if (isDeleting) {
-                textContainer.textContent = fullText.substring(0, bannerCharIndex - 1);
-                bannerCharIndex--;
-            } else {
-                textContainer.textContent = fullText.substring(0, bannerCharIndex + 1);
-                bannerCharIndex++;
-            }
-
-            let typeSpeed = isDeleting ? 30 : 60;
-
-            if (!isDeleting && bannerCharIndex === fullText.length) {
-                typeSpeed = 2500;
-                isDeleting = true;
-            } else if (isDeleting && bannerCharIndex === 0) {
-                isDeleting = false;
-                bannerMsgIndex = (bannerMsgIndex + 1) % splashSlides.length;
-                typeSpeed = 500;
-            }
-
-            setTimeout(runTypewriter, typeSpeed);
-        }
-
-        let fatigueChartInstance = null;
-        let alertChartInstance = null;
         let latestAIAnalysis = "";
 
         function toggleKpiCard(card) {
@@ -374,125 +480,495 @@
             }
         }
 
-        function getSessionPct(s) {
-            if (!s) return 0;
-            if (s.compliance != null) return s.compliance;
-            const total = s.total_frames ?? s.totalFrames ?? 0;
-            const good = s.good_frames ?? s.goodFrames ?? 0;
-            return total > 112 ? Math.max(0, (good / (total - 112)) * 100) : 0;
+        function goBack() {
+            window.location.href = "dashboard.html";
+        }
+
+        function getSessionPct(session) {
+            if (!session) return 0;
+
+            if (session.compliance !== undefined && session.compliance !== null) {
+                return session.compliance;
+            }
+
+            const total = session.total_frames !== undefined
+                ? session.total_frames
+                : (session.totalFrames || 0);
+
+            const good = session.good_frames !== undefined
+                ? session.good_frames
+                : (session.goodFrames || 0);
+
+            if (total <= 112) return 0;
+
+            const validFrames = total - 112;
+            const score = (good / validFrames) * 100;
+
+            return isFinite(score) ? score : 0;
         }
 
         async function getAllSessions() {
+            let sessions = [];
+
             try {
                 const userId = localStorage.getItem('currentUserId');
-                const { data, error } = await _supabase.from('sessions').select('*').eq('user_id', userId).order('session_id', { ascending: true });
-                if (error || !data?.length) throw new Error();
-                return data;
-            } catch {
-                return getAllLocalSessions();
+
+                const { data, error } = await _supabase
+                    .from('sessions')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('session_id', { ascending: true });
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    console.log("Successfully retrieved Cloud logs");
+                    sessions = data;
+                } else {
+                    throw new Error("NO DATA IN DATABASE");
+                }
+            } catch (e) {
+                console.warn("Failed to connect to DB, using local storage", e);
+
+                const localSessions = await getAllLocalSessions();
+                const alreadyHasBanner = document.getElementById('offline-status-banner');
+
+                if (localSessions.length > 0 && !alreadyHasBanner) {
+                    const statusMsg = document.createElement('div');
+                    statusMsg.id = 'offline-status-banner';
+                    statusMsg.style = "background:#fee2e2; color:#b91c1c; padding:12px; border-radius:12px; margin-bottom:20px; font-size:14px; font-weight:600; text-align:center;";
+                    statusMsg.innerHTML = `<span class="material-symbols-rounded"></span> No connection to Database. Displaying local data.`;
+                    document.querySelector('main').prepend(statusMsg);
+                }
+
+                return localSessions;
             }
+
+            return sessions;
         }
 
         async function getAllLocalSessions() {
-            const user = localStorage.getItem('currentUser');
-            const all = JSON.parse(localStorage.getItem("sessions")) || [];
-            return all.filter(s => s.owner === user) || [];
+            let localSessions = [];
+            const currentUser = localStorage.getItem('currentUser');
+
+            if (!currentUser) return [];
+
+            console.log("Retrieving local sessions for:", currentUser);
+
+            const allStoredSessions = JSON.parse(localStorage.getItem("sessions")) || [];
+
+            localSessions = typeof filterSessionsForCurrentUser === "function"
+                ? filterSessionsForCurrentUser(allStoredSessions)
+                : allStoredSessions.filter(session => session.owner === currentUser);
+
+            console.log(`Found ${localSessions.length} local sessions for user.`);
+
+            return localSessions || [];
+        }
+
+        async function getLatestSession() {
+            const sessions = await getAllSessions();
+            return sessions.length ? sessions.at(-1) : null;
+        }
+
+        function renderMuscleMemoryTrend(sessions) {
+            const canvas = document.getElementById("muscleMemoryChart");
+            const feedback = document.getElementById("muscle-memory-feedback");
+
+            if (!canvas) return;
+
+            if (!sessions || sessions.length < 2) {
+                feedback.textContent = "At least two completed sessions are required to establish a resilience trend.";
+                return;
+            }
+
+            const orderedSessions = [...sessions].sort((a, b) => {
+                const dateA = new Date(a.session_end || a.sessionEnd || a.created_at || 0);
+                const dateB = new Date(b.session_end || b.sessionEnd || b.created_at || 0);
+                return dateA - dateB;
+            });
+
+            const labels = [];
+            const resilienceValues = [];
+
+            orderedSessions.forEach((session, index) => {
+                let resilience = session.resilience ?? session.resilience_seconds ?? session.resilienceSeconds;
+                resilience = Number(resilience);
+
+                if (!Number.isFinite(resilience)) return;
+
+                const date = session.session_end || session.sessionEnd || session.created_at;
+
+                labels.push(date ? new Date(date).toLocaleDateString() : `Session ${index + 1}`);
+                resilienceValues.push(Number(resilience.toFixed(2)));
+            });
+
+            if (resilienceValues.length < 2) {
+                feedback.textContent = "Not enough valid resilience data is available to establish a trend.";
+                return;
+            }
+
+            new Chart(canvas, {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Resilience",
+                        data: resilienceValues,
+                        borderColor: "#0052CC",
+                        backgroundColor: "rgba(0, 82, 204, 0.08)",
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: "Recovery Time (seconds)"
+                            },
+                            ticks: {
+                                callback: value => value + "s"
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: "Session"
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Resilience: ${context.parsed.y.toFixed(2)}s`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const first = resilienceValues[0];
+            const latest = resilienceValues[resilienceValues.length - 1];
+            const difference = latest - first;
+
+            if (difference < 0) {
+                feedback.innerHTML = `<strong>Positive muscle-memory trend:</strong> Your average recovery time has decreased by ${Math.abs(difference).toFixed(2)} seconds, suggesting faster responses to posture alerts.`;
+            } else if (difference > 0) {
+                feedback.innerHTML = `<strong>Attention needed:</strong> Your recovery time has increased by ${difference.toFixed(2)} seconds compared with the first recorded session. Focus on correcting posture as soon as an alert appears.`;
+            } else {
+                feedback.innerHTML = `<strong>Stable trend:</strong> Your resilience has remained consistent across the recorded sessions. Continue responding promptly to posture alerts.`;
+            }
+        }
+
+        function renderWorkspaceDiagnostic(sessions) {
+            const lateralEl = document.getElementById("workspace-lateral");
+            const slouchEl = document.getElementById("workspace-slouch");
+            const forwardEl = document.getElementById("workspace-forward");
+            const feedback = document.getElementById("workspace-diagnostic-feedback");
+
+            if (!sessions || sessions.length === 0) return;
+
+            let lateral = 0;
+            let slouch = 0;
+            let forward = 0;
+
+            sessions.forEach(session => {
+                lateral += Number(session.lateral_alerts ?? session.lateralAlerts ?? 0);
+                slouch += Number(session.slouch_alerts ?? session.slouchAlerts ?? 0);
+                forward += Number(session.forward_alerts ?? session.forwardAlerts ?? 0);
+            });
+
+            const total = lateral + slouch + forward;
+
+            if (total === 0) {
+                lateralEl.textContent = "0%";
+                slouchEl.textContent = "0%";
+                forwardEl.textContent = "0%";
+
+                feedback.innerHTML = "<strong>No posture violations detected.</strong> Your recorded sessions currently show no measurable lateral, slouch, or forward alerts.";
+                return;
+            }
+
+            const lateralPct = (lateral / total) * 100;
+            const slouchPct = (slouch / total) * 100;
+            const forwardPct = (forward / total) * 100;
+
+            lateralEl.textContent = lateralPct.toFixed(1) + "%";
+            slouchEl.textContent = slouchPct.toFixed(1) + "%";
+            forwardEl.textContent = forwardPct.toFixed(1) + "%";
+
+            const patterns = [
+                { name: "lateral", value: lateralPct },
+                { name: "slouch", value: slouchPct },
+                { name: "forward", value: forwardPct }
+            ];
+
+            patterns.sort((a, b) => b.value - a.value);
+
+            const dominant = patterns[0];
+
+            if (dominant.name === "lateral") {
+                feedback.innerHTML = `<strong>Dominant pattern: lateral leaning.</strong> A high lateral-alert ratio may indicate an off-centre seating position, uneven monitor placement, or a tendency to lean toward one side.`;
+            } else if (dominant.name === "forward") {
+                feedback.innerHTML = `<strong>Dominant pattern: forward posture.</strong> Frequent forward alerts may indicate that the screen is positioned too far away or that you are consistently leaning toward the display.`;
+            } else {
+                feedback.innerHTML = `<strong>Dominant pattern: slouching.</strong> Frequent slouch alerts may indicate fatigue or insufficient back support. Consider adjusting your chair and taking regular posture breaks.`;
+            }
         }
 
         async function loadAnalytics() {
+            const currentName = localStorage.getItem("currentDisplayName");
             const sessions = await getAllSessions();
             const localSessions = await getAllLocalSessions();
-            if (!sessions.length) return;
 
-            const curr = sessions.at(-1);
-            const currLocal = localSessions.length ? localSessions.at(-1) : null;
-            const prev = sessions.slice(0, -1);
+            console.log("LOCAL SESSIONS: ", localSessions);
 
-            const currVal = curr.compliance ?? getSessionPct(curr);
-            document.getElementById("curr-score").textContent = currVal.toFixed(1) + "%";
-
-            if (prev.length) {
-                const avg = prev.reduce((a, s) => a + getSessionPct(s), 0) / prev.length;
-                const delta = (currVal - avg).toFixed(1);
-                const impEl = document.getElementById("improvement-score");
-                impEl.textContent = (delta > 0 ? "+" : "") + delta + "%";
-                impEl.style.color = delta < 0 ? "var(--danger)" : "#16A34A";
-            }
-
-            const debt = curr.ergonomic_debt ?? Math.ceil(((curr.bad_frames ?? curr.badFrames ?? 0) * 0.181) / 60);
-            document.getElementById("ergo-debt").textContent = debt + "m";
-
-            if (alertChartInstance) alertChartInstance.destroy();
-            alertChartInstance = new Chart(document.getElementById("chart"), {
-                type: "pie",
-                data: {
-                    labels: ["Lateral", "Forward", "Slouch", "Multiple"],
-                    datasets: [{
-                        data: [curr.lateral_alerts || 0, curr.forward_alerts || 0, curr.slouch_alerts || 0, curr.multiple_alerts || 0],
-                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "#10b981"]
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            document.getElementById("resilience-ratio").textContent = (curr.resilience ?? "--") + "s";
-
-            let proprio = curr.proprio_score ?? parseFloat((0.6 * currVal + 0.4 * Math.max(0, 100 - debt * 3.3)).toFixed(1));
-            document.getElementById("proprio-score").textContent = proprio;
-
-            buildFatigueChart(curr, currLocal);
-        }
-
-        function buildFatigueChart(cloudSession, localSession) {
-            const fatigueContainer = document.getElementById('fatigue-container');
-            const logs = localSession?.logs || cloudSession?.logs || [];
-
-            if (!logs || !logs.length) {
-                fatigueContainer.innerHTML = `
-                    <div class="chart-error-fallback">
-                        <span class="material-symbols-rounded">bar_chart_off</span>
-                        <h3>No Timeline Telemetry</h3>
-                        <p>Complete a longer active session to view decay telemetry.</p>
+            if (!sessions.length) {
+                document.querySelector('.analytics-main-pro').innerHTML = `
+                    <div style="padding:100px; text-align:center;">
+                        <h2 style="color:var(--blue-900);">There is no session history in the database for you, ${currentName}</h2>
+                        <p style="color:var(--blue-500); margin-bottom:24px;">Start a live session to generate reports.</p>
+                        <button class="primary-btn" style="width:fit-content; margin:0 auto;" onclick="goBack()">Return to Dashboard</button>
                     </div>`;
                 return;
             }
 
-            const binCount = 5;
-            const goodCounts = new Array(binCount).fill(0);
-            const totalCounts = new Array(binCount).fill(0);
+            renderMuscleMemoryTrend(sessions);
+            renderWorkspaceDiagnostic(sessions);
 
-            logs.forEach((log, index) => {
-                const binIndex = Math.min(binCount - 1, Math.floor((index / logs.length) * binCount));
-                const status = String(log.status || "").trim().toUpperCase();
-                totalCounts[binIndex]++;
-                if (status === "GOOD" || status === "OPTIMAL POSTURE") {
-                    goodCounts[binIndex]++;
+            const currentSession = sessions.at(-1);
+            const currentLocalSession = localSessions && localSessions.length ? localSessions.at(-1) : null;
+            const previousSessions = sessions.slice(0, -1);
+
+            let currentVal = currentSession.compliance;
+
+            if (currentVal === undefined || currentVal === null) {
+                currentVal = getSessionPct(currentSession);
+            }
+
+            document.getElementById("curr-score").textContent = currentVal.toFixed(1) + "%";
+
+            let historicalAvg = null;
+
+            if (previousSessions.length > 0) {
+                historicalAvg = previousSessions.reduce((acc, s) => acc + getSessionPct(s), 0) / previousSessions.length;
+            }
+
+            const improvementElement = document.getElementById("improvement-score");
+
+            if (historicalAvg !== null) {
+                const delta = (currentVal - historicalAvg).toFixed(1);
+
+                improvementElement.textContent = (delta > 0 ? "+" : "") + delta + "%";
+                improvementElement.style.color = delta < 0 ? "var(--danger)" : "#16A34A";
+            }
+
+            let debtMinutes = currentSession.ergonomic_debt;
+
+            if (debtMinutes === undefined || debtMinutes === null) {
+                const sumBad = currentSession.bad_frames !== undefined
+                    ? currentSession.bad_frames
+                    : (currentSession.badFrames || 0);
+
+                debtMinutes = Math.ceil((sumBad * 0.181) / 60);
+            }
+
+            document.getElementById("ergo-debt").textContent = debtMinutes + "m";
+
+            new Chart(document.getElementById("chart"), {
+                type: "pie",
+                data: {
+                    labels: ["Lateral", "Forward", "Slouch", "Multiple"],
+                    datasets: [{
+                        data: [
+                            currentSession.lateral_alerts || currentSession.lateralAlerts || 0,
+                            currentSession.forward_alerts || currentSession.forwardAlerts || 0,
+                            currentSession.slouch_alerts || currentSession.slouchAlerts || 0,
+                            currentSession.multiple_alerts || currentSession.multipleAlerts || 0
+                        ],
+                        backgroundColor: ["#3b82f6", "#ef4444", "#f59e0b", "green"]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
 
-            const decayPoints = goodCounts.map((good, i) => {
-                const total = totalCounts[i];
-                return total > 0 ? parseFloat(((good / total) * 100).toFixed(1)) : 100;
-            });
+            const resilienceEl = document.getElementById("resilience-ratio");
+            let rawResilienceValue = currentSession.resilience;
 
-            fatigueContainer.innerHTML = '<canvas id="fatigueChart"></canvas>';
+            if (rawResilienceValue !== undefined && rawResilienceValue !== null) {
+                resilienceEl.textContent = rawResilienceValue + "s";
+            } else {
+                let totalRecoveryTime = 0;
+                let recoveryCount = 0;
+
+                const logsRes = currentLocalSession?.logs || currentSession.logs || [];
+
+                if (Array.isArray(logsRes) && logsRes.length > 0) {
+                    for (let i = 0; i < logsRes.length; i++) {
+                        if (logsRes[i].status === "ALERT") {
+                            const alertTime = new Date(logsRes[i].timestamp);
+
+                            for (let j = i + 1; j < logsRes.length; j++) {
+                                if (logsRes[j].status === "GOOD") {
+                                    const recoverTime = new Date(logsRes[j].timestamp);
+                                    const delta = (recoverTime - alertTime) / 1000;
+
+                                    if (delta > 0 && delta < 600) {
+                                        totalRecoveryTime += delta;
+                                        recoveryCount++;
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (recoveryCount > 0) {
+                    rawResilienceValue = totalRecoveryTime / recoveryCount;
+                    resilienceEl.textContent = rawResilienceValue.toFixed(1) + "s";
+                }
+            }
+
+            let proprioScore = currentSession.proprio_score || currentSession.proprioScore;
+
+            if (proprioScore === undefined || proprioScore === null) {
+                const complianceScore = currentVal || 0;
+                const debtScore = Math.max(0, 100 - (debtMinutes * 3.3));
+
+                proprioScore = parseFloat((0.6 * complianceScore + 0.4 * debtScore).toFixed(1));
+            } else {
+                proprioScore = parseFloat(Number(proprioScore).toFixed(1));
+            }
+
+            const proprioEl = document.getElementById("proprio-score");
+            proprioEl.textContent = proprioScore;
+
+            const proprioFeedback = document.getElementById("proprio-feedback");
+
+            if (proprioScore >= 80) {
+                proprioEl.style.color = "#16A34A";
+                proprioFeedback.innerText = "GOOD";
+            } else if (proprioScore >= 50) {
+                proprioEl.style.color = "#F59E0B";
+                proprioFeedback.innerText = "Tweak your threshold next session!";
+            } else {
+                proprioEl.style.color = "#EF4444";
+                proprioFeedback.innerText = "Improve your compliance";
+            }
+
+            const fatigueContainer = document.getElementById('fatigue-container');
+
+            if (!localSessions || localSessions.length === 0) {
+                fatigueContainer.innerHTML = '';
+
+                const errorOverlay = document.createElement('div');
+                errorOverlay.className = 'chart-error-fallback';
+
+                errorOverlay.innerHTML = `
+                    <span class="material-symbols-rounded">error</span>
+                    <h3>No local data</h3>
+                    <p>Log a new session now</p>
+                    <button class="primary-btn" style="padding: 8px 16px; font-size: 12px; width: auto;" onclick="location.href='live.html'">Launch live monitor</button>
+                `;
+
+                fatigueContainer.appendChild(errorOverlay);
+                return;
+            }
+
             const fatigueCtx = document.getElementById('fatigueChart').getContext('2d');
 
-            if (fatigueChartInstance) fatigueChartInstance.destroy();
-            fatigueChartInstance = new Chart(fatigueCtx, {
+            const totalFramesCheck = currentSession.total_frames ||
+                currentSession.totalFrames ||
+                currentLocalSession?.totalFrames ||
+                0;
+
+            if (totalFramesCheck < 100) {
+                const fallbackDataPoints = [
+                    currentVal,
+                    Math.max(0, currentVal - 5),
+                    Math.max(0, currentVal - 12),
+                    Math.max(0, currentVal - 18),
+                    Math.max(0, currentVal - 22)
+                ];
+
+                renderFatigueChart(fatigueCtx, fallbackDataPoints);
+            } else {
+                const logs = currentLocalSession.logs;
+
+                if (!logs || !logs.length) {
+                    const dynamicDataPoints = [
+                        currentVal,
+                        Math.max(0, currentVal - 4),
+                        Math.max(0, currentVal - 9),
+                        Math.max(0, currentVal - 15),
+                        Math.max(0, currentVal - 20)
+                    ];
+
+                    renderFatigueChart(fatigueCtx, dynamicDataPoints);
+                    return;
+                }
+
+                const binCount = 5;
+                const goodCounts = new Array(binCount).fill(0);
+                const badCounts = new Array(binCount).fill(0);
+
+                logs.forEach((log, index) => {
+                    const binIndex = Math.min(
+                        binCount - 1,
+                        Math.floor((index / logs.length) * binCount)
+                    );
+
+                    const status = String(log.status || "").trim().toUpperCase();
+
+                    if (status === "GOOD" || status === "OPTIMAL POSTURE") {
+                        goodCounts[binIndex]++;
+                    } else if (status === "ALERT" || status === "BAD") {
+                        badCounts[binIndex]++;
+                    }
+                });
+
+                const fatigueDataPoints = goodCounts.map((good, i) => {
+                    const bad = badCounts[i];
+                    const total = good + bad;
+                    return total > 0 ? (good / total) * 100 : 100;
+                });
+
+                renderFatigueChart(fatigueCtx, fatigueDataPoints.reverse());
+            }
+        }
+
+        function renderFatigueChart(ctx, dataPoints) {
+            new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['0-20%', '20-40%', '40-60%', '60-80%', '80-100%'],
+                    labels: ['Start', '25%', '50%', '75%', 'End'],
                     datasets: [{
-                        label: 'Compliance %',
-                        data: decayPoints,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                        label: 'Postural Efficiency %',
+                        data: dataPoints,
+                        borderColor: '#0052CC',
+                        backgroundColor: 'rgba(0, 82, 204, 0.08)',
                         fill: true,
-                        tension: 0.35,
+                        tension: 0.45,
                         pointRadius: 4,
                         pointBackgroundColor: '#FFFFFF',
-                        pointBorderColor: '#2563eb',
+                        pointBorderColor: '#0052CC',
                         pointBorderWidth: 2
                     }]
                 },
@@ -503,14 +979,18 @@
                         y: {
                             beginAtZero: true,
                             max: 100,
-                            ticks: { callback: value => value + '%' }
+                            ticks: {
+                                callback: value => value + '%'
+                            }
                         }
                     },
                     plugins: {
-                        legend: { display: false },
+                        legend: {
+                            display: false
+                        },
                         tooltip: {
                             callbacks: {
-                                label: (context) => `Interval Compliance: ${context.parsed.y}%`
+                                label: context => `Efficiency: ${context.parsed.y.toFixed(1)}%`
                             }
                         }
                     }
@@ -518,54 +998,178 @@
             });
         }
 
-        // Streaming Typewriter animation for AI Markdown analysis
-        async function typewriteMarkdown(element, fullText, delay = 20) {
-            element.innerHTML = '';
-            const words = fullText.split(' ');
-            let accumulated = '';
-            for (let i = 0; i < words.length; i++) {
-                accumulated += (i === 0 ? '' : ' ') + words[i];
-                element.innerHTML = marked.parse(accumulated);
-                await new Promise(resolve => setTimeout(resolve, delay));
-            }
-        }
-
         async function refreshAIAnalysis() {
             const output = document.getElementById("ai-analysis-content");
-            output.innerHTML = `<div class="themed-loader-container"><div class="themed-spinner"></div><span>Analyzing posture telemetry...</span></div>`;
+
+            if (!output) return;
+
+            output.innerHTML = `
+                <div class="themed-loader-container">
+                    <div class="themed-spinner"></div>
+                    <span class="loader-text-pulse">Mitraa is analyzing your posture telemetry...</span>
+                </div>
+            `;
+
             try {
-                const { data: { session } } = await _supabase.auth.getSession();
-                const res = await fetch("https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
-                    body: JSON.stringify({ action: "analysis" })
-                });
-                const data = await res.json();
+                const { data: { session }, error: sessionError } = await _supabase.auth.getSession();
+
+                console.log("Supabase session:", session);
+                console.log("Session error:", sessionError);
+
+                if (sessionError || !session) {
+                    throw new Error("No authenticated Supabase session exists.");
+                }
+
+                const response = await fetch(
+                    "https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/chat-service",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${session.access_token}`
+                        },
+                        body: JSON.stringify({
+                            action: "analysis"
+                        })
+                    }
+                );
+
+                const rawResponse = await response.text();
+
+                console.log("chat-service HTTP status:", response.status);
+                console.log("chat-service raw response:", rawResponse);
+
+                let data;
+
+                try {
+                    data = JSON.parse(rawResponse);
+                } catch {
+                    throw new Error(`Edge Function returned non-JSON response: ${rawResponse}`);
+                }
+
+                if (!response.ok) {
+                    throw new Error(data?.error || `Edge Function failed with HTTP ${response.status}`);
+                }
+
+                if (!data?.responseText) {
+                    throw new Error("Edge Function succeeded but returned no responseText.");
+                }
+
                 latestAIAnalysis = data.responseText;
-                await typewriteMarkdown(output, latestAIAnalysis, 20);
-            } catch (err) {
-                output.innerHTML = `<div style="padding:12px; background:#fee2e2; color:#991b1b;">Analysis service currently unavailable.</div>`;
+                output.innerHTML = marked.parse(latestAIAnalysis);
+            } catch (error) {
+                console.error("Mitraa analysis failure:", error);
+
+                output.innerHTML = `
+                    <div style="padding:20px; border-radius:16px; background:#fee2e2; color:#991b1b; line-height:1.5;">
+                        <strong>Failed to load analysis.</strong>
+                        <br><br>
+                        ${error.message}
+                    </div>
+                `;
             }
         }
 
         async function exportAnalyticsPDF() {
-            if (!latestAIAnalysis) return alert("Generate AI diagnostics first.");
+            if (!latestAIAnalysis) {
+                alert("Generate AI diagnostics first.");
+                return;
+            }
+
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-            pdf.text("Summitra Analytics Report", 15, 20);
-            pdf.text(latestAIAnalysis.replace(/\*\*/g, ""), 15, 30);
-            pdf.save("Summitra_Report.pdf");
+
+            const pdf = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
+
+            pdf.setFillColor(0, 82, 204);
+            pdf.rect(0, 0, 210, 25, "F");
+
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(22);
+            pdf.text("Summitra Analytics", 15, 16);
+
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFontSize(10);
+            pdf.text(`Generated: ${new Date().toLocaleString()}`, 15, 35);
+
+            pdf.setFontSize(14);
+            pdf.text("Performance Summary", 15, 50);
+
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            pdf.setFontSize(11);
+            pdf.text(`User: ${localStorage.getItem('currentUser')}`, 15, pageHeight - 10);
+            pdf.text(`Compliance: ${document.getElementById("curr-score").innerText}`, 15, 60);
+            pdf.text(`Resilience: ${document.getElementById("resilience-ratio").innerText}`, 15, 68);
+            pdf.text(`Ergonomic Debt: ${document.getElementById("ergo-debt").innerText}`, 15, 76);
+            pdf.text(`Proprioception: ${document.getElementById("proprio-score").innerText}`, 15, 84);
+
+            pdf.setFontSize(14);
+            pdf.text("Mitraa's Diagnostics", 15, 100);
+
+            const cleanText = latestAIAnalysis.replace(/\*\*/g, "").replace(/#/g, "");
+            const wrapped = pdf.splitTextToSize(cleanText, 180);
+
+            pdf.setFontSize(11);
+            pdf.text(wrapped, 15, 110);
+
+            pdf.save(`Summitra_Report-${Date.now()}.pdf`);
+        }
+
+        const bannerMessages = [
+            "Summitra monitors your posture in real time and helps you build healthier working habits.",
+            "Your posture data is transformed into meaningful wellness insights.",
+            "Mitraa analyzes your posture patterns and provides personalized feedback.",
+            "Track your compliance, resilience, ergonomic debt, and proprioception over time."
+        ];
+
+        let bannerMessageIndex = 0;
+
+        function startTypewriter() {
+            const textContainer = document.getElementById("banner-text-container");
+
+            if (!textContainer) return;
+
+            let message = bannerMessages[bannerMessageIndex];
+            let characterIndex = 0;
+
+            textContainer.textContent = "";
+
+            function typeCharacter() {
+                if (characterIndex < message.length) {
+                    textContainer.textContent += message.charAt(characterIndex);
+                    characterIndex++;
+
+                    setTimeout(typeCharacter, 35);
+                } else {
+                    setTimeout(() => {
+                        bannerMessageIndex = (bannerMessageIndex + 1) % bannerMessages.length;
+                        startTypewriter();
+                    }, 3000);
+                }
+            }
+
+            typeCharacter();
         }
 
         document.addEventListener("DOMContentLoaded", async () => {
-            runTypewriter();
-            if (window.summitraAuthReady) await window.summitraAuthReady;
+            console.log("Initializing...");
+            startTypewriter();
+
+            if (window.summitraAuthReady) {
+                await window.summitraAuthReady;
+            }
+
             await loadAnalytics();
+
+            /* await refreshAIAnalysis(); */
         });
     </script>
 
     <div id="summitra-help-root"></div>
     <script src="help-system.js" defer></script>
 </body>
-
 </html>
