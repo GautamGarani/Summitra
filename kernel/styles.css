@@ -1786,19 +1786,26 @@ header {
 }
 
 #help-box {
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 320px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    position: fixed !important;
+    bottom: 20px !important; /* Spacing from screen bottom */
+    right: 20px !important;
+    width: 350px;
+    max-width: calc(100vw - 32px); /* Prevents overflow on small mobile screens */
+    max-height: calc(100dvh - 100px); /* Restricts height so it stays within screen boundaries regardless of header size */
+    z-index: 9999;
     display: none;
-    /* Hidden by default */
     flex-direction: column;
     overflow: hidden;
-    z-index: 9999;
-    font-family: sans-serif;
+    border: 2px solid var(--blue-accent);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: cardEnter 0.3s cubic-bezier(.2, .8, .2, 1);
+}
+
+.help-body {
+    padding: 20px;
+    background: white;
+    overflow-y: auto; /* Allows contents to scroll if screen height is constrained */
 }
 
 .modal-active {
