@@ -98,51 +98,13 @@
             50% { opacity: 0; }
         }
 
-@media (max-width: 900px) {
-    .charts-matrix,
-    .advanced-analytics-grid {
-        grid-template-columns: 1fr !important;
-    }
-}
-
+        @media (max-width: 900px) {
+            .charts-matrix {
+                grid-template-columns: 1fr;
+            }
+        }
 
         @media (max-width: 768px) {
-                .analytics-main-pro {
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        padding: 1rem !important;
-        overflow-x: hidden;
-    }
-
-    .charts-matrix,
-    .advanced-analytics-grid {
-        width: 100%;
-        max-width: 100%;
-        grid-template-columns: minmax(0, 1fr) !important;
-        box-sizing: border-box;
-    }
-
-    .chart-pro-card,
-    .advanced-analytics-card {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-    }
-
-    .chart-container-pro,
-    .advanced-chart-container {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-    }
-
-    canvas {
-        max-width: 100% !important;
-    }
-    
             .fancy-header {
                 padding: 1rem 1.2rem;
             }
@@ -282,10 +244,6 @@
                     <button class="dropdown-item" onclick="location.href='profile.html'">
                         <span class="material-symbols-rounded">person</span>
                         Your Profile
-                    </button>
-                    <button class="dropdown-item danger-item" onclick="deleteAccount()">
-                        <span class="material-symbols-rounded">delete_forever</span>
-                        Delete Account
                     </button>
                     <button class="dropdown-item" onclick="logout()">
                         <span class="material-symbols-rounded">logout</span>
@@ -752,21 +710,42 @@
             forwardEl.textContent = forwardPct.toFixed(1) + "%";
 
             const patterns = [
-                { name: "lateral", value: lateralPct },
-                { name: "slouch", value: slouchPct },
-                { name: "forward", value: forwardPct }
+            { name: "lateral", value: lateralPct },
+            { name: "slouch", value: slouchPct },
+            { name: "forward", value: forwardPct }
             ];
 
-            patterns.sort((a, b) => b.value - a.value);
+        patterns.sort((a, b) => b.value - a.value);
 
-            const dominant = patterns[0];
+        const dominant = patterns[0];
+        const second = patterns[1];
 
-            if (dominant.name === "lateral") {
-                feedback.innerHTML = `<strong>Dominant pattern: lateral leaning.</strong> A high lateral-alert ratio may indicate an off-centre seating position, uneven monitor placement, or a tendency to lean toward one side.`;
+        if (dominant.value === second.value) {
+
+            feedback.innerHTML =
+            `<strong>Shared posture pattern identified.</strong> ` +
+            `Your posture alerts are equally distributed between ${dominant.name} and ${second.name}.`;
+
+        } else if (dominant.name === "lateral") {
+
+                feedback.innerHTML =
+                    `<strong>Dominant pattern: lateral leaning.</strong> ` +
+                    `A high lateral-alert ratio may indicate an off-centre seating position, ` +
+                    `uneven monitor placement, or a tendency to lean toward one side.`;
+
             } else if (dominant.name === "forward") {
-                feedback.innerHTML = `<strong>Dominant pattern: forward posture.</strong> Frequent forward alerts may indicate that the screen is positioned too far away or that you are consistently leaning toward the display.`;
+
+                feedback.innerHTML =
+                    `<strong>Dominant pattern: forward posture.</strong> ` +
+                    `Frequent forward alerts may indicate that the screen is positioned too far away ` +
+                    `or that you are consistently leaning toward the display.`;
+
             } else {
-                feedback.innerHTML = `<strong>Dominant pattern: slouching.</strong> Frequent slouch alerts may indicate fatigue or insufficient back support. Consider adjusting your chair and taking regular posture breaks.`;
+
+                feedback.innerHTML =
+                    `<strong>Dominant pattern: slouching.</strong> ` +
+                    `Frequent slouch alerts may indicate fatigue or insufficient back support. ` +
+                    `Consider adjusting your chair and taking regular posture breaks.`;
             }
         }
 
