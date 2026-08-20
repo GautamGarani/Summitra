@@ -1366,14 +1366,14 @@ header {
     padding: 10px 12px;
     border-radius: 12px;
     background: transparent;
-    color: var(--danger);
+    color: var(--blue-900);
     font-weight: 600;
     font-size: 14px;
     transition: background 0.2s;
 }
 
 .dropdown-item:hover {
-    background: #FEF2F2;
+    background: var(--blue-accent);
 }
 
 /* Container alignment */
@@ -1467,7 +1467,7 @@ header {
     border-radius: 10px;
     background: transparent;
     border: none;
-    color: var(--danger);
+    color: var(--blue-900);
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
@@ -1475,9 +1475,32 @@ header {
 }
 
 .dropdown-item:hover {
+    background: var(--blue-accent);
+    transform: translateX(4px);
+}
+
+/* Secondary / muted item */
+.dropdown-item.secondary-item {
+    color: var(--blue-500);
+    font-weight: 500;
+}
+
+.dropdown-item.secondary-item:hover {
+    background: var(--surface);
+    color: var(--blue-900);
+}
+
+/* Danger — Delete Account */
+.dropdown-item.danger-item {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+.dropdown-item.danger-item:hover {
     background: #fff1f2;
     transform: translateX(4px);
 }
+
 
 /* Ensure header uses space-between for extreme right alignment */
 header {
@@ -1588,7 +1611,7 @@ header {
     margin: 8px 0;
 }
 
-/* Interactive Logout Item */
+/* Interactive Dropdown Item */
 .dropdown-item {
     width: 100%;
     display: flex;
@@ -1598,7 +1621,7 @@ header {
     border-radius: 12px;
     background: transparent;
     border: none;
-    color: var(--danger);
+    color: var(--blue-900);
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
@@ -1606,8 +1629,7 @@ header {
 }
 
 .dropdown-item:hover {
-    background: #fff1f2;
-    /* Soft red danger hover */
+    background: var(--blue-accent);
     transform: translateX(4px);
 }
 

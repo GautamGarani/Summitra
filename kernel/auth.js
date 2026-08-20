@@ -315,6 +315,233 @@ async function attemptSignUp(event) {
 }
 
 // ============================================================================
+// DELETE ACCOUNT
+// ============================================================================
+
+/**
+ * Injects (once) and shows the delete-account confirmation modal.
+ * The user must type their exact UUID to unlock the final delete button.
+ */
+async function deleteAccount() {
+    // Ensure the user is authenticated before proceeding
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (!session) {
+        alert('You are not logged in.');
+        return;
+    }
+
+    const userId = session.user.id;
+
+    // ---- Inject the modal HTML once ----------------------------------------
+    const MODAL_ID = 'deleteAccountModal';
+    if (!document.getElementById(MODAL_ID)) {
+        const modalHTML = `
+        <div id="${MODAL_ID}" style="
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(13,27,42,0.7);
+            backdrop-filter: blur(6px);
+            z-index: 10001;
+            justify-content: center; align-items: center;">
+
+            <div style="
+                background: #fff; border-radius: 20px;
+                border-top: 4px solid var(--danger);
+                padding: 32px; max-width: 440px; width: 90%;
+                box-shadow: 0 24px 48px -12px rgba(0,0,0,0.25);
+                animation: cardEnter 0.3s cubic-bezier(.2,.8,.2,1);">
+
+                <div style="font-size: 2rem; margin-bottom: 12px; color: var(--danger);">&#9888;</div>
+
+                <h3 style="
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    font-size: 1.3rem; color: #0D1B2A;
+                    margin: 0 0 8px;">Delete Your Account</h3>
+
+                <p style="
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    font-size: 0.9rem; color: #415A77;
+                    line-height: 1.6; margin: 0 0 20px;">
+                    This will permanently delete your account, all sessions, and all associated data. <strong>This action cannot be undone.</strong>
+                </p>
+
+                <p style="
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    font-size: 0.85rem; color: #415A77;
+                    margin: 0 0 6px;">
+                    To confirm, type your account UUID below:
+                </p>
+
+                <div style="
+                    font-family: 'JetBrains Mono', monospace;
+                    font-size: 0.8rem; color: var(--danger);
+                    background: #FFF1F2; border-radius: 8px;
+                    padding: 10px 14px; margin-bottom: 14px;
+                    word-break: break-all; user-select: all;"
+                    id="deleteModalUUID"></div>
+
+                <input id="deleteUUIDInput" type="text" placeholder="Paste or type your UUID here"
+                    autocomplete="off" spellcheck="false"
+                    style="
+                        width: 100%; box-sizing: border-box;
+                        padding: 12px 14px; border-radius: 10px;
+                        border: 1.5px solid var(--border-soft);
+                        font-family: 'JetBrains Mono', monospace;
+                        font-size: 0.82rem; color: #0D1B2A;
+                        outline: none; transition: border-color 0.2s;
+                        margin-bottom: 20px;" />
+
+                <div style="display: flex; gap: 12px;">
+                    <button id="deleteModalCancelBtn"
+                        style="
+                            flex: 1; padding: 12px; border-radius: 10px;
+                            border: 1.5px solid var(--border-soft);
+                            background: transparent; color: #415A77;
+                            font-family: 'Plus Jakarta Sans', sans-serif;
+                            font-weight: 600; font-size: 0.9rem;
+                            cursor: pointer; transition: background 0.2s;">
+                        Cancel
+                    </button>
+                    <button id="deleteModalConfirmBtn" disabled
+                        style="
+                            flex: 1; padding: 12px; border-radius: 10px;
+                            border: none; background: var(--danger);
+                            color: #fff; opacity: 0.4;
+                            font-family: 'Plus Jakarta Sans', sans-serif;
+                            font-weight: 700; font-size: 0.9rem;
+                            cursor: not-allowed; transition: opacity 0.2s;">
+                        Delete Account
+                    </button>
+                </div>
+
+                <div id="deleteModalStatus" style="
+                    display: none; margin-top: 14px;
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    font-size: 0.85rem; color: var(--danger);
+                    text-align: center;"></div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Wire up live UUID validation
+        const input = document.getElementById('deleteUUIDInput');
+        const confirmBtn = document.getElementById('deleteModalConfirmBtn');
+
+        input.addEventListener('input', () => {
+            const matches = input.value.trim() === document.getElementById('deleteModalUUID').textContent.trim();
+            confirmBtn.disabled = !matches;
+            confirmBtn.style.opacity = matches ? '1' : '0.4';
+            confirmBtn.style.cursor = matches ? 'pointer' : 'not-allowed';
+        });
+
+        // Cancel button
+        document.getElementById('deleteModalCancelBtn').addEventListener('click', () => {
+            document.getElementById(MODAL_ID).style.display = 'none';
+            input.value = '';
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.4';
+            confirmBtn.style.cursor = 'not-allowed';
+            document.getElementById('deleteModalStatus').style.display = 'none';
+        });
+
+        // Close on backdrop click
+        document.getElementById(MODAL_ID).addEventListener('click', (e) => {
+            if (e.target === document.getElementById(MODAL_ID)) {
+                document.getElementById('deleteModalCancelBtn').click();
+            }
+        });
+
+        // Confirm button — perform the deletion
+        confirmBtn.addEventListener('click', async () => {
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.4';
+            confirmBtn.textContent = 'Deleting…';
+
+            const statusEl = document.getElementById('deleteModalStatus');
+            statusEl.style.display = 'block';
+            statusEl.style.color = '#415A77';
+            statusEl.textContent = 'Communicating with server…';
+
+            try {
+                // 1. Call the server-side RPC that deletes sessions, profile, and auth user.
+                //    This is the primary path — it runs as a security-definer postgres function
+                //    so it can delete from auth.users directly.
+                const { error: rpcError } = await _supabase.rpc('delete_own_account');
+
+                if (rpcError) {
+                    // RPC failed — surface the real error instead of silently continuing.
+                    // The fallback client-side path can only delete sessions + profile rows;
+                    // it cannot remove the auth.users record without the RPC.
+                    console.error('[deleteAccount] RPC error:', rpcError.message);
+
+                    statusEl.textContent = 'Cleaning up data…';
+                    const { error: sessErr } = await _supabase
+                        .from('sessions').delete().eq('user_id', session.user.id);
+                    const { error: profErr } = await _supabase
+                        .from('profiles').delete().eq('id', session.user.id);
+
+                    if (sessErr || profErr) {
+                        throw new Error(
+                            `Partial cleanup failed. RPC: ${rpcError.message}` +
+                            (sessErr ? ` | Sessions: ${sessErr.message}` : '') +
+                            (profErr ? ` | Profile: ${profErr.message}` : '')
+                        );
+                    }
+                    // Even if data rows were cleaned, auth user still exists.
+                    // Sign out so the session token stops working, then tell the user.
+                    await _supabase.auth.signOut();
+                    clearAuthCache();
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    throw new Error(
+                        `Data cleared, but the auth user record could not be deleted (${rpcError.message}). ` +
+                        `Please run the updated SQL migration in Supabase and try again.`
+                    );
+                }
+
+                // 2. RPC succeeded — sign out to invalidate the JWT immediately.
+                await _supabase.auth.signOut();
+
+                // 3. Wipe all local state.
+                clearAuthCache();
+                localStorage.clear();
+                sessionStorage.clear();
+
+                statusEl.style.color = 'var(--success)';
+                statusEl.textContent = 'Account deleted. Redirecting…';
+
+                setTimeout(() => {
+                    window.location.replace('login.html');
+                }, 1200);
+
+            } catch (err) {
+                console.error('[deleteAccount] Critical error:', err);
+                statusEl.style.color = 'var(--danger)';
+                statusEl.textContent = `Error: ${err.message || 'Deletion failed. Please try again.'}`;
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = '1';
+                confirmBtn.textContent = 'Delete Account';
+            }
+        });
+    }
+
+    // ---- Show the modal with the user's UUID populated ---------------------
+    document.getElementById('deleteModalUUID').textContent = userId;
+    document.getElementById('deleteUUIDInput').value = '';
+    const confirmBtn = document.getElementById('deleteModalConfirmBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '0.4';
+    confirmBtn.style.cursor = 'not-allowed';
+    confirmBtn.textContent = 'Delete Account';
+    document.getElementById('deleteModalStatus').style.display = 'none';
+    document.getElementById(MODAL_ID).style.display = 'flex';
+
+    // Close any open profile dropdown
+    const menu = document.getElementById('profile-dropdown');
+    if (menu) menu.classList.remove('active');
+}
+
+// ============================================================================
 // VERSION CHECKING & AUTO-RELOAD LOGIC
 // ============================================================================
 const CLIENT_VERSION = "1.0.0";
