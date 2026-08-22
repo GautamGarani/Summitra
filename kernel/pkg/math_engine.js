@@ -8,13 +8,14 @@
  * @param {boolean} forward_on
  * @param {boolean} slouch_on
  * @param {boolean} success_on
+ * @param {number} elapsed_seconds
  * @returns {string}
  */
-export function process_feedback(tilt_degrees, forward_degrees, vertical_ratio, tilt_on, forward_on, slouch_on, success_on) {
+export function process_feedback(tilt_degrees, forward_degrees, vertical_ratio, tilt_on, forward_on, slouch_on, success_on, elapsed_seconds) {
     let deferred1_0;
     let deferred1_1;
     try {
-        const ret = wasm.process_feedback(tilt_degrees, forward_degrees, vertical_ratio, tilt_on, forward_on, slouch_on, success_on);
+        const ret = wasm.process_feedback(tilt_degrees, forward_degrees, vertical_ratio, tilt_on, forward_on, slouch_on, success_on, elapsed_seconds);
         deferred1_0 = ret[0];
         deferred1_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);

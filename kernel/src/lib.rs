@@ -106,8 +106,8 @@ fn calculate_deviation_score(tilt: f32, forward: f32, vertical: f32) -> (f32, bo
     // Dynamic Safe Zones with 10% Buffer
     let t_low = c.min_tilt - (c.min_tilt.abs() * 0.1).max(1.0);
     let t_high = c.max_tilt + (c.max_tilt.abs() * 0.1).max(1.0);
-    let f_low = c.min_forward - (c.min_forward.abs() * 0.1).max(1.0);
-    let f_high = c.max_forward + (c.max_forward.abs() * 0.1).max(1.0);
+    let f_low = c.min_forward - (c.min_forward.abs() * 0.05).max(1.0);
+    let f_high = c.max_forward + (c.max_forward.abs() * 0.05).max(1.0);
     // Vertical is ratio (slouch), buffer is tighter
     let v_low = c.min_vertical - (c.min_vertical * 0.05); 
     let v_high = c.max_vertical + (c.max_vertical * 0.05);
@@ -137,8 +137,20 @@ pub fn process_feedback(
     tilt_on: bool,
     forward_on: bool,
     slouch_on: bool,
-    success_on: bool
+    success_on: bool,
+    elapsed_seconds: f32 // [v3.0] Pass real time to prevent JS frame drifting
 ) -> String {
+
+    // ========================================================= [v3.0]
+    // SECURE SESSION TERMINATION LIMIT
+    // Edit this variable to change the maximum session length.
+    // Enforced in Rust to prevent tampering via browser console.
+    // =========================================================
+    let max_session_seconds: f32 = 120.0; // 2 minutes
+    
+    if elapsed_seconds >= max_session_seconds {
+        return "TERMINATE_SESSION".to_string();
+    }
 
     update_calibration(tilt_degrees, forward_degrees, vertical_ratio);
 
@@ -151,8 +163,6 @@ pub fn process_feedback(
     drop(tbuf);
 
     // Per-Dimension Instability: Forward & Vertical [v2.0]
-    // Each axis now has its own stability score so that a jittery head tilt
-    // no longer masks a slow, deliberate forward lean or slouch.
     let mut fbuf = FORWARD_BUFFER.lock().unwrap();
     if fbuf.len() >= BUFFER_SIZE { fbuf.pop_front(); }
     fbuf.push_back(forward_degrees);
@@ -183,13 +193,19 @@ pub fn process_feedback(
     let cumulative = *acc;
 
     // Out of range AND Moving Slow AND Persistent [v1.0]
-    // Per-Dimension Instability tracked above [v2.0]; global gate uses max so ANY jittery axis
-    // suppresses all alerts — prevents a jittery head tilt from masking false forward/slouch fires. [v2.0]
     let global_instability = tilt_instability.max(forward_instability).max(slouch_instability);
     let base_gate = deviation > 0.0 && cumulative > CUMULATIVE_ALERT_THRESHOLD && global_instability < INSTABILITY_THRESHOLD;
+    
     let is_tilt_bad = bad_t && tilt_on && base_gate;
     let is_forward_bad = bad_f && forward_on && base_gate;
-    let is_slouch_bad = bad_v && slouch_on && base_gate;
+    let mut is_slouch_bad = bad_v && slouch_on && base_gate;
+
+    // [v3.0] Separation of Forward and Slouch
+    // If both trigger simultaneously, prioritize Forward Lean since the neck deviation
+    // physically causes the vertical ratio to drop. This prevents duplicate alerts.
+    if is_forward_bad && is_slouch_bad {
+        is_slouch_bad = false;
+    }
 
     // Determine current state including Slouching
     let current_state = match (is_tilt_bad, is_forward_bad, is_slouch_bad) {

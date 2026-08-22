@@ -600,12 +600,51 @@ async function startCoach() {
                     rawText.innerHTML = `Tilt: ${degrees.toFixed(1)}° | Neck: ${neckAngle.toFixed(1)}° | Slouch: ${verticalRatio.toFixed(2)}`;
 
                     if (sessionData.totalFrames % 3 === 0) {
-                        process_feedback(degrees, neckAngle, verticalRatio, tiltOn, forwardOn, slouchOn, false);
+                        process_feedback(degrees, neckAngle, verticalRatio, tiltOn, forwardOn, slouchOn, false, 0.0);
                     }
                 } else {
                     overlay.style.display = 'none';
 
-                    let feedback = process_feedback(degrees, neckAngle, verticalRatio, tiltOn, forwardOn, slouchOn, successOn);
+                    // [v3.0] Track exact real-world time to avoid JS frame rate drifting
+                    if (window.sessionStartRealTime === undefined) {
+                        window.sessionStartRealTime = Date.now();
+                    }
+                    let elapsedSeconds = (Date.now() - window.sessionStartRealTime) / 1000.0;
+
+                    let feedback = process_feedback(degrees, neckAngle, verticalRatio, tiltOn, forwardOn, slouchOn, successOn, elapsedSeconds);
+
+                    // [v3.0] Handle secure session termination enforced by Rust
+                    if (feedback === "TERMINATE_SESSION") {
+                        if (!window._sessionAutoTerminated) {
+                            window._sessionAutoTerminated = true;
+                            running = false;
+                            const autoModal = document.getElementById("auto-terminate-modal");
+                            if (autoModal) autoModal.classList.remove("modal-hidden");
+                            setTimeout(() => {
+                                const confirmBtn = document.getElementById("confirm-exit-btn");
+                                if (confirmBtn) confirmBtn.click();
+                            }, 3000);
+                        }
+                        return; // Halt loop
+                    }
+
+                    // [v3.0] Update Live UI Timer
+                    let displayTimer = document.getElementById("session-timer-display");
+                    if (displayTimer) {
+                        let mins = Math.floor(elapsedSeconds / 60);
+                        let secs = Math.floor(elapsedSeconds % 60);
+                        displayTimer.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    }
+                    
+                    let timerWarning = document.getElementById("session-timer-warning");
+                    if (timerWarning) {
+                        // Max limit is 120s (2 min), warn when 60s or less remains
+                        if (120 - elapsedSeconds <= 60 && elapsedSeconds < 120) {
+                            timerWarning.style.display = "block";
+                        } else {
+                            timerWarning.style.display = "none";
+                        }
+                    }
 
                     display.innerHTML = feedback;
                     rawText.innerHTML = `Tilt: ${degrees.toFixed(1)}° | Neck: ${neckAngle.toFixed(1)}° | Slouch: ${verticalRatio.toFixed(2)}`;

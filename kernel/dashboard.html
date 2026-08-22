@@ -444,6 +444,10 @@
                 <span class="material-symbols-rounded">fiber_new</span>
             </button>
 
+            <button class="secondary-btn logout-pill" onclick="location.href='manifest.html'" title="Session Manifest">
+                <span class="material-symbols-rounded">table_view</span>
+            </button>
+
             <div class="profile-container">
                 <button class="profile-trigger" onclick="toggleDropdown()">
                     <span class="material-symbols-rounded">account_circle</span>
@@ -559,23 +563,23 @@
                 </button>
             </div>
 
+
+            <!-- [v3.0] Cloud Database Card -->
             <div class="card feature-card">
-                <div class="feature-badge" style="background: var(--tertiary-light); color: var(--tertiary);">
-                    <span class="material-symbols-rounded">database</span>
+                <div class="feature-badge" style="background: #E0F2FE; color: #0284C7;">
+                    <span class="material-symbols-rounded">cloud_sync</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <h2>Local Storage</h2>
-                    <button class="secondary-btn delete-btn-danger" onclick="clearHistory()">
-                        <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
-                    </button>
+                    <h2>Cloud Database</h2>
+                    <span id="cloud-session-count-text" style="font-size: 0.9rem; font-weight: 700; color: #0284C7; padding: 4px 10px; background: #F0F9FF; border-radius: 99px;">Loading...</span>
                 </div>
-                <p>A view of your data currently cached in your browser's local storage.</p>
+                <p>Your permanent session logs synced to the cloud.</p>
 
                 <div class="manifest-table-container">
                     <table class="manifest-light-table">
                         <thead>
                             <tr>
-                                <th>LOCAL ID</th>
+                                <th>SESSION ID</th>
                                 <th>DUR</th>
                                 <th>TILT ALERTS</th>
                                 <th>NECK ALERTS</th>
@@ -583,10 +587,14 @@
                                 <th>SCORE</th>
                             </tr>
                         </thead>
-                        <tbody id="ledger-body">
+                        <tbody id="cloud-ledger-body">
                         </tbody>
                     </table>
                 </div>
+                <button class="btn" onclick="location.href='manifest.html'" style="margin-top: 14px; width: 100%;">
+                    <span class="material-symbols-rounded">table_view</span>
+                    Open Session Manifest
+                </button>
             </div>
 
         </section>
@@ -670,10 +678,64 @@
             }
         }
 
+        async function renderCloudLedger() {
+            try {
+                const userId = localStorage.getItem('currentUserId');
+                const tbody = document.getElementById("cloud-ledger-body");
+                const countText = document.getElementById("cloud-session-count-text");
+                
+                if (!userId || typeof _supabase === 'undefined') {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--error-state);">Offline: Cannot connect to Supabase</td></tr>`;
+                    countText.innerText = "Offline";
+                    return;
+                }
+
+                const { data, error, count } = await _supabase
+                    .from('sessions')
+                    .select('*', { count: 'exact' })
+                    .eq('user_id', userId)
+                    .order('session_end', { ascending: false });
+
+                if (error) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--error-state);">Error loading data</td></tr>`;
+                    countText.innerText = "Error";
+                    return;
+                }
+
+                countText.innerText = `${count || 0} Sessions`;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--blue-secondary);">No cloud sessions recorded yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = "";
+                data.forEach((session, index) => {
+                    const durationSec = session.duration_seconds || session.duration || 0;
+                    const timeStr = formatDuration(durationSec);
+                    const compliance = getSessionPct(session).toFixed(1);
+
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>#${session.session_id || '?'}</td>
+                        <td>${timeStr}</td> 
+                        <td>${session.lateral_alerts || 0}</td>
+                        <td>${session.forward_alerts || 0}</td>
+                        <td>${session.slouch_alerts || 0}</td>
+                        <td style="font-weight: 800; color: #0284C7">${compliance}%</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", async () => {
             if (window.summitraAuthReady) await window.summitraAuthReady;
             renderLedger();
             updateWelcomeMessage();
+            renderCloudLedger();
 
             setTimeout(() => {
                 const overlay = document.getElementById('bot-welcome-overlay');

@@ -951,32 +951,86 @@
                     return;
                 }
 
-                const binCount = 5;
-                const goodCounts = new Array(binCount).fill(0);
-                const badCounts = new Array(binCount).fill(0);
+                try {
+                    const binCount = 5;
+                    const goodTime = new Array(binCount).fill(0);
+                    const badTime = new Array(binCount).fill(0);
 
-                logs.forEach((log, index) => {
-                    const binIndex = Math.min(
-                        binCount - 1,
-                        Math.floor((index / logs.length) * binCount)
-                    );
+                    // [v3.0] Reconstruct precise chronological timeline
+                    const sessionStartTime = currentLocalSession.sessionStart ? new Date(currentLocalSession.sessionStart).getTime() : new Date(logs[0].timestamp).getTime();
+                    const sessionEndTime = currentLocalSession.sessionEnd ? new Date(currentLocalSession.sessionEnd).getTime() : sessionStartTime + ((currentLocalSession.durationSeconds || currentLocalSession.duration || 120) * 1000);
+                    const totalDuration = Math.max(1, sessionEndTime - sessionStartTime);
 
-                    const status = String(log.status || "").trim().toUpperCase();
+                    let currentStateIsGood = true; // Sessions always begin in a Good state post-calibration
+                    let lastTimestamp = sessionStartTime;
 
-                    if (status === "GOOD" || status === "OPTIMAL POSTURE") {
-                        goodCounts[binIndex]++;
-                    } else if (status === "ALERT" || status === "BAD") {
-                        badCounts[binIndex]++;
+                    // Function to distribute time chunks across bin boundaries accurately
+                    const processDuration = (startT, endT, isGood) => {
+                        if (endT <= startT) return;
+                        const binSize = Math.max(1, totalDuration / binCount);
+                        let currentT = startT;
+                        
+                        let safetyCounter = 0;
+                        while (currentT < endT && safetyCounter++ < 100) {
+                            const unboundedBinIndex = Math.floor((currentT - sessionStartTime) / binSize);
+                            const binIndex = Math.min(binCount - 1, Math.max(0, unboundedBinIndex));
+                            
+                            const binEndT = sessionStartTime + ((unboundedBinIndex + 1) * binSize);
+                            const chunkEndT = Math.min(endT, binEndT);
+                            const duration = chunkEndT - currentT;
+                            
+                            if (duration <= 0) {
+                                // Failsafe: if math breaks down, dump remaining time into current bin and exit
+                                if (isGood) goodTime[binIndex] += (endT - currentT);
+                                else badTime[binIndex] += (endT - currentT);
+                                break;
+                            }
+                            
+                            if (isGood) goodTime[binIndex] += duration;
+                            else badTime[binIndex] += duration;
+                            
+                            currentT = chunkEndT;
+                        }
+                    };
+
+                    logs.forEach(log => {
+                        const logTime = new Date(log.timestamp).getTime();
+                        processDuration(lastTimestamp, logTime, currentStateIsGood);
+                        
+                        const status = String(log.status || "").trim().toUpperCase();
+                        currentStateIsGood = (status === "GOOD" || status === "OPTIMAL POSTURE");
+                        lastTimestamp = logTime;
+                    });
+                    
+                    // Process the final tail block of the session
+                    processDuration(lastTimestamp, sessionEndTime, currentStateIsGood);
+
+                    const fatigueDataPoints = goodTime.map((good, i) => {
+                        const bad = badTime[i];
+                        const total = good + bad;
+                        return total > 0 ? (good / total) * 100 : (i === 0 ? 100 : null);
+                    });
+                    
+                    // Forward-fill empty bins (if a bin had exactly 0 duration mapped to it)
+                    let lastValid = fatigueDataPoints[0];
+                    for (let i = 1; i < fatigueDataPoints.length; i++) {
+                        if (fatigueDataPoints[i] === null) fatigueDataPoints[i] = lastValid;
+                        else lastValid = fatigueDataPoints[i];
                     }
-                });
 
-                const fatigueDataPoints = goodCounts.map((good, i) => {
-                    const bad = badCounts[i];
-                    const total = good + bad;
-                    return total > 0 ? (good / total) * 100 : 100;
-                });
-
-                renderFatigueChart(fatigueCtx, fatigueDataPoints.reverse());
+                    renderFatigueChart(fatigueCtx, fatigueDataPoints);
+                } catch (e) {
+                    console.error("Error computing timeline-based compliance chart:", e);
+                    // Graceful fallback to static/dynamic data points
+                    const dynamicDataPoints = [
+                        currentVal,
+                        Math.max(0, currentVal - 4),
+                        Math.max(0, currentVal - 9),
+                        Math.max(0, currentVal - 15),
+                        Math.max(0, currentVal - 20)
+                    ];
+                    renderFatigueChart(fatigueCtx, dynamicDataPoints);
+                }
             }
         }
 

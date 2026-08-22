@@ -107,6 +107,24 @@
   </div>
   </div>
 
+  <!-- [v3.0] Auto-termination notification modal -->
+  <style>
+    @keyframes progressShrink {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+  </style>
+  <div id="auto-terminate-modal" class="modal-overlay modal-hidden">
+    <div class="modal-content" style="text-align: center; padding: 2.5rem 2rem; max-width: 420px;">
+      <span class="material-symbols-rounded" style="font-size: 3rem; color: #16A34A; display: block; margin-bottom: 1rem;">cloud_done</span>
+      <h3 style="margin: 0 0 0.5rem; color: var(--blue-900); font-size: 1.3rem; font-weight: 800;">Session Submitted Automatically</h3>
+      <p style="color: var(--blue-secondary); font-size: 0.95rem; margin: 0 0 1.5rem;">Your maximum session time was reached. Your data has been saved and you'll be redirected to Analytics shortly.</p>
+      <div style="height: 4px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+        <div style="height: 100%; width: 100%; background: var(--blue-primary); border-radius: 4px; animation: progressShrink 3s linear forwards;"></div>
+      </div>
+    </div>
+  </div>
+
   <header>
     <div class="header-content">
       <img src="logo.jpg" class="logo-watermark" alt="Summitra">
@@ -246,6 +264,18 @@
 
 
     <section id="monitor-card">
+
+      <!-- [v3.0] Session Timer Display -->
+      <div class="card-segment">
+        <span class="label">Session Timer</span>
+        <div id="session-timer-display" style="font-size: 2rem; font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--blue-primary); margin: 8px 0;">
+          00:00
+        </div>
+        <div id="session-timer-warning" style="color: var(--error-state); font-size: 0.9rem; font-weight: 600; display: none;">
+          <span class="material-symbols-rounded" style="vertical-align: middle; font-size: 1.1rem;">warning</span>
+          Less than 1 minute remaining
+        </div>
+      </div>
 
       <div class="card-segment">
 
