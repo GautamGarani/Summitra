@@ -379,7 +379,7 @@
         </div>
     </div>
 
-    <header class="fancy-header">
+    <header class="fancy-header" id="main-chat-header">
         <div class="header-content">
             <img src="logo.jpg" class="logo-watermark" alt="Summitra">
             <div class="header-text-group">
@@ -432,6 +432,28 @@
             </div>
         </div>
     </header>
+
+    <script>
+        // Check if we are embedded
+        if (window.self !== window.top || window.location.search.includes('embed=true')) {
+            const h = document.getElementById('main-chat-header');
+            if (h) h.style.display = 'none';
+            const wo = document.getElementById('bot-welcome-overlay');
+            if (wo) wo.style.display = 'none';
+            const layout = document.querySelector('.chat-layout');
+            if (layout) {
+                layout.style.padding = '0';
+                layout.style.maxWidth = '100%';
+                layout.style.height = '100%';
+            }
+            const container = document.querySelector('.chat-container');
+            if (container) {
+                container.style.border = 'none';
+                container.style.borderRadius = '0';
+                container.style.boxShadow = 'none';
+            }
+        }
+    </script>
 
     <main class="chat-layout animate-fade-in-up">
         <div class="chat-container">

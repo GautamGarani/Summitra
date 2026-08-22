@@ -402,7 +402,163 @@
             to { opacity: 0; visibility: hidden; pointer-events: none; }
         }
     </style>
-</head>
+    <style>
+        .dashboard-content-split {
+            display: grid;
+            grid-template-columns: 6fr 4fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        .hero-slide-container {
+            position: relative;
+            min-height: 180px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--surface) 0%, #E0F2FE 100%);
+            border: 1px solid var(--border-soft);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .hero-slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        
+        .update-injection { display: flex; align-items: flex-start; gap: 1rem; margin-top: 10px; }
+        .update-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.1); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .update-content h4 { margin: 0 0 4px 0; font-size: 1.2rem; color: white; }
+        .update-content p { margin: 0; font-size: 0.9rem; color: #94a3b8; line-height: 1.5; }
+        
+        @keyframes periodicVibrate {
+            0%, 94% { transform: translate(0); }
+            95% { transform: translate(-2px, 1px) rotate(-1deg); }
+            96% { transform: translate(2px, -1px) rotate(1deg); }
+            97% { transform: translate(-2px, -1px) rotate(-1deg); }
+            98% { transform: translate(2px, 1px) rotate(1deg); }
+            99% { transform: translate(-1px, 0) rotate(0deg); }
+            100% { transform: translate(0); }
+        }
+        
+        .wiggling-card {
+            background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+            border: 1px solid var(--border-soft);
+            border-radius: 24px;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,82,204,0.08);
+            animation: periodicVibrate 6s infinite;
+        }
+        .wiggling-card:hover { animation-play-state: paused; }
+        
+        .video-slideshow { width: 100%; height: 100%; position: relative; }
+        .v-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
+        .v-slide.active { opacity: 1; }
+        .v-icon { font-size: 4rem; color: var(--blue-primary); margin-bottom: 1.5rem; animation: floatBadge 3s ease-in-out infinite; }
+        .v-slide h3 { font-size: 1.5rem; color: var(--blue-900); margin: 0 0 1rem; font-weight: 800; }
+        .v-slide p { font-size: 1rem; color: var(--blue-secondary); line-height: 1.5; margin: 0; }
+        
+        @media (max-width: 900px) {
+            .dashboard-content-split { grid-template-columns: 1fr; }
+            .dash-right-col { order: 2; margin-top: 1rem; }
+            .dash-left-col { order: 1; }
+            .wiggling-card { aspect-ratio: auto; height: 350px; }
+            .dash-bottom-col { width: 100% !important; margin-top: 1.5rem !important; }
+        }
+    </style>    <style id="missing-exp-css">
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(3deg); }
+        }
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(0,82,204,0.05); }
+            50% { box-shadow: 0 8px 25px rgba(0,82,204,0.15); }
+        }
+        
+        .exp-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-soft); 
+            border-radius: 20px; 
+            overflow: hidden; 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .exp-card:hover { 
+            border-color: var(--blue-primary); 
+            transform: translateY(-4px);
+            animation: glowPulse 2s infinite;
+        }
+        .exp-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--blue-primary), #0284C7);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .exp-card:hover::before, .exp-card.open::before { opacity: 1; }
+
+        .exp-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 1.5rem; cursor: pointer; user-select: none;
+        }
+        .exp-header-left { display: flex; align-items: center; gap: 16px; }
+        
+        .exp-badge {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            animation: floatBadge 4s ease-in-out infinite;
+        }
+        .exp-badge:nth-child(even) { animation-delay: -2s; }
+
+        .exp-icon { color: var(--blue-secondary); font-size: 1.8rem; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .exp-card.open .exp-icon { transform: rotate(180deg); color: var(--blue-primary); }
+        
+        .exp-body { 
+            max-height: 0; 
+            opacity: 0;
+            overflow: hidden; 
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-in-out, padding 0.6s;
+            padding: 0 1.5rem;
+        }
+        .exp-card.open .exp-body { 
+            max-height: 800px; 
+            opacity: 1;
+            padding: 0 1.5rem 1.5rem;
+            border-top: 1px dashed var(--border-soft);
+            margin-top: 0.5rem;
+            padding-top: 1.5rem;
+        }
+        
+        .btn-sm { padding: 6px 14px; font-size: 0.85rem; border-radius: 10px; font-weight: 700; z-index: 2; position: relative; }
+        
+        .chat-inline { display: flex; flex-direction: column; height: 380px; border: 1px solid var(--border-soft); border-radius: 16px; background: #FAFBFC; overflow: hidden; }
+        .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { max-width: 85%; padding: 12px 16px; border-radius: 14px; font-size: 0.9rem; line-height: 1.4; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .chat-msg.bot { align-self: flex-start; background: #fff; border: 1px solid var(--border-soft); color: var(--blue-900); }
+        .chat-msg.user { align-self: flex-end; background: linear-gradient(135deg, var(--blue-primary), #0284C7); color: #fff; border: none; }
+        .chat-input-area { display: flex; gap: 10px; padding: 12px 14px; background: #fff; border-top: 1px solid var(--border-soft); }
+        .chat-input { flex: 1; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 12px; padding: 10px 14px; font-family: inherit; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+        .chat-input:focus { border-color: var(--blue-primary); background: #fff; }
+        .chat-send { background: var(--blue-primary); color: #fff; border: none; border-radius: 12px; width: 42px; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .chat-send:active { transform: scale(0.95); }
+    </style></head>
 
 <body>
     <div id="bot-welcome-overlay">
@@ -504,101 +660,295 @@
 
     <main class="dashboard-main-pro">
 
-        <section class="dashboard-hero animate-fade-in-up">
-            <div class="hero-copy">
-                <h1 class="gemini-greet">Hello, <span id="welcome-name">Guest</span>!</h1>
+            <section class="dashboard-hero hero-slide-container" id="hero-slider">
+                <div class="hero-slide active">
+                    <h1 class="gemini-greet" style="margin:0 0 16px;">Hello, <span id="welcome-name">Guest</span>!</h1>
+                    <div class="hero-pills" style="margin:0; justify-content: flex-start;">
+                        <div class="metric-pill"><span class="material-symbols-rounded">monitoring</span> Realtime Guidance</div>
+                        <div class="metric-pill"><span class="material-symbols-rounded">query_stats</span> Session Trends</div>
+                        <div class="metric-pill"><span class="material-symbols-rounded">workspace_premium</span> Adaptive Calibration</div>
+                    </div>
+                </div>
+                <div class="hero-slide">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                        <span class="material-symbols-rounded" style="color:#6ea8fe;">campaign</span>
+                        <h2 style="font-size:1.1rem; margin:0; color:white; font-weight:800;">What's new in Summitra?</h2>
+                    </div>
+                    <div id="latest-update-card">
+                        <span style="color:#94a3b8;">Loading latest updates...</span>
+                    </div>
+                </div>
+            </section>
+<div class="dashboard-content-split">
+        <div class="dash-left-col">
+            
+            
+            <section class="feature-grid animate-fade-in-up" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div class="exp-card">
+                    <div class="exp-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="exp-header-left">
+                            <div class="exp-badge" style="background:#FFF0F2; color:#E11D48;"><span class="material-symbols-rounded">center_focus_strong</span></div>
+                            <div>
+                                <h3 style="margin:0; font-size:1.15rem; color:var(--blue-900); font-weight:800;">Start Monitoring</h3>
+                                <p style="margin:4px 0 0; font-size:0.85rem; color:var(--blue-secondary);">Launch Vision Engine & Tracking</p>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <button class="btn btn-sm" onclick="event.stopPropagation(); location.href='live.html'">Launch</button>
+                            <span class="material-symbols-rounded exp-icon">expand_more</span>
+                        </div>
+                    </div>
+                    <div class="exp-body">
+                        <p style="color:var(--blue-secondary); margin-bottom:1.5rem; font-size:0.95rem; line-height:1.5;">Launch the Vision Engine to begin real-time posture tracking and live kinetic feedback. Mitraa will continuously analyze your webcam feed to ensure perfect ergonomic compliance throughout your session.</p>
+                    </div>
+                </div>
+
+                <div class="exp-card">
+                    <div class="exp-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="exp-header-left">
+                            <div class="exp-badge" style="background:#F0FDF4; color:#16A34A;"><span class="material-symbols-rounded">analytics</span></div>
+                            <div>
+                                <h3 style="margin:0; font-size:1.15rem; color:var(--blue-900); font-weight:800;">View Analytics</h3>
+                                <p style="margin:4px 0 0; font-size:0.85rem; color:var(--blue-secondary);">Analyze compliance trends</p>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <button class="secondary-btn btn-sm" onclick="event.stopPropagation(); location.href='analytics.html'">View</button>
+                            <span class="material-symbols-rounded exp-icon">expand_more</span>
+                        </div>
+                    </div>
+                    <div class="exp-body">
+                        <p style="color:var(--blue-secondary); margin-bottom:1.5rem; font-size:0.95rem; line-height:1.5;">Compare sessions, examine alert distributions, and track your overall ergonomic debt and resilience trends over time.</p>
+                    </div>
+                </div>
+
+                <div class="exp-card">
+                    <div class="exp-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="exp-header-left">
+                            <div class="exp-badge" style="background:#F0F9FF; color:#0284C7;"><span class="material-symbols-rounded">cloud_sync</span></div>
+                            <div>
+                                <h3 style="margin:0; font-size:1.15rem; color:var(--blue-900); font-weight:800;">Cloud Database</h3>
+                                <p style="margin:4px 0 0; font-size:0.85rem; color:var(--blue-secondary);">Manage synced sessions</p>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span id="cloud-session-count-text" style="font-size:0.8rem; font-weight:800; color:#0284C7; padding:4px 10px; background:#E0F2FE; border-radius:99px;">Loading...</span>
+                            <span class="material-symbols-rounded exp-icon">expand_more</span>
+                        </div>
+                    </div>
+                    <div class="exp-body">
+                        <div class="manifest-table-container">
+                            <table class="manifest-light-table" style="margin-bottom:1.5rem;">
+                                <thead>
+                                    <tr><th>SESSION ID</th><th>DUR</th><th>TILT</th><th>NECK</th><th>SLOUCH</th><th>SCORE</th></tr>
+                                </thead>
+                                <tbody id="cloud-ledger-body"></tbody>
+                            </table>
+                        </div>
+                        <button class="btn" onclick="location.href='manifest.html'" style="width: 100%; justify-content: center;">
+                            <span class="material-symbols-rounded" style="margin-right:8px;">table_view</span> Open Session Manifest
+                        </button>
+                    </div>
+                </div>
+            
+<div class="exp-card">
+            <div class="exp-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="exp-header-left">
+                    <div class="exp-badge" style="background: linear-gradient(135deg, var(--blue-primary), #0284C7); color: #fff; box-shadow: 0 4px 15px rgba(0,82,204,0.3);"><span class="material-symbols-rounded">auto_awesome</span></div>
+                    <div>
+                        <h3 style="margin:0; font-size:1.15rem; color:var(--blue-900); font-weight:800;">Mitraa AI Chat</h3>
+                        <p style="margin:4px 0 0; font-size:0.85rem; color:var(--blue-secondary);">Chat with your posture assistant</p>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <button class="secondary-btn btn-sm" onclick="event.stopPropagation(); location.href='chat.html'">Full Screen</button>
+                    <span class="material-symbols-rounded exp-icon">expand_more</span>
+                </div>
             </div>
-
-            <div class="hero-pills">
-                <div class="metric-pill">
-                    <span class="material-symbols-rounded">monitoring</span>
-                    Realtime Guidance
-                </div>
-                <div class="metric-pill">
-                    <span class="material-symbols-rounded">query_stats</span>
-                    Session Trends
-                </div>
-                <div class="metric-pill">
-                    <span class="material-symbols-rounded">workspace_premium</span>
-                    Adaptive Calibration
+            <div class="exp-body">
+                <p style="color:var(--blue-secondary); margin-bottom:1.2rem; font-size:0.95rem;">Have an in-depth conversation with Mitraa directly from your dashboard.</p>
+                <div class="chat-inline">
+                    <div class="chat-messages" id="dash-chat-messages">
+                        <div class="chat-msg bot">Hi there! I'm Mitraa. How can I help you improve your posture today?</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="dash-chat-input" class="chat-input" placeholder="Message Mitraa..." autocomplete="off" onkeydown="if(event.key==='Enter') dashSendMessage()">
+                        <button class="chat-send" id="dash-chat-send" onclick="dashSendMessage()"><span class="material-symbols-rounded" style="font-size:1.2rem;">send</span></button>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+            </section>
+        </div>
 
-        <section class="feature-grid animate-fade-in-up">
-
-            <div class="card feature-card">
-                <div class="feature-badge">
-                    <span class="material-symbols-rounded">center_focus_strong</span>
+        <div class="dash-right-col">
+            <div class="wiggling-card">
+                <div class="video-slideshow" id="vid-slideshow">
+                    <div class="v-slide active">
+                        <span class="material-symbols-rounded v-icon">center_focus_strong</span>
+                        <h3>Precision Tracking</h3>
+                        <p>Our Vision Engine analyzes your posture biomechanics at 30 frames per second using state-of-the-art AI.</p>
+                    </div>
+                    <div class="v-slide">
+                        <span class="material-symbols-rounded v-icon">psychology</span>
+                        <h3>Smart Alerts</h3>
+                        <p>Receive gentle audio nudges and visual feedback instantly when ergonomic drift is detected.</p>
+                    </div>
+                    <div class="v-slide">
+                        <span class="material-symbols-rounded v-icon">trending_up</span>
+                        <h3>Build Resilience</h3>
+                        <p>Track your compliance score and proprioception metrics seamlessly across all your sessions.</p>
+                    </div>
                 </div>
-                <h2>Start Monitoring</h2>
-                <p>Launch the Vision Engine to begin real-time posture tracking and live feedback.</p>
-                <button class="btn" onclick="location.href='live.html'">
-                    Launch Live Monitor
-                    <span class="material-symbols-rounded">sensors</span>
-                </button>
             </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        // ── Slideshows ──────────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch new.html to populate the "What's New" slide
+            try {
+                const res = await fetch('new.html');
+                const text = await res.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                const cards = doc.querySelectorAll('.update-card');
+                if (cards.length > 0) {
+                    const firstCard = cards[0];
+                    const iconSpan = firstCard.querySelector('.icon-box span');
+                    const h4 = firstCard.querySelector('h4');
+                    const p = firstCard.querySelector('p');
+                    document.getElementById('latest-update-card').innerHTML =
+                        '<div class="update-injection">' +
+                            '<div class="update-icon"><span class="material-symbols-rounded">' + (iconSpan ? iconSpan.innerText.trim() : 'info') + '</span></div>' +
+                            '<div class="update-content">' +
+                                '<h4>' + (h4 ? h4.innerText.trim() : 'Update') + '</h4>' +
+                                '<p>' + (p ? p.innerText.trim() : '...') + '</p>' +
+                            '</div>' +
+                        '</div>';
+                }
+            } catch (e) { console.error("Failed to fetch new.html updates:", e); }
+        });
 
-            <div class="card feature-card">
-                <div class="feature-badge" style="background: var(--secondary-light); color: var(--secondary);">
-                    <span class="material-symbols-rounded">analytics</span>
-                </div>
-                <h2>View Analytics</h2>
-                <p>Compare sessions, examine alert distributions, and track your compliance trend.</p>
-                <button class="btn" onclick="location.href='analytics.html'">
-                    View Analytics
-                    <span class="material-symbols-rounded">insights</span>
-                </button>
-            </div>
+        setInterval(() => {
+            const slides = document.querySelectorAll('#hero-slider .hero-slide');
+            if (slides.length < 2) return;
+            let activeIdx = 0;
+            slides.forEach((s, idx) => { if (s.classList.contains('active')) activeIdx = idx; });
+            slides[activeIdx].classList.remove('active');
+            slides[(activeIdx + 1) % slides.length].classList.add('active');
+        }, 6000);
 
-            <div class="card feature-card">
-                <div class="feature-badge" style="background: #E8F5E9; color: #2E7D32;">
-                    <span class="material-symbols-rounded">chat</span>
-                </div>
-                <h2>Mitraa AI Chat</h2>
-                <p>Have an in-depth conversation with Mitraa, your secure AI posture intelligence assistant.</p>
-                <button class="btn" onclick="location.href='chat.html'">
-                    Open AI Chat
-                    <span class="material-symbols-rounded">send</span>
-                </button>
-            </div>
+        setInterval(() => {
+            const slides = document.querySelectorAll('#vid-slideshow .v-slide');
+            if (slides.length < 2) return;
+            let activeIdx = 0;
+            slides.forEach((s, idx) => { if (s.classList.contains('active')) activeIdx = idx; });
+            slides[activeIdx].classList.remove('active');
+            slides[(activeIdx + 1) % slides.length].classList.add('active');
+        }, 4000);
 
+        // ── Inline Mitraa Chat (exact port of chat.html logic) ───────────────
+        let dashSession = null;
+        let dashHistory = [];
 
-            <!-- [v3.0] Cloud Database Card -->
-            <div class="card feature-card">
-                <div class="feature-badge" style="background: #E0F2FE; color: #0284C7;">
-                    <span class="material-symbols-rounded">cloud_sync</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <h2>Cloud Database</h2>
-                    <span id="cloud-session-count-text" style="font-size: 0.9rem; font-weight: 700; color: #0284C7; padding: 4px 10px; background: #F0F9FF; border-radius: 99px;">Loading...</span>
-                </div>
-                <p>Your permanent session logs synced to the cloud.</p>
+        // Initialise auth session when ready
+        (async () => {
+            if (window.summitraAuthReady) dashSession = await window.summitraAuthReady;
+        })();
 
-                <div class="manifest-table-container">
-                    <table class="manifest-light-table">
-                        <thead>
-                            <tr>
-                                <th>SESSION ID</th>
-                                <th>DUR</th>
-                                <th>TILT ALERTS</th>
-                                <th>NECK ALERTS</th>
-                                <th>SLOUCH ALERTS</th>
-                                <th>SCORE</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cloud-ledger-body">
-                        </tbody>
-                    </table>
-                </div>
-                <button class="btn" onclick="location.href='manifest.html'" style="margin-top: 14px; width: 100%;">
-                    <span class="material-symbols-rounded">table_view</span>
-                    Open Session Manifest
-                </button>
-            </div>
+        async function dashAppendMsg(sender, text) {
+            const box = document.getElementById('dash-chat-messages');
+            const div = document.createElement('div');
+            div.className = 'chat-msg ' + (sender === 'bot' ? 'bot' : 'user');
 
-        </section>
-    </main>
+            if (sender === 'bot') {
+                box.appendChild(div);
+                const words = text.split(' ');
+                let current = '';
+                for (let i = 0; i < words.length; i++) {
+                    current += (i === 0 ? '' : ' ') + words[i];
+                    div.innerHTML = typeof marked !== 'undefined' ? marked.parse(current) : current;
+                    box.scrollTop = box.scrollHeight;
+                    await new Promise(r => setTimeout(r, 20));
+                }
+            } else {
+                div.textContent = text;
+                box.appendChild(div);
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        function dashShowTyping() {
+            const box = document.getElementById('dash-chat-messages');
+            const t = document.createElement('div');
+            t.className = 'chat-msg bot'; t.id = 'dash-typing';
+            t.innerHTML = '<span style="opacity:.5">Mitraa is thinking\u2026</span>';
+            box.appendChild(t);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function dashRemoveTyping() {
+            document.getElementById('dash-typing')?.remove();
+        }
+
+        async function dashSendMessage() {
+            const input = document.getElementById('dash-chat-input');
+            const btn   = document.getElementById('dash-chat-send');
+            const text  = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            input.disabled = true;
+            btn.disabled   = true;
+
+            dashHistory.push({ role: 'user', content: text });
+            await dashAppendMsg('user', text);
+            dashShowTyping();
+
+            try {
+                // Refresh session if needed
+                if (!dashSession) {
+                    const { data } = await _supabase.auth.getSession();
+                    dashSession = data.session;
+                }
+                if (!dashSession) throw new Error('Not authenticated. Please log in again.');
+
+                const res = await fetch(
+                    'https://gigpodszdjckhvpzmuuh.supabase.co/functions/v1/conversation-service',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + dashSession.access_token
+                        },
+                        body: JSON.stringify({ messages: dashHistory })
+                    }
+                );
+
+                const rawText = await res.text();
+                let data;
+                try { data = JSON.parse(rawText); } catch { throw new Error('Malformed response from server.'); }
+                if (!res.ok) throw new Error(data.error || 'Request failed (' + res.status + ')');
+
+                dashRemoveTyping();
+                const reply = data.responseText || 'No response received.';
+                dashHistory.push({ role: 'assistant', content: reply });
+                await dashAppendMsg('bot', reply);
+
+            } catch (err) {
+                dashRemoveTyping();
+                await dashAppendMsg('bot', '**Error:** ' + err.message);
+                dashHistory.pop();
+            } finally {
+                input.disabled = false;
+                btn.disabled   = false;
+                input.focus();
+            }
+        }
+    </script></main>
 
     <script>
         function getSessionPct(session) {
@@ -750,3 +1100,13 @@
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+

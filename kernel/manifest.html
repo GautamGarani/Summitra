@@ -33,8 +33,12 @@
         .session-list { display:flex; flex-direction:column; gap:10px; }
         .session-entry { background:var(--card-bg); border:1px solid var(--border-soft); border-radius:16px; overflow:hidden; transition:box-shadow 0.2s,border-color 0.2s; }
         .session-entry:hover { box-shadow:0 4px 20px rgba(0,82,204,0.08); border-color:var(--blue-200); }
-        .session-header-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 80px 40px; align-items:center; padding:0.9rem 1.25rem; cursor:pointer; gap:8px; }
-        .session-header-row:hover { background:rgba(0,82,204,0.02); }
+        .session-header-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 80px 40px 40px 40px;
+            align-items: center; padding: 0.9rem 1.25rem; cursor: pointer;
+            gap: 8px;
+        }.session-header-row:hover { background:rgba(0,82,204,0.02); }
         .sh-id { font-size:0.8rem; color:var(--blue-secondary); font-family:'JetBrains Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .sh-val { font-size:0.88rem; font-weight:600; color:var(--blue-900); text-align:center; }
         .sh-score { font-size:0.88rem; font-weight:800; color:var(--blue-primary); text-align:center; }
@@ -70,7 +74,7 @@
         .hc-input:focus { border-color:var(--blue-primary); }
         .hc-send { background:var(--blue-primary); color:#fff; border:none; border-radius:10px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity 0.2s; flex-shrink:0; }
         .hc-send:hover { opacity:0.85; }
-        .session-table-header { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 80px 40px; gap:8px; padding:0.5rem 1.25rem; font-size:0.72rem; font-weight:700; color:var(--blue-secondary); text-transform:uppercase; letter-spacing:0.05em; }
+        .session-table-header { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 80px 40px 40px 40px; gap:8px; padding:0.5rem 1.25rem; font-size:0.72rem; font-weight:700; color:var(--blue-secondary); text-transform:uppercase; letter-spacing:0.05em; }
         .sth-center { text-align:center; }
         .no-results { text-align:center; padding:3rem; color:var(--blue-secondary); }
         @media (max-width:768px) { .fancy-header{padding:1rem 1.2rem;} .manifest-page{padding:1rem;} .metrics-strip{grid-template-columns:repeat(2,1fr);} .detail-grid{grid-template-columns:repeat(2,1fr);} #mitraa-hover-chat{width:calc(100vw - 32px);right:16px;left:16px;} }
@@ -307,7 +311,9 @@
                         '<span class="sh-val">' + (s.slouch_alerts || 0) + '</span>' +
                         '<span class="sh-score">' + compliance + '</span>' +
                         '<span class="sh-val">' + proprio + '</span>' +
+                        '<button class="secondary-btn" style="padding:4px; border-radius:6px; color:var(--blue-primary); border:none; background:none; cursor:pointer;" onclick="event.stopPropagation(); openMitraaChat(\'' + sid + '\',\'' + date + '\',\'' + compliance + '\',\'' + proprio + '\')" title="Ask Mitraa"><span class="material-symbols-rounded" style="font-size:1.1rem;">auto_awesome</span></button>' +
                         '<button class="delete-row-btn" onclick="deleteSession(event,\'' + sid + '\')" title="Delete"><span class="material-symbols-rounded" style="font-size:1.1rem;">delete</span></button>' +
+                        '<span class="material-symbols-rounded sh-expand" style="font-size:1.4rem;">expand_more</span>' +
                     '</div>' +
                     '<div class="session-detail" id="detail-' + idx + '">' +
                         '<div class="detail-grid">' +
