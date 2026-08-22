@@ -705,14 +705,28 @@ function unlockAudio() {
 const alertSound = new Audio('alert.mp3');
 const successSound = new Audio('success.mp3');
 
+// [v2.0] Cooldown timers — prevent sounds from firing back-to-back when
+// posture state oscillates at the threshold edge (e.g. BadTilt ↔ MultipleBad).
+// Rust still fires play_alert() correctly; only the actual sound is rate-limited.
+const ALERT_COOLDOWN_MS = 4000;  // minimum 4s between alert sounds
+const SUCCESS_COOLDOWN_MS = 2000; // minimum 2s between success sounds
+let lastAlertTime = 0;
+let lastSuccessTime = 0;
+
 window.play_alert = function () {
     if (!audioUnlocked) return;
+    const now = Date.now();
+    if (now - lastAlertTime < ALERT_COOLDOWN_MS) return;
+    lastAlertTime = now;
     alertSound.currentTime = 0;
     alertSound.play().catch(() => { });
 };
 
 window.play_success = function () {
     if (!audioUnlocked) return;
+    const now = Date.now();
+    if (now - lastSuccessTime < SUCCESS_COOLDOWN_MS) return;
+    lastSuccessTime = now;
     successSound.currentTime = 0;
     successSound.play().catch(() => { });
 };

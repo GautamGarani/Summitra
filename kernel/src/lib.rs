@@ -170,12 +170,15 @@ pub fn process_feedback(
     // Deviation & Classification based on Calibration Range
     let (deviation, bad_t, bad_f, bad_v) = calculate_deviation_score(tilt_degrees, forward_degrees, vertical_ratio);
 
-    // Time Filter (Cumulative Drift)
+    // Time Filter (Cumulative Drift) [v3.0]
+    // We cap the increment so even extreme deviations take a few seconds (~2.5s min) to trigger.
     let mut acc = DRIFT_ACCUM.lock().unwrap();
     if deviation > 0.0 {
-        *acc += deviation * 0.1; // Multiplier helps reach 20.0 in ~3s
+        let increment = (deviation * 0.1).min(1.5); 
+        *acc += increment;
     } else {
         *acc *= DRIFT_DECAY;
+        if *acc < 0.1 { *acc = 0.0; } // Prevent lingering accumulation
     }
     let cumulative = *acc;
 
