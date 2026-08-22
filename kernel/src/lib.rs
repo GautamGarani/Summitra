@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use std::sync::Mutex;
 use once_cell::sync::Lazy;
 
-// =========================================================
+// ========================================================= [v1.0]
 // STATE DESCRIPTORS
 // =========================================================
 #[derive(PartialEq, Clone, Copy)]
@@ -17,7 +17,7 @@ enum PostureState {
 
 const BUFFER_SIZE: usize = 20;
 
-// =========================================================
+// ========================================================= [v1.0]
 // BUFFERS
 // =========================================================
 static TILT_BUFFER: Lazy<Mutex<VecDeque<f32>>> =
@@ -32,7 +32,7 @@ static VERTICAL_BUFFER: Lazy<Mutex<VecDeque<f32>>> =
 static LAST_STATE: Lazy<Mutex<PostureState>> =
     Lazy::new(|| Mutex::new(PostureState::Good));
 
-// =========================================================
+// ========================================================= [v1.0]
 // DRIFT MEMORY (Constants tailored for 180ms loop)
 // =========================================================
 static DRIFT_ACCUM: Lazy<Mutex<f32>> =
@@ -42,7 +42,7 @@ const CUMULATIVE_ALERT_THRESHOLD: f32 = 20.0;
 const DRIFT_DECAY: f32 = 0.85; 
 const INSTABILITY_THRESHOLD: f32 = 8.0; 
 
-// =========================================================
+// ========================================================= [v1.0]
 // CALIBRATION (DYNAMIC BOUNDARIES)
 // =========================================================
 struct CalibrationState {
@@ -75,7 +75,7 @@ extern "C" {
     fn play_success();
 }
 
-// =========================================================
+// ========================================================= [v1.0]
 // CALIBRATION: Recording User's Proprioceptive Range
 // =========================================================
 fn update_calibration(tilt: f32, forward: f32, vertical: f32) {
@@ -96,7 +96,7 @@ fn update_calibration(tilt: f32, forward: f32, vertical: f32) {
     }
 }
 
-// =========================================================
+// ========================================================= [v1.0]
 // DECISION LOGIC: 10% Buffer Range & Speed Check
 // =========================================================
 fn calculate_deviation_score(tilt: f32, forward: f32, vertical: f32) -> (f32, bool, bool, bool) {
@@ -142,13 +142,30 @@ pub fn process_feedback(
 
     update_calibration(tilt_degrees, forward_degrees, vertical_ratio);
 
-    // Speed Calculation (Instability)
+    // Speed Calculation (Instability) [v1.0]
     let mut tbuf = TILT_BUFFER.lock().unwrap();
     if tbuf.len() >= BUFFER_SIZE { tbuf.pop_front(); }
     tbuf.push_back(tilt_degrees);
     let mean = tbuf.iter().sum::<f32>() / tbuf.len() as f32;
-    let instability = (tbuf.iter().map(|x| (x - mean).powi(2)).sum::<f32>() / tbuf.len() as f32).sqrt();
+    let tilt_instability = (tbuf.iter().map(|x| (x - mean).powi(2)).sum::<f32>() / tbuf.len() as f32).sqrt();
     drop(tbuf);
+
+    // Per-Dimension Instability: Forward & Vertical [v2.0]
+    // Each axis now has its own stability score so that a jittery head tilt
+    // no longer masks a slow, deliberate forward lean or slouch.
+    let mut fbuf = FORWARD_BUFFER.lock().unwrap();
+    if fbuf.len() >= BUFFER_SIZE { fbuf.pop_front(); }
+    fbuf.push_back(forward_degrees);
+    let fmean = fbuf.iter().sum::<f32>() / fbuf.len() as f32;
+    let forward_instability = (fbuf.iter().map(|x| (x - fmean).powi(2)).sum::<f32>() / fbuf.len() as f32).sqrt();
+    drop(fbuf);
+
+    let mut vbuf = VERTICAL_BUFFER.lock().unwrap();
+    if vbuf.len() >= BUFFER_SIZE { vbuf.pop_front(); }
+    vbuf.push_back(vertical_ratio);
+    let vmean = vbuf.iter().sum::<f32>() / vbuf.len() as f32;
+    let slouch_instability = (vbuf.iter().map(|x| (x - vmean).powi(2)).sum::<f32>() / vbuf.len() as f32).sqrt();
+    drop(vbuf);
 
     // Deviation & Classification based on Calibration Range
     let (deviation, bad_t, bad_f, bad_v) = calculate_deviation_score(tilt_degrees, forward_degrees, vertical_ratio);
@@ -162,12 +179,13 @@ pub fn process_feedback(
     }
     let cumulative = *acc;
 
-    // Out of range AND Moving Slow AND Persistent
-    let gate = deviation > 0.0 && instability < INSTABILITY_THRESHOLD && cumulative > CUMULATIVE_ALERT_THRESHOLD;
-
-    let is_tilt_bad = bad_t && tilt_on && gate;
-    let is_forward_bad = bad_f && forward_on && gate;
-    let is_slouch_bad = bad_v && slouch_on && gate;
+    // Out of range AND Moving Slow AND Persistent [v1.0]
+    // Per-Dimension Gates: each axis uses its own instability score [v2.0]
+    // base_gate checks deviation and drift; each axis additionally checks its own motion stability.
+    let base_gate = deviation > 0.0 && cumulative > CUMULATIVE_ALERT_THRESHOLD;
+    let is_tilt_bad = bad_t && tilt_on && base_gate && tilt_instability < INSTABILITY_THRESHOLD;
+    let is_forward_bad = bad_f && forward_on && base_gate && forward_instability < INSTABILITY_THRESHOLD;
+    let is_slouch_bad = bad_v && slouch_on && base_gate && slouch_instability < INSTABILITY_THRESHOLD;
 
     // Determine current state including Slouching
     let current_state = match (is_tilt_bad, is_forward_bad, is_slouch_bad) {
@@ -184,6 +202,11 @@ pub fn process_feedback(
 
     match (prev, current_state) {
         (PostureState::Good, s) if s != PostureState::Good => {
+            play_alert();
+            match_state_text(current_state)
+        }
+        // Bad→DifferentBad: alert fires when posture shifts between bad types [v2.0]
+        (p, s) if p != PostureState::Good && s != PostureState::Good && p != s => {
             play_alert();
             match_state_text(current_state)
         }
