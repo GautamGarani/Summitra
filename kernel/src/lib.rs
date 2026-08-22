@@ -180,12 +180,13 @@ pub fn process_feedback(
     let cumulative = *acc;
 
     // Out of range AND Moving Slow AND Persistent [v1.0]
-    // Per-Dimension Gates: each axis uses its own instability score [v2.0]
-    // base_gate checks deviation and drift; each axis additionally checks its own motion stability.
-    let base_gate = deviation > 0.0 && cumulative > CUMULATIVE_ALERT_THRESHOLD;
-    let is_tilt_bad = bad_t && tilt_on && base_gate && tilt_instability < INSTABILITY_THRESHOLD;
-    let is_forward_bad = bad_f && forward_on && base_gate && forward_instability < INSTABILITY_THRESHOLD;
-    let is_slouch_bad = bad_v && slouch_on && base_gate && slouch_instability < INSTABILITY_THRESHOLD;
+    // Per-Dimension Instability tracked above [v2.0]; global gate uses max so ANY jittery axis
+    // suppresses all alerts — prevents a jittery head tilt from masking false forward/slouch fires. [v2.0]
+    let global_instability = tilt_instability.max(forward_instability).max(slouch_instability);
+    let base_gate = deviation > 0.0 && cumulative > CUMULATIVE_ALERT_THRESHOLD && global_instability < INSTABILITY_THRESHOLD;
+    let is_tilt_bad = bad_t && tilt_on && base_gate;
+    let is_forward_bad = bad_f && forward_on && base_gate;
+    let is_slouch_bad = bad_v && slouch_on && base_gate;
 
     // Determine current state including Slouching
     let current_state = match (is_tilt_bad, is_forward_bad, is_slouch_bad) {
@@ -196,6 +197,20 @@ pub fn process_feedback(
         _ => PostureState::MultipleBad
     };
 
+    // Build descriptive text for current state [v2.0]
+    // MultipleBad now lists specific axes so the user knows exactly what to fix.
+    // Keywords chosen to avoid "Lateral", "Forward", "Slouch" so live.js multiple_alerts DB count is preserved.
+    let state_text: String = match current_state {
+        PostureState::MultipleBad => {
+            let mut parts: Vec<&str> = Vec::new();
+            if is_tilt_bad    { parts.push("Head Tilt"); }
+            if is_forward_bad { parts.push("Neck Lean"); }
+            if is_slouch_bad  { parts.push("Back Posture"); }
+            format!("Alert: Multiple Issues - {}", parts.join(" + "))
+        }
+        _ => match_state_text(current_state),
+    };
+
     let mut last_state = LAST_STATE.lock().unwrap();
     let prev = *last_state;
     *last_state = current_state;
@@ -203,18 +218,18 @@ pub fn process_feedback(
     match (prev, current_state) {
         (PostureState::Good, s) if s != PostureState::Good => {
             play_alert();
-            match_state_text(current_state)
+            state_text
         }
         // Bad→DifferentBad: alert fires when posture shifts between bad types [v2.0]
         (p, s) if p != PostureState::Good && s != PostureState::Good && p != s => {
             play_alert();
-            match_state_text(current_state)
+            state_text
         }
         (s, PostureState::Good) if s != PostureState::Good => {
             if success_on { play_success(); }
-            match_state_text(current_state)
+            state_text
         }
-        _ => match_state_text(current_state)
+        _ => state_text
     }
 }
 
