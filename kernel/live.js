@@ -628,18 +628,19 @@ async function startCoach() {
                         return; // Halt loop
                     }
 
-                    // [v3.0] Update Live UI Timer
+                    // [v3.0] Update Live UI Timer (Countdown)
+                    let remainingSeconds = Math.max(0, 900 - elapsedSeconds);
                     let displayTimer = document.getElementById("session-timer-display");
                     if (displayTimer) {
-                        let mins = Math.floor(elapsedSeconds / 60);
-                        let secs = Math.floor(elapsedSeconds % 60);
+                        let mins = Math.floor(remainingSeconds / 60);
+                        let secs = Math.floor(remainingSeconds % 60);
                         displayTimer.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                     }
                     
                     let timerWarning = document.getElementById("session-timer-warning");
                     if (timerWarning) {
-                        // Max limit is 120s (2 min), warn when 60s or less remains
-                        if (120 - elapsedSeconds <= 60 && elapsedSeconds < 120) {
+                        // Warn when 60s or less remains
+                        if (remainingSeconds <= 60 && remainingSeconds > 0) {
                             timerWarning.style.display = "block";
                         } else {
                             timerWarning.style.display = "none";

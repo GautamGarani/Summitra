@@ -146,7 +146,7 @@ pub fn process_feedback(
     // Edit this variable to change the maximum session length.
     // Enforced in Rust to prevent tampering via browser console.
     // =========================================================
-    let max_session_seconds: f32 = 120.0; // 2 minutes
+    let max_session_seconds: f32 = 900.0; // 15 minutes
     
     if elapsed_seconds >= max_session_seconds {
         return "TERMINATE_SESSION".to_string();
